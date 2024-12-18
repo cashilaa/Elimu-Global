@@ -1,0 +1,7 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Book shape -->
+  <path d="M8 10C8 8 10 5 20 5C30 5 32 8 32 10V30C32 28 30 25 20 25C10 25 8 28 8 30V10Z" fill="#4A90E2"/>
+  <path d="M8 10V30" stroke="#2D6BC1" stroke-width="2"/>
+  <!-- Pages -->
+  <path d="M12 12H28M12 16H28M12 20H20" stroke="white" stroke-width="2"/>
+</svg> 

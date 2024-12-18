@@ -1,0 +1,16 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Head -->
+  <circle cx="100" cy="60" r="45" fill="#FFD93D"/>
+  <!-- Body -->
+  <path d="M50 180V120C50 97.909 67.909 80 90 80H110C132.091 80 150 97.909 150 120V180H50Z" fill="#4A90E2"/>
+  <!-- Face -->
+  <circle cx="85" cy="55" r="5" fill="#000"/>
+  <circle cx="115" cy="55" r="5" fill="#000"/>
+  <path d="M90 70C90 70 95 75 100 75C105 75 110 70 110 70" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+  <!-- Hair -->
+  <path d="M60 40C60 40 70 20 100 20C130 20 140 40 140 40" fill="#663300"/>
+  <!-- Glasses -->
+  <rect x="75" y="50" width="20" height="10" rx="5" stroke="#000" stroke-width="2" fill="none"/>
+  <rect x="105" y="50" width="20" height="10" rx="5" stroke="#000" stroke-width="2" fill="none"/>
+  <path d="M95 55H105" stroke="#000" stroke-width="2"/>
+</svg> 
