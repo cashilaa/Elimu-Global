@@ -14,105 +14,81 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstructorController = void 0;
 const common_1 = require("@nestjs/common");
-const platform_express_1 = require("@nestjs/platform-express");
-const multer_1 = require("multer");
-const path_1 = require("path");
 const instructor_service_1 = require("./instructor.service");
 const create_instructor_dto_1 = require("./dto/create-instructor.dto");
+const update_instructor_dto_1 = require("./dto/update-instructor.dto");
+const auth_service_1 = require("../auth/auth.service");
 let InstructorController = class InstructorController {
-    constructor(instructorService) {
+    constructor(instructorService, authService) {
         this.instructorService = instructorService;
+        this.authService = authService;
     }
-    async register(createInstructorDto, file) {
-        try {
-            // Parse JSON strings back to objects
-            const parsedDto = Object.assign(Object.assign({}, createInstructorDto), { socialLinks: typeof createInstructorDto.socialLinks === 'string'
-                    ? JSON.parse(createInstructorDto.socialLinks)
-                    : createInstructorDto.socialLinks, teachingAreas: typeof createInstructorDto.teachingAreas === 'string'
-                    ? JSON.parse(createInstructorDto.teachingAreas)
-                    : createInstructorDto.teachingAreas });
-            // Add profile picture path if file was uploaded
-            if (file) {
-                parsedDto.profilePicture = `/uploads/profiles/${file.filename}`;
-            }
-            const instructor = await this.instructorService.register(parsedDto);
-            return {
-                success: true,
-                message: 'Registration successful!',
-                data: instructor
-            };
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                throw new common_1.BadRequestException(error.message);
-            }
-            throw new common_1.BadRequestException('An unexpected error occurred during registration');
-        }
+    async create(createInstructorDto) {
+        // Use AuthService for registration instead
+        return this.authService.register(createInstructorDto);
     }
-    async login({ email, password }) {
-        try {
-            const result = await this.instructorService.login(email, password);
-            return Object.assign({ success: true }, result);
-        }
-        catch (error) {
-            if (error instanceof common_1.UnauthorizedException) {
-                throw new common_1.UnauthorizedException(error.message);
-            }
-            throw new common_1.BadRequestException('An unexpected error occurred during login');
-        }
+    async login(loginDto) {
+        // Use AuthService for login instead
+        return this.authService.login(loginDto.email, loginDto.password);
     }
-    async findAll() {
-        const instructors = await this.instructorService.findAll();
-        return {
-            success: true,
-            data: instructors
-        };
+    findAll() {
+        return this.instructorService.findAll();
+    }
+    findOne(id) {
+        return this.instructorService.findOne(id);
+    }
+    update(id, updateInstructorDto) {
+        return this.instructorService.update(id, updateInstructorDto);
+    }
+    remove(id) {
+        return this.instructorService.remove(id);
     }
 };
 __decorate([
-    (0, common_1.Post)('register'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.CREATED),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('profilePicture', {
-        storage: (0, multer_1.diskStorage)({
-            destination: './uploads/profiles',
-            filename: (req, file, callback) => {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-                callback(null, `${uniqueSuffix}${(0, path_1.extname)(file.originalname)}`);
-            }
-        }),
-        fileFilter: (req, file, callback) => {
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-                return callback(new common_1.BadRequestException('Only image files are allowed!'), false);
-            }
-            callback(null, true);
-        },
-        limits: {
-            fileSize: 5 * 1024 * 1024 // 5MB
-        }
-    })),
+    (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_instructor_dto_1.CreateInstructorDto, Object]),
+    __metadata("design:paramtypes", [create_instructor_dto_1.CreateInstructorDto]),
     __metadata("design:returntype", Promise)
-], InstructorController.prototype, "register", null);
+], InstructorController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)('login'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], InstructorController.prototype, "login", null);
 __decorate([
-    (0, common_1.Post)('findAll'),
-    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], InstructorController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], InstructorController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, update_instructor_dto_1.UpdateInstructorDto]),
+    __metadata("design:returntype", void 0)
+], InstructorController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], InstructorController.prototype, "remove", null);
 InstructorController = __decorate([
-    (0, common_1.Controller)('api/instructors'),
-    __metadata("design:paramtypes", [instructor_service_1.InstructorService])
+    (0, common_1.Controller)('instructors'),
+    __metadata("design:paramtypes", [instructor_service_1.InstructorService,
+        auth_service_1.AuthService])
 ], InstructorController);
 exports.InstructorController = InstructorController;

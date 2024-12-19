@@ -1,94 +1,45 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, BadRequestException, UseInterceptors, UploadedFile, UnauthorizedException } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { InstructorService } from './instructor.service';
 import { CreateInstructorDto } from './dto/create-instructor.dto';
+import { UpdateInstructorDto } from './dto/update-instructor.dto';
+import { AuthService } from '../auth/auth.service';
 
-@Controller('api/instructors')
+@Controller('instructors')
 export class InstructorController {
-  constructor(private readonly instructorService: InstructorService) {}
+  constructor(
+    private readonly instructorService: InstructorService,
+    private readonly authService: AuthService
+  ) {}
 
-  @Post('register')
-  @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor('profilePicture', {
-    storage: diskStorage({
-      destination: './uploads/profiles',
-      filename: (req, file, callback) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        callback(null, `${uniqueSuffix}${extname(file.originalname)}`);
-      }
-    }),
-    fileFilter: (req, file, callback) => {
-      if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-        return callback(new BadRequestException('Only image files are allowed!'), false);
-      }
-      callback(null, true);
-    },
-    limits: {
-      fileSize: 5 * 1024 * 1024 // 5MB
-    }
-  }))
-  async register(
-    @Body() createInstructorDto: CreateInstructorDto,
-    @UploadedFile() file?: Express.Multer.File
-  ) {
-    try {
-      // Parse JSON strings back to objects
-      const parsedDto = {
-        ...createInstructorDto,
-        socialLinks: typeof createInstructorDto.socialLinks === 'string' 
-          ? JSON.parse(createInstructorDto.socialLinks)
-          : createInstructorDto.socialLinks,
-        teachingAreas: typeof createInstructorDto.teachingAreas === 'string'
-          ? JSON.parse(createInstructorDto.teachingAreas)
-          : createInstructorDto.teachingAreas
-      };
-
-      // Add profile picture path if file was uploaded
-      if (file) {
-        parsedDto.profilePicture = `/uploads/profiles/${file.filename}`;
-      }
-
-      const instructor = await this.instructorService.register(parsedDto);
-      
-      return {
-        success: true,
-        message: 'Registration successful!',
-        data: instructor
-      };
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        throw new BadRequestException(error.message);
-      }
-      throw new BadRequestException('An unexpected error occurred during registration');
-    }
+  @Post()
+  async create(@Body() createInstructorDto: CreateInstructorDto) {
+    // Use AuthService for registration instead
+    return this.authService.register(createInstructorDto);
   }
 
   @Post('login')
-  @HttpCode(HttpStatus.OK)
-  async login(@Body() { email, password }: { email: string; password: string }) {
-    try {
-      const result = await this.instructorService.login(email, password);
-      return {
-        success: true,
-        ...result
-      };
-    } catch (error) {
-      if (error instanceof UnauthorizedException) {
-        throw new UnauthorizedException(error.message);
-      }
-      throw new BadRequestException('An unexpected error occurred during login');
-    }
+  async login(@Body() loginDto: { email: string; password: string }) {
+    // Use AuthService for login instead
+    return this.authService.login(loginDto.email, loginDto.password);
   }
 
-  @Post('findAll')
-  @HttpCode(HttpStatus.OK)
-  async findAll() {
-    const instructors = await this.instructorService.findAll();
-    return {
-      success: true,
-      data: instructors
-    };
+  @Get()
+  findAll() {
+    return this.instructorService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.instructorService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateInstructorDto: UpdateInstructorDto) {
+    return this.instructorService.update(id, updateInstructorDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.instructorService.remove(id);
   }
 }

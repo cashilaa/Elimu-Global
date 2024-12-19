@@ -1,157 +1,159 @@
 import React, { useState } from 'react';
-import { Link, useLocation, Outlet } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  LayoutDashboard,
-  BookOpen,
-  Video,
-  Users,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Sun,
-  Moon,
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  LayoutDashboard, BookOpen, Users, Calendar, Settings, 
+  LogOut, Menu, X, Bell, Search 
 } from 'lucide-react';
 
-const navigation = [
-  { name: 'Dashboard', href: '/instructor/dashboard', icon: LayoutDashboard },
-  { name: 'Courses', href: '/instructor/courses', icon: BookOpen },
-  { name: 'Online Classes', href: '/instructor/zoom-meetings', icon: Video },
-  { name: 'Students', href: '/instructor/students', icon: Users },
-  { name: 'Settings', href: '/instructor/settings', icon: Settings },
-];
-
 const DashboardLayout = () => {
-  const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
+  const navigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Courses', href: '/dashboard/courses', icon: BookOpen },
+    { name: 'Students', href: '/dashboard/students', icon: Users },
+    { name: 'Schedule', href: '/dashboard/schedule', icon: Calendar },
+    { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  ];
 
-  const handleLogout = () => {
-    // Add logout logic here
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
+  const NavLink = ({ item }) => {
+    const isActive = location.pathname === item.href;
+    return (
+      <Link
+        to={item.href}
+        className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors
+          ${isActive 
+            ? 'bg-blue-50 text-blue-600' 
+            : 'text-gray-600 hover:bg-gray-50'
+          }
+        `}
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <item.icon className="w-5 h-5" />
+        <span className={`${!isSidebarOpen && 'hidden'}`}>{item.name}</span>
+      </Link>
+    );
   };
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? 'dark' : ''}`}>
-      <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Mobile menu button */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
-          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white dark:bg-gray-800 shadow-lg"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 bg-white rounded-lg shadow-md"
         >
-          {isSidebarOpen ? (
-            <X className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-          ) : (
-            <Menu className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-          )}
+          {isMobileMenuOpen ? <X /> : <Menu />}
         </button>
+      </div>
 
-        {/* Sidebar */}
-        <motion.div
-          className={`${
-            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-          } fixed md:relative md:translate-x-0 z-40 w-64 h-screen transition-transform duration-300 ease-in-out`}
-          initial={false}
-        >
-          <div className="flex flex-col h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-gray-700">
-              <Link to="/instructor/dashboard" className="flex items-center">
-                <img
-                  className="h-8 w-auto"
-                  src="/logo.png"
-                  alt="Elimu Global"
+      {/* Mobile Sidebar Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed top-0 left-0 z-40
+          h-full bg-white border-r border-gray-200
+          transition-all duration-300 ease-in-out
+          ${isSidebarOpen ? 'w-64' : 'w-20'}
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        {/* Logo */}
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-200">
+          <img src="/logo.svg" alt="Logo" className="w-8 h-8" />
+          {isSidebarOpen && <span className="text-xl font-bold">Elimu Global</span>}
+        </div>
+
+        {/* Navigation */}
+        <nav className="p-4 space-y-2">
+          {navigation.map((item) => (
+            <NavLink key={item.name} item={item} />
+          ))}
+        </nav>
+
+        {/* Bottom Section */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+          <button 
+            className="flex items-center gap-3 px-3 py-2 w-full text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            onClick={() => {/* Add logout logic */}}
+          >
+            <LogOut className="w-5 h-5" />
+            {isSidebarOpen && <span>Logout</span>}
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main
+        className={`
+          transition-all duration-300 ease-in-out
+          ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}
+        `}
+      >
+        {/* Top Bar */}
+        <header className="sticky top-0 z-30 bg-white border-b border-gray-200">
+          <div className="flex items-center justify-between px-4 py-4">
+            {/* Desktop Sidebar Toggle */}
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="hidden lg:block p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Search Bar */}
+            <div className="flex-1 max-w-xl mx-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-                  Elimu Global
-                </span>
-              </Link>
+              </div>
             </div>
-            
-            <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
-              <nav className="flex-1 px-2 space-y-1">
-                {navigation.map((item) => {
-                  const isCurrentPage = isActive(item.href);
-                  return (
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                        isCurrentPage
-                          ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300'
-                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <motion.div
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex items-center"
-                      >
-                        <item.icon
-                          className={`mr-3 flex-shrink-0 h-6 w-6 ${
-                            isCurrentPage
-                              ? 'text-blue-600 dark:text-blue-300'
-                              : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-500 dark:group-hover:text-gray-300'
-                          }`}
-                        />
-                        {item.name}
-                      </motion.div>
-                    </Link>
-                  );
-                })}
-              </nav>
 
-              <div className="px-2 space-y-2 mt-auto">
-                {/* Dark mode toggle */}
-                <button
-                  onClick={toggleDarkMode}
-                  className="w-full flex items-center px-2 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  {isDarkMode ? (
-                    <Sun className="mr-3 h-6 w-6" />
-                  ) : (
-                    <Moon className="mr-3 h-6 w-6" />
-                  )}
-                  {isDarkMode ? 'Light Mode' : 'Dark Mode'}
-                </button>
-
-                {/* Logout button */}
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center px-2 py-2 text-sm font-medium text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/50"
-                >
-                  <LogOut className="mr-3 h-6 w-6" />
-                  Logout
-                </button>
+            {/* Right Section */}
+            <div className="flex items-center gap-4">
+              <button className="p-2 hover:bg-gray-100 rounded-lg relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+              </button>
+              <div className="flex items-center gap-3">
+                <img
+                  src="/avatar.jpg"
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full"
+                />
+                <div className="hidden sm:block">
+                  <p className="text-sm font-medium">John Doe</p>
+                  <p className="text-xs text-gray-500">Instructor</p>
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
+        </header>
 
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Outlet />
-              </motion.div>
-            </div>
-          </div>
-        </main>
-      </div>
+        {/* Page Content */}
+        <div className="container mx-auto">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 };

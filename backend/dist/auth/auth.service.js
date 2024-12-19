@@ -50,48 +50,59 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const instructor_schema_1 = require("../instructor/instructor.schema");
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
 const jwt_1 = require("@nestjs/jwt");
+const instructor_schema_1 = require("../instructor/instructor.schema");
+const bcrypt = __importStar(require("bcrypt"));
 let AuthService = class AuthService {
     constructor(instructorModel, jwtService) {
         this.instructorModel = instructorModel;
         this.jwtService = jwtService;
     }
-    async signUp(createInstructorDto, file) {
-        const uploadPath = path.join(__dirname, '..', 'uploads', file.originalname);
-        fs.writeFileSync(uploadPath, file.buffer);
-        createInstructorDto.cv = uploadPath;
-        const createdInstructor = new this.instructorModel(createInstructorDto);
-        return createdInstructor.save();
+    async register(createInstructorDto, file) {
+        const { email } = createInstructorDto;
+        // Check if instructor already exists
+        const existingInstructor = await this.instructorModel.findOne({ email: email.toLowerCase() });
+        if (existingInstructor) {
+            throw new common_1.HttpException('Email already exists', common_1.HttpStatus.BAD_REQUEST);
+        }
+        // Create new instructor
+        const instructor = new this.instructorModel(Object.assign(Object.assign({}, createInstructorDto), { email: email.toLowerCase() }));
+        const savedInstructor = await instructor.save();
+        const instructorData = savedInstructor.toObject();
+        const { password } = instructorData, rest = __rest(instructorData, ["password"]);
+        return rest;
     }
     async login(email, password) {
-        console.log('Login attempt:', { email, password }); // Log the incoming credentials
-        const instructor = await this.instructorModel.findOne({ email }).exec();
-        if (!instructor) {
-            console.log('Instructor not found'); // Log if instructor is not found
-            throw new common_1.UnauthorizedException('Invalid credentials');
+        try {
+            console.log('Attempting to find instructor with email:', email);
+            const instructor = await this.instructorModel.findOne({
+                email: email.toLowerCase()
+            }).select('+password');
+            if (!instructor) {
+                throw new common_1.UnauthorizedException('Invalid email or password');
+            }
+            console.log('Instructor found, verifying password');
+            const isPasswordValid = await bcrypt.compare(password, instructor.password);
+            if (!isPasswordValid) {
+                throw new common_1.UnauthorizedException('Invalid email or password');
+            }
+            console.log('Password verified, generating token');
+            const token = this.jwtService.sign({
+                id: instructor._id,
+                email: instructor.email
+            });
+            const instructorData = instructor.toObject();
+            const { password: _ } = instructorData, rest = __rest(instructorData, ["password"]);
+            return {
+                success: true,
+                token,
+                instructor: rest
+            };
         }
-        const instructorDoc = instructor;
-        const isPasswordValid = await instructorDoc.validatePassword(password);
-        if (!isPasswordValid) {
-            console.log('Invalid password'); // Log if password is invalid
-            throw new common_1.UnauthorizedException('Invalid credentials');
+        catch (error) {
+            console.error('Login service error:', error);
+            throw new common_1.HttpException((error === null || error === void 0 ? void 0 : error.message) || 'An error occurred during login', (error === null || error === void 0 ? void 0 : error.status) || common_1.HttpStatus.BAD_REQUEST);
         }
-        const token = this.generateToken(instructorDoc);
-        const _a = instructorDoc.toObject(), { password: _, validatePassword } = _a, instructorData = __rest(_a, ["password", "validatePassword"]);
-        return {
-            token,
-            instructor: instructorData,
-        };
-    }
-    generateToken(instructor) {
-        const payload = {
-            sub: instructor._id,
-            email: instructor.email
-        };
-        return this.jwtService.sign(payload);
     }
 };
 AuthService = __decorate([

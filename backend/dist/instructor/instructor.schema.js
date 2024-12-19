@@ -34,8 +34,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstructorSchema = exports.Instructor = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
 const bcrypt = __importStar(require("bcrypt"));
-let Instructor = class Instructor {
+let Instructor = class Instructor extends mongoose_2.Document {
     validatePassword(password) {
         return bcrypt.compare(password, this.password);
     }
@@ -85,7 +86,13 @@ __decorate([
     __metadata("design:type", String)
 ], Instructor.prototype, "bio", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: Object }),
+    (0, mongoose_1.Prop)({
+        type: {
+            linkedin: String,
+            twitter: String,
+            website: String,
+        },
+    }),
     __metadata("design:type", Object)
 ], Instructor.prototype, "socialLinks", void 0);
 __decorate([
@@ -93,29 +100,43 @@ __decorate([
     __metadata("design:type", String)
 ], Instructor.prototype, "profilePicture", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: true }),
+    (0, mongoose_1.Prop)({ default: false }),
     __metadata("design:type", Boolean)
 ], Instructor.prototype, "isVerified", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 'pending', enum: ['pending', 'active', 'suspended'] }),
+    __metadata("design:type", String)
+], Instructor.prototype, "status", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [{ type: String, ref: 'Course' }] }),
+    __metadata("design:type", Array)
+], Instructor.prototype, "courses", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], Instructor.prototype, "analytics", void 0);
 Instructor = __decorate([
-    (0, mongoose_1.Schema)({ timestamps: true })
+    (0, mongoose_1.Schema)({
+        timestamps: true,
+        toJSON: {
+            transform: (doc, ret) => {
+                delete ret.password;
+                return ret;
+            },
+        },
+    })
 ], Instructor);
 exports.Instructor = Instructor;
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
-// Add pre-save middleware
-exports.InstructorSchema.pre('save', function (next) {
+// Add password hashing middleware
+exports.InstructorSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
-        bcrypt.genSalt(10, (err, salt) => {
-            if (err)
-                return next(err);
-            bcrypt.hash(this.password, salt, (err, hash) => {
-                if (err)
-                    return next(err);
-                this.password = hash;
-                next();
-            });
-        });
+        const salt = await bcrypt.genSalt();
+        this.password = await bcrypt.hash(this.password, salt);
     }
-    else {
-        next();
-    }
+    next();
 });
+// Add password validation method
+exports.InstructorSchema.methods.validatePassword = async function (password) {
+    return bcrypt.compare(password, this.password);
+};

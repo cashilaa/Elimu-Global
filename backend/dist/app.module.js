@@ -8,35 +8,15 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_module_1 = require("./auth/auth.module");
-const instructor_module_1 = require("./instructor/instructor.module");
-const zoom_module_1 = require("./zoom/zoom.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            config_1.ConfigModule.forRoot({
-                isGlobal: true,
-            }),
-            mongoose_1.MongooseModule.forRootAsync({
-                imports: [config_1.ConfigModule],
-                useFactory: async (configService) => {
-                    const uri = configService.get('MONGODB_URI');
-                    if (!uri) {
-                        throw new Error('MONGODB_URI is not defined');
-                    }
-                    return {
-                        uri,
-                    };
-                },
-                inject: [config_1.ConfigService],
-            }),
+            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb+srv://Shilla:cashi7378@cluster0.20ozn.mongodb.net/elimu_global'),
             auth_module_1.AuthModule,
-            instructor_module_1.InstructorModule,
-            zoom_module_1.ZoomModule,
         ],
     })
 ], AppModule);

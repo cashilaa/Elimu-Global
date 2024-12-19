@@ -15,28 +15,55 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const platform_express_1 = require("@nestjs/platform-express");
-const create_instructor_dto_1 = require("../instructor/create-instructor.dto");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const instructor_schema_1 = require("../instructor/instructor.schema");
 let AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, instructorModel) {
         this.authService = authService;
+        this.instructorModel = instructorModel;
     }
-    async signUp(createInstructorDto, file) {
-        return this.authService.signUp(createInstructorDto, file);
+    async checkInstructor(email) {
+        try {
+            console.log('Checking instructor with email:', email);
+            const instructor = await this.instructorModel.findOne({
+                email: email.toLowerCase().trim()
+            }).exec();
+            console.log('Instructor found:', !!instructor);
+            return {
+                exists: !!instructor,
+                email: email,
+                found: instructor ? true : false
+            };
+        }
+        catch (error) {
+            console.error('Check instructor error:', error);
+            throw new common_1.HttpException('Error checking instructor', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    async login(loginDto) {
-        return this.authService.login(loginDto.email, loginDto.password);
+    async login(body) {
+        try {
+            console.log('Login request received:', body);
+            if (!body.email || !body.password) {
+                throw new common_1.HttpException('Email and password are required', common_1.HttpStatus.BAD_REQUEST);
+            }
+            const result = await this.authService.login(body.email, body.password);
+            console.log('Login result:', result);
+            return result;
+        }
+        catch (error) {
+            console.error('Login error:', error);
+            throw new common_1.HttpException((error === null || error === void 0 ? void 0 : error.message) || 'Login failed', (error === null || error === void 0 ? void 0 : error.status) || common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 };
 __decorate([
-    (0, common_1.Post)('signup'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('cv')),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.UploadedFile)()),
+    (0, common_1.Get)('check/:email'),
+    __param(0, (0, common_1.Param)('email')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_instructor_dto_1.CreateInstructorDto, Object]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], AuthController.prototype, "signUp", null);
+], AuthController.prototype, "checkInstructor", null);
 __decorate([
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Body)()),
@@ -45,7 +72,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 AuthController = __decorate([
-    (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    (0, common_1.Controller)('instructors'),
+    __param(1, (0, mongoose_1.InjectModel)(instructor_schema_1.Instructor.name)),
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        mongoose_2.Model])
 ], AuthController);
 exports.AuthController = AuthController;

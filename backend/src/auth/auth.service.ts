@@ -1,64 +1,80 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Instructor, InstructorDocument } from '../instructor/instructor.schema';
-import { CreateInstructorDto } from '../instructor/create-instructor.dto';
-import * as fs from 'fs';
-import * as path from 'path';
-import { Express } from 'express';
 import { JwtService } from '@nestjs/jwt';
-
-type InstructorResponse = Omit<Instructor, 'password' | 'validatePassword'>;
+import { Instructor } from '../instructor/instructor.schema';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(Instructor.name) private readonly instructorModel: Model<InstructorDocument>,
-    private readonly jwtService: JwtService,
+    @InjectModel(Instructor.name) private instructorModel: Model<Instructor>,
+    private jwtService: JwtService,
   ) {}
 
-  async signUp(createInstructorDto: CreateInstructorDto, file: Express.Multer.File): Promise<Instructor> {
-    const uploadPath = path.join(__dirname, '..', 'uploads', file.originalname);
-    fs.writeFileSync(uploadPath, file.buffer);
-    createInstructorDto.cv = uploadPath;
-    const createdInstructor = new this.instructorModel(createInstructorDto);
-    return createdInstructor.save();
+  async register(createInstructorDto: any, file?: Express.Multer.File) {
+    const { email } = createInstructorDto;
+
+    // Check if instructor already exists
+    const existingInstructor = await this.instructorModel.findOne({ email: email.toLowerCase() });
+    if (existingInstructor) {
+      throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
+    }
+
+    // Create new instructor
+    const instructor = new this.instructorModel({
+      ...createInstructorDto,
+      email: email.toLowerCase(),
+    });
+
+    const savedInstructor = await instructor.save();
+    const instructorData = savedInstructor.toObject();
+    const { password, ...rest } = instructorData;
+
+    return rest;
   }
 
-  async login(email: string, password: string): Promise<{ token: string; instructor: InstructorResponse }> {
-    console.log('Login attempt:', { email, password }); // Log the incoming credentials
+  async login(email: string, password: string) {
+    try {
+      console.log('Attempting to find instructor with email:', email);
 
-    const instructor = await this.instructorModel.findOne({ email }).exec();
-    
-    if (!instructor) {
-        console.log('Instructor not found'); // Log if instructor is not found
-        throw new UnauthorizedException('Invalid credentials');
-    }
+      const instructor = await this.instructorModel.findOne({ 
+        email: email.toLowerCase() 
+      }).select('+password');
 
-    const instructorDoc = instructor as InstructorDocument;
+      if (!instructor) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
 
-    const isPasswordValid = await instructorDoc.validatePassword(password);
-    
-    if (!isPasswordValid) {
-        console.log('Invalid password'); // Log if password is invalid
-        throw new UnauthorizedException('Invalid credentials');
-    }
+      console.log('Instructor found, verifying password');
 
-    const token = this.generateToken(instructorDoc);
-    
-    const { password: _, validatePassword, ...instructorData } = instructorDoc.toObject();
-    
-    return {
+      const isPasswordValid = await bcrypt.compare(password, instructor.password);
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid email or password');
+      }
+
+      console.log('Password verified, generating token');
+
+      const token = this.jwtService.sign({
+        id: instructor._id,
+        email: instructor.email
+      });
+
+      const instructorData = instructor.toObject();
+      const { password: _, ...rest } = instructorData;
+
+      return {
+        success: true,
         token,
-        instructor: instructorData as InstructorResponse,
-    };
-  }
+        instructor: rest
+      };
 
-  private generateToken(instructor: InstructorDocument): string {
-    const payload = { 
-      sub: instructor._id, 
-      email: instructor.email 
-    };
-    return this.jwtService.sign(payload);
+    } catch (error: any) {
+      console.error('Login service error:', error);
+      throw new HttpException(
+        error?.message || 'An error occurred during login',
+        error?.status || HttpStatus.BAD_REQUEST
+      );
+    }
   }
 }

@@ -4,6 +4,8 @@ import {
   User, Briefcase, FileText, Award, Globe, MessageCircle, 
   Star, ArrowRight, ArrowLeft, Mail, Lock, Eye, EyeOff 
 } from 'lucide-react';
+import Testimonial from './ui/Testimonial';
+import BlobButton from './ui/BlobButton';
 
 const INITIAL_FORM_STATE = {
   firstName: '',
@@ -32,6 +34,15 @@ const InstructorForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM_STATE);
   const [previewUrl, setPreviewUrl] = useState(null);
+
+  const inputClasses = `
+    mt-1 block w-full px-4 py-3 
+    bg-white border-b border-gray-200
+    focus:ring-0 focus:border-blue-500
+    transition-all duration-200
+    hover:border-b-blue-300
+    ${showPassword ? 'pr-12' : 'pr-4'}
+  `;
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -163,7 +174,7 @@ const InstructorForm = () => {
         return (
           <div className="space-y-4">
             <div className="flex flex-col items-center space-y-4 mb-6">
-              <div className="relative group">
+              <div className="relative group cursor-pointer transform transition-all duration-200 hover:scale-105">
                 {previewUrl ? (
                   <img
                     src={previewUrl}
@@ -198,7 +209,7 @@ const InstructorForm = () => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={inputClasses}
                   placeholder="Enter your first name"
                 />
               </div>
@@ -209,7 +220,7 @@ const InstructorForm = () => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={inputClasses}
                   placeholder="Enter your last name"
                 />
               </div>
@@ -223,7 +234,7 @@ const InstructorForm = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={inputClasses}
                   placeholder="Enter your email"
                 />
               </div>
@@ -237,7 +248,7 @@ const InstructorForm = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={inputClasses}
                   placeholder="Create a password"
                 />
                 <button
@@ -261,7 +272,7 @@ const InstructorForm = () => {
                 name="expertise"
                 value={formData.expertise}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 placeholder="Your main area of expertise"
               />
             </div>
@@ -272,7 +283,7 @@ const InstructorForm = () => {
                 name="experience"
                 value={formData.experience}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 placeholder="Years of teaching experience"
               />
             </div>
@@ -282,7 +293,7 @@ const InstructorForm = () => {
                 name="education"
                 value={formData.education}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 rows="3"
                 placeholder="Your educational background"
               />
@@ -293,7 +304,7 @@ const InstructorForm = () => {
                 name="certification"
                 value={formData.certification}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 rows="3"
                 placeholder="Relevant certifications"
               />
@@ -310,7 +321,7 @@ const InstructorForm = () => {
                 name="teachingAreas"
                 value={formData.teachingAreas.join(', ')}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 placeholder="Enter subjects (comma-separated)"
               />
             </div>
@@ -320,7 +331,7 @@ const InstructorForm = () => {
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 rows="4"
                 placeholder="Tell us about yourself"
               />
@@ -337,7 +348,7 @@ const InstructorForm = () => {
                 name="socialLinks.linkedin"
                 value={formData.socialLinks.linkedin}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 placeholder="LinkedIn URL"
               />
             </div>
@@ -348,7 +359,7 @@ const InstructorForm = () => {
                 name="socialLinks.twitter"
                 value={formData.socialLinks.twitter}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 placeholder="Twitter URL"
               />
             </div>
@@ -359,7 +370,7 @@ const InstructorForm = () => {
                 name="socialLinks.website"
                 value={formData.socialLinks.website}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className={inputClasses}
                 placeholder="Website URL"
               />
             </div>
@@ -371,91 +382,117 @@ const InstructorForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="px-6 py-8 sm:p-10">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 text-center">
-                Instructor Registration
-              </h2>
-              <p className="mt-2 text-sm text-gray-600 text-center">
-                Join our community of educators and start sharing your knowledge
-              </p>
-            </div>
+    <div className="min-h-screen flex">
+      {/* Form Section */}
+      <div className="flex-1 relative">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-100" />
+        <div className="relative h-full overflow-y-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="max-w-xl mx-auto">
+            <div className="bg-white/80 backdrop-blur-lg">
+              <div className="px-4 py-6 sm:px-8 sm:py-8">
+                <div className="mb-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-blue-600 text-center">
+                    Instructor Registration
+                  </h2>
+                  <p className="mt-2 text-sm text-gray-600 text-center">
+                    Join our community of educators and start sharing your knowledge
+                  </p>
+                </div>
 
-            {/* Progress Steps */}
-            <div className="mb-8">
-              <div className="flex justify-center items-center space-x-2">
-                {['Account', 'Qualifications', 'Profile', 'Social'].map((step, index) => (
-                  <div key={step} className="flex items-center">
-                    <div className={`
-                      flex items-center justify-center w-8 h-8 rounded-full 
-                      ${formStep === index 
-                        ? 'bg-blue-600 text-white' 
-                        : formStep > index 
-                          ? 'bg-green-500 text-white'
-                          : 'bg-gray-200 text-gray-600'
-                      }
-                    `}>
-                      {formStep > index ? '✓' : index + 1}
-                    </div>
-                    {index < 3 && (
-                      <div className={`w-12 h-1 mx-2 ${
-                        formStep > index ? 'bg-green-500' : 'bg-gray-200'
-                      }`} />
+                {/* Progress Steps */}
+                <div className="mb-8 sm:mb-10 overflow-x-auto">
+                  <div className="flex justify-center items-center min-w-max px-4">
+                    {['Account', 'Qualifications', 'Profile', 'Social'].map((step, index) => (
+                      <div key={step} className="flex items-center">
+                        <div className={`
+                          flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full 
+                          transition-all duration-300 ease-in-out
+                          ${formStep === index 
+                            ? 'bg-blue-600 text-white ring-4 ring-blue-100' 
+                            : formStep > index 
+                              ? 'bg-green-500 text-white'
+                              : 'bg-gray-100 text-gray-400'
+                          }
+                        `}>
+                          {formStep > index ? '✓' : index + 1}
+                        </div>
+                        {index < 3 && (
+                          <div className={`w-8 sm:w-16 h-1 mx-1 sm:mx-2 rounded-full transition-all duration-300 ${
+                            formStep > index ? 'bg-green-500' : 'bg-gray-200'
+                          }`} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-center mt-2 space-x-4 sm:space-x-16 min-w-max px-4">
+                    {['Account', 'Qualifications', 'Profile', 'Social'].map((step, index) => (
+                      <span key={step} className={`text-xs font-medium ${
+                        formStep >= index ? 'text-blue-600' : 'text-gray-400'
+                      }`}>
+                        {step}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="bg-white/50 backdrop-blur p-4 sm:p-6">
+                    {renderStepContent()}
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="flex flex-col sm:flex-row justify-between pt-6 gap-4">
+                    {formStep > 0 && (
+                      <BlobButton
+                        type="button"
+                        onClick={prevStep}
+                        variant="secondary"
+                        className="sm:w-1/3"
+                      >
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Previous
+                      </BlobButton>
+                    )}
+                    {formStep < 3 ? (
+                      <BlobButton
+                        type="button"
+                        onClick={nextStep}
+                        className={formStep === 0 ? 'w-full' : 'sm:w-2/3'}
+                      >
+                        Next
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </BlobButton>
+                    ) : (
+                      <BlobButton
+                        type="submit"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                          </>
+                        ) : (
+                          'Complete Registration'
+                        )}
+                      </BlobButton>
                     )}
                   </div>
-                ))}
+                </form>
               </div>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {renderStepContent()}
-
-              <div className="flex justify-between pt-4">
-                {formStep > 0 && (
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Previous
-                  </button>
-                )}
-                {formStep < 3 ? (
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className={`${!formStep && 'w-full'} ml-auto inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                  >
-                    Next
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </button>
-                ) : (
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Processing...
-                      </>
-                    ) : (
-                      'Complete Registration'
-                    )}
-                  </button>
-                )}
-              </div>
-            </form>
           </div>
         </div>
+      </div>
+
+      {/* Image & Testimonials Section */}
+      <div className="hidden lg:block lg:w-1/2 relative">
+        <div className="absolute inset-0 bg-cover bg-center" 
+             style={{ backgroundImage: "url('/images/teacher-background.jpg')" }} />
+        <Testimonial />
       </div>
     </div>
   );
