@@ -45,7 +45,20 @@ const Dashboard = () => {
       students: 25,
       type: 'Live Session'
     },
-    // Add more sessions...
+    {
+      title: 'Advanced JavaScript Concepts',
+      time: '4:00 PM - 5:30 PM',
+      date: 'Tomorrow',
+      students: 18,
+      type: 'Live Session'
+    },
+    {
+      title: 'Web Development Basics',
+      time: '10:00 AM - 11:30 AM',
+      date: 'Dec 22, 2023',
+      students: 30,
+      type: 'Live Session'
+    }
   ];
 
   const recentActivities = [
@@ -54,8 +67,32 @@ const Dashboard = () => {
       message: 'New student enrolled in React Fundamentals',
       time: '2 hours ago'
     },
-    // Add more activities...
+    {
+      type: 'completion',
+      message: 'Sarah completed JavaScript Basics course',
+      time: '4 hours ago'
+    },
+    {
+      type: 'review',
+      message: 'New 5-star review on Advanced React Patterns',
+      time: '6 hours ago'
+    }
   ];
+
+  const StatCard = ({ stat }) => (
+    <Card className="hover:translate-y-[-4px] transition-transform">
+      <CardContent className="flex items-start justify-between">
+        <div>
+          <p className="text-sm font-medium text-gray-600">{stat.title}</p>
+          <h3 className="text-2xl font-bold mt-2 text-gray-900">{stat.value}</h3>
+          <p className={`text-sm mt-1 text-${stat.color}-600`}>{stat.change}</p>
+        </div>
+        <div className={`p-3 bg-${stat.color}-50 rounded-lg`}>
+          <stat.icon className={`w-6 h-6 text-${stat.color}-500`} />
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -67,25 +104,14 @@ const Dashboard = () => {
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
           <Bell size={20} />
-          <span>Notifications</span>
+          <span className="hidden sm:inline">Notifications</span>
         </button>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
-          <Card key={index} className="hover:translate-y-[-4px] transition-transform">
-            <CardContent className="flex items-start justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                <h3 className="text-2xl font-bold mt-2 text-gray-900">{stat.value}</h3>
-                <p className={`text-sm mt-1 text-${stat.color}-600`}>{stat.change}</p>
-              </div>
-              <div className={`p-3 bg-${stat.color}-50 rounded-lg`}>
-                <stat.icon className={`w-6 h-6 text-${stat.color}-500`} />
-              </div>
-            </CardContent>
-          </Card>
+          <StatCard key={index} stat={stat} />
         ))}
       </div>
 
@@ -102,17 +128,22 @@ const Dashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {upcomingSessions.map((session, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div 
+                  key={index} 
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-blue-100 rounded-lg">
                       <Clock className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
                       <h4 className="font-medium text-gray-900">{session.title}</h4>
-                      <p className="text-sm text-gray-600">{session.time} • {session.date}</p>
+                      <p className="text-sm text-gray-600">
+                        {session.time} • {session.date} • {session.students} students
+                      </p>
                     </div>
                   </div>
-                  <button className="p-2 hover:bg-gray-100 rounded-full">
+                  <button className="p-2 hover:bg-white rounded-full transition-colors">
                     <ChevronRight className="w-5 h-5 text-gray-400" />
                   </button>
                 </div>
