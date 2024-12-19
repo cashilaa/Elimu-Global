@@ -12,4 +12,9 @@ export class AuthController {
   async signUp(@Body() createInstructorDto: CreateInstructorDto, @UploadedFile() file: Express.Multer.File) {
     return this.authService.signUp(createInstructorDto, file);
   }
+
+  @Post('login')
+  async login(@Body() loginDto: { email: string; password: string }) {
+    return this.authService.login(loginDto.email, loginDto.password);
+  }
 }

@@ -24,6 +24,9 @@ let AuthController = class AuthController {
     async signUp(createInstructorDto, file) {
         return this.authService.signUp(createInstructorDto, file);
     }
+    async login(loginDto) {
+        return this.authService.login(loginDto.email, loginDto.password);
+    }
 };
 __decorate([
     (0, common_1.Post)('signup'),
@@ -34,6 +37,13 @@ __decorate([
     __metadata("design:paramtypes", [create_instructor_dto_1.CreateInstructorDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signUp", null);
+__decorate([
+    (0, common_1.Post)('login'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "login", null);
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

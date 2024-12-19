@@ -1,59 +1,62 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity('instructors')
-export class Instructor {
-  @PrimaryGeneratedColumn('uuid')
+@Schema()
+export class Instructor extends Document {
+  @Prop({ required: true })
   id: string;
 
-  @Column()
+  @Prop({ required: true })
   firstName: string;
 
-  @Column()
+  @Prop({ required: true })
   lastName: string;
 
-  @Column({ unique: true })
+  @Prop({ unique: true, required: true })
   email: string;
 
-  @Column()
+  @Prop({ required: true })
   password: string;
 
-  @Column({ nullable: true })
-  phoneNumber: string;
+  @Prop()
+  phoneNumber?: string;
 
-  @Column()
+  @Prop({ required: true })
   expertise: string;
 
-  @Column()
+  @Prop({ required: true })
   experience: string;
 
-  @Column()
+  @Prop({ required: true })
   education: string;
 
-  @Column({ nullable: true })
-  certification: string;
+  @Prop()
+  certification?: string;
 
-  @Column('simple-array')
+  @Prop({ type: [{ type: String }] })
   teachingAreas: string[];
 
-  @Column('text')
+  @Prop({ type: String })
   bio: string;
 
-  @Column('json')
+  @Prop({ type: Object })
   socialLinks: {
     linkedin: string;
     twitter: string;
     website: string;
   };
 
-  @Column({ nullable: true })
-  avatarUrl: string;
+  @Prop()
+  avatarUrl?: string;
 
-  @Column({ default: false })
+  @Prop({ default: false })
   isVerified: boolean;
 
-  @CreateDateColumn()
+  @Prop({ default: Date.now })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @Prop({ default: Date.now })
   updatedAt: Date;
 }
+
+export const InstructorSchema = SchemaFactory.createForClass(Instructor);

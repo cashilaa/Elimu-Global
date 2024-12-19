@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Instructor, InstructorDocument } from './instructor.schema';
 import { CreateInstructorDto } from './dto/create-instructor.dto';
 
-type InstructorResponse = Omit<Instructor, 'password'>;
+type InstructorResponse = Omit<Instructor, 'password' | 'validatePassword'>;
 
 @Injectable()
 export class InstructorService {
@@ -16,7 +16,6 @@ export class InstructorService {
   ) {}
 
   async register(createInstructorDto: CreateInstructorDto): Promise<InstructorResponse> {
-    // Check if instructor with email already exists
     const existingInstructor = await this.instructorModel.findOne({ 
       email: createInstructorDto.email 
     }).exec();
@@ -25,28 +24,24 @@ export class InstructorService {
       throw new ConflictException('Email already registered');
     }
 
-    // Hash the password
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createInstructorDto.password, salt);
 
-    // Create the instructor
     const instructor = new this.instructorModel({
       ...createInstructorDto,
       password: hashedPassword,
       isVerified: true
     });
 
-    // Save the instructor and convert to plain object
     const savedInstructor = await instructor.save();
     const plainInstructor = savedInstructor.toObject();
     
-    // Remove sensitive data
-    const { password, ...instructorData } = plainInstructor;
+    const { password, validatePassword, ...instructorData } = plainInstructor;
     
     return instructorData as InstructorResponse;
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string): Promise<{ token: string; instructor: InstructorResponse }> {
     const instructor = await this.instructorModel.findOne({ email }).exec();
     
     if (!instructor) {
@@ -66,11 +61,11 @@ export class InstructorService {
 
     const token = this.jwtService.sign(payload);
     
-    const { password: _, ...instructorData } = instructor.toObject();
+    const { password: _, validatePassword, ...instructorData } = instructor.toObject();
     
     return {
       token,
-      instructor: instructorData,
+      instructor: instructorData as InstructorResponse,
     };
   }
 
@@ -104,7 +99,7 @@ export class InstructorService {
     const updatedInstructor = await instructor.save();
     const plainInstructor = updatedInstructor.toObject();
     
-    const { password, ...instructorData } = plainInstructor;
+    const { password, validatePassword, ...instructorData } = plainInstructor;
     return instructorData as InstructorResponse;
   }
 }

@@ -57,9 +57,7 @@ const Schedule = () => {
           >
             Month
           </Button>
-          <Button>
-            New Session
-          </Button>
+          <Button onClick={() => console.log('Open session creation modal or redirect')}>New Session</Button>
         </div>
       </div>
 

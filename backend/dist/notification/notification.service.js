@@ -19,9 +19,11 @@ const mongoose_2 = require("mongoose");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const notification_schema_1 = require("./notification.schema");
+const group_entity_1 = require("../instructor/entities/group.entity"); // Importing Group type
 let NotificationService = class NotificationService {
-    constructor(notificationModel) {
+    constructor(notificationModel, groupModel) {
         this.notificationModel = notificationModel;
+        this.groupModel = groupModel;
     }
     async create(createNotificationDto) {
         const notification = new this.notificationModel(createNotificationDto);
@@ -92,6 +94,47 @@ let NotificationService = class NotificationService {
             metadata: { courseId, studentId },
         });
     }
+    async notifyGroupCreation(group) {
+        for (const studentId of group.studentIds) {
+            await this.create({
+                userId: studentId,
+                title: 'Added to New Group',
+                message: `You have been added to group: ${group.name}`,
+                type: 'group',
+                category: 'enrollment',
+            });
+        }
+    }
+    async notifyGroupMeeting(groupId, meeting) {
+        const group = await this.groupModel.findById(groupId); // Ensure group is fetched
+        if (!group)
+            return;
+        for (const studentId of group.studentIds) {
+            await this.create({
+                userId: studentId,
+                title: 'New Group Meeting Scheduled',
+                message: `A new meeting has been scheduled for ${group.name}`,
+                type: 'meeting',
+                category: 'schedule',
+                metadata: {
+                    meetingId: meeting.id,
+                    meetingLink: meeting.join_url,
+                    startTime: meeting.start_time,
+                },
+            });
+        }
+    }
+    async notifyStudentsAddedToGroup(group, newStudentIds) {
+        for (const studentId of newStudentIds) {
+            await this.create({
+                userId: studentId,
+                title: 'Added to Group',
+                message: `You have been added to group: ${group.name}`,
+                type: 'group',
+                category: 'enrollment',
+            });
+        }
+    }
 };
 __decorate([
     (0, websockets_1.WebSocketServer)(),
@@ -105,6 +148,8 @@ NotificationService = __decorate([
         },
     }),
     __param(0, (0, mongoose_1.InjectModel)(notification_schema_1.Notification.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)(group_entity_1.Group.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model])
 ], NotificationService);
 exports.NotificationService = NotificationService;

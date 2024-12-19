@@ -9,79 +9,81 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Instructor = void 0;
-const typeorm_1 = require("typeorm");
-let Instructor = class Instructor {
+exports.InstructorSchema = exports.Instructor = void 0;
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+let Instructor = class Instructor extends mongoose_2.Document {
 };
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "firstName", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "lastName", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ unique: true }),
+    (0, mongoose_1.Prop)({ unique: true, required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Instructor.prototype, "phoneNumber", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "expertise", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "experience", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "education", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Instructor.prototype, "certification", void 0);
 __decorate([
-    (0, typeorm_1.Column)('simple-array'),
+    (0, mongoose_1.Prop)({ type: [{ type: String }] }),
     __metadata("design:type", Array)
 ], Instructor.prototype, "teachingAreas", void 0);
 __decorate([
-    (0, typeorm_1.Column)('text'),
+    (0, mongoose_1.Prop)({ type: String }),
     __metadata("design:type", String)
 ], Instructor.prototype, "bio", void 0);
 __decorate([
-    (0, typeorm_1.Column)('json'),
+    (0, mongoose_1.Prop)({ type: Object }),
     __metadata("design:type", Object)
 ], Instructor.prototype, "socialLinks", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Instructor.prototype, "avatarUrl", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ default: false }),
+    (0, mongoose_1.Prop)({ default: false }),
     __metadata("design:type", Boolean)
 ], Instructor.prototype, "isVerified", void 0);
 __decorate([
-    (0, typeorm_1.CreateDateColumn)(),
+    (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], Instructor.prototype, "createdAt", void 0);
 __decorate([
-    (0, typeorm_1.UpdateDateColumn)(),
+    (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], Instructor.prototype, "updatedAt", void 0);
 Instructor = __decorate([
-    (0, typeorm_1.Entity)('instructors')
+    (0, mongoose_1.Schema)()
 ], Instructor);
 exports.Instructor = Instructor;
+exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);

@@ -59,23 +59,18 @@ let InstructorService = class InstructorService {
         this.jwtService = jwtService;
     }
     async register(createInstructorDto) {
-        // Check if instructor with email already exists
         const existingInstructor = await this.instructorModel.findOne({
             email: createInstructorDto.email
         }).exec();
         if (existingInstructor) {
             throw new common_1.ConflictException('Email already registered');
         }
-        // Hash the password
         const salt = await bcrypt.genSalt();
         const hashedPassword = await bcrypt.hash(createInstructorDto.password, salt);
-        // Create the instructor
         const instructor = new this.instructorModel(Object.assign(Object.assign({}, createInstructorDto), { password: hashedPassword, isVerified: true }));
-        // Save the instructor and convert to plain object
         const savedInstructor = await instructor.save();
         const plainInstructor = savedInstructor.toObject();
-        // Remove sensitive data
-        const { password } = plainInstructor, instructorData = __rest(plainInstructor, ["password"]);
+        const { password, validatePassword } = plainInstructor, instructorData = __rest(plainInstructor, ["password", "validatePassword"]);
         return instructorData;
     }
     async login(email, password) {
@@ -92,7 +87,7 @@ let InstructorService = class InstructorService {
             email: instructor.email,
         };
         const token = this.jwtService.sign(payload);
-        const _a = instructor.toObject(), { password: _ } = _a, instructorData = __rest(_a, ["password"]);
+        const _a = instructor.toObject(), { password: _, validatePassword } = _a, instructorData = __rest(_a, ["password", "validatePassword"]);
         return {
             token,
             instructor: instructorData,
@@ -122,7 +117,7 @@ let InstructorService = class InstructorService {
         instructor.isVerified = true;
         const updatedInstructor = await instructor.save();
         const plainInstructor = updatedInstructor.toObject();
-        const { password } = plainInstructor, instructorData = __rest(plainInstructor, ["password"]);
+        const { password, validatePassword } = plainInstructor, instructorData = __rest(plainInstructor, ["password", "validatePassword"]);
         return instructorData;
     }
 };

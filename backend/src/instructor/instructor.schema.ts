@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 
 export type InstructorDocument = Instructor & Document;
 
@@ -50,6 +51,26 @@ export class Instructor {
 
   @Prop({ default: true })
   isVerified: boolean;
+
+  validatePassword(password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+  }
 }
 
 export const InstructorSchema = SchemaFactory.createForClass(Instructor);
+
+// Add pre-save middleware
+InstructorSchema.pre<InstructorDocument>('save', function(next) {
+  if (this.isModified('password')) {
+    bcrypt.genSalt(10, (err, salt) => {
+      if (err) return next(err);
+      bcrypt.hash(this.password, salt, (err, hash) => {
+        if (err) return next(err);
+        this.password = hash;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
+});

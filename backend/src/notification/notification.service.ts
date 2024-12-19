@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Notification, NotificationDocument } from './notification.schema';
+import { Group } from '../instructor/entities/group.entity'; // Importing Group type
 
 @Injectable()
 @WebSocketGateway({
@@ -18,6 +19,8 @@ export class NotificationService {
   constructor(
     @InjectModel(Notification.name)
     private notificationModel: Model<NotificationDocument>,
+    @InjectModel(Group.name) // Injecting Group model
+    private groupModel: Model<Group>, // Using Group type directly
   ) {}
 
   async create(createNotificationDto: {
@@ -108,5 +111,49 @@ export class NotificationService {
       category: 'review',
       metadata: { courseId, studentId },
     });
+  }
+
+  async notifyGroupCreation(group: Group): Promise<void> {
+    for (const studentId of group.studentIds) {
+      await this.create({
+        userId: studentId,
+        title: 'Added to New Group',
+        message: `You have been added to group: ${group.name}`,
+        type: 'group',
+        category: 'enrollment',
+      });
+    }
+  }
+
+  async notifyGroupMeeting(groupId: string, meeting: any): Promise<void> {
+    const group = await this.groupModel.findById(groupId); // Ensure group is fetched
+    if (!group) return;
+
+    for (const studentId of group.studentIds) {
+      await this.create({
+        userId: studentId,
+        title: 'New Group Meeting Scheduled',
+        message: `A new meeting has been scheduled for ${group.name}`,
+        type: 'meeting',
+        category: 'schedule',
+        metadata: {
+          meetingId: meeting.id,
+          meetingLink: meeting.join_url,
+          startTime: meeting.start_time,
+        },
+      });
+    }
+  }
+
+  async notifyStudentsAddedToGroup(group: Group, newStudentIds: string[]): Promise<void> {
+    for (const studentId of newStudentIds) {
+      await this.create({
+        userId: studentId,
+        title: 'Added to Group',
+        message: `You have been added to group: ${group.name}`,
+        type: 'group',
+        category: 'enrollment',
+      });
+    }
   }
 }

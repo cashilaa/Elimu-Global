@@ -7,7 +7,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig(({ mode }) => {
-  // Load environment variables based on the current mode
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
@@ -19,15 +18,12 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       proxy: {
-        '/instructor': {
-          target: 'http://localhost:3000', // Adjust this to your backend server's address and port
+        '/api': {
+          target: 'http://localhost:3000',
           changeOrigin: true,
-          secure: false,
-        },
-      },
-    },
-    define: {
-      'import.meta.env': env, // Make environment variables available in the app
-    },
+          rewrite: (path) => path.replace(/^\/api/, ''),
+        }
+      }
+    }
   };
 });
