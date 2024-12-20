@@ -22,8 +22,23 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:3000',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
-        }
-      }
-    }
+        },
+      },
+    },
+    build: {
+      target: 'esnext', // Ensure compatibility with modern browsers
+      cssCodeSplit: true, // Enable CSS code splitting
+      chunkSizeWarningLimit: 1000, // Set a warning limit for chunk size (in KB)
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'], // Split vendor libraries
+          },
+        },
+      },
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom'], // Pre-bundle essential dependencies
+    },
   };
 });
