@@ -1,38 +1,43 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as compression from 'compression';
+const compression = require('compression');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn'], // Reduce logging in production
+    logger: ['error', 'warn'],
   });
   
-  // Enable compression
+  // Add global prefix
+  app.setGlobalPrefix('api');
+  
+  // Enable compression without type assertion
   app.use(compression());
   
   // Enable CORS
-  app.enableCors();
+  app.enableCors({
+    origin: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
   
   // Use environment port or default to 3000
   const port = process.env.PORT || 3000;
   
-  await app.listen(port);
-  console.log(`Application is running on: ${await app.getUrl()}`);
+  await app.listen(port, '0.0.0.0');
+  console.log(`Application is running on port ${port}`);
 }
 
-// Add error handling
+// Error handling
 bootstrap().catch(err => {
   console.error('Failed to start the application:', err);
   process.exit(1);
 });
 
-// Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
   console.error('Uncaught Exception:', err);
   process.exit(1);
 });
 
-// Handle unhandled rejections
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Rejection:', err);
   process.exit(1);
