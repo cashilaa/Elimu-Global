@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,10 +18,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ZoomService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+const instructor_schema_1 = require("../instructor/instructor.schema");
 const axios_1 = __importDefault(require("axios"));
 let ZoomService = class ZoomService {
-    constructor(configService) {
+    constructor(configService, instructorModel) {
         this.configService = configService;
+        this.instructorModel = instructorModel;
         this.baseUrl = 'https://api.zoom.us/v2';
         this.accessToken = null;
         this.tokenExpiry = 0;
@@ -59,40 +66,36 @@ let ZoomService = class ZoomService {
         }
     }
     async createMeeting(instructorId, courseData) {
-        var _a;
+        const instructor = await this.instructorModel.findById(instructorId);
+        if (!instructor) {
+            throw new common_1.NotFoundException('Instructor not found');
+        }
         const token = await this.getAccessToken();
+        const meetingOptions = {
+            topic: courseData.title,
+            type: 2,
+            start_time: courseData.startTime,
+            duration: courseData.duration,
+            timezone: instructor.timezone || 'UTC',
+            settings: {
+                host_video: true,
+                participant_video: true,
+                join_before_host: false,
+                mute_upon_entry: true,
+                waiting_room: true
+            }
+        };
         try {
-            const response = await axios_1.default.post(`${this.baseUrl}/users/me/meetings`, {
-                topic: courseData.topic,
-                type: 2,
-                start_time: courseData.startTime,
-                duration: courseData.duration,
-                timezone: 'UTC',
-                agenda: courseData.agenda,
-                settings: {
-                    host_video: true,
-                    participant_video: true,
-                    join_before_host: false,
-                    mute_upon_entry: true,
-                    waiting_room: true,
-                    meeting_authentication: true,
-                },
-            }, {
+            const response = await axios_1.default.post(`${this.baseUrl}/users/me/meetings`, meetingOptions, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
-            return {
-                meetingId: response.data.id,
-                joinUrl: response.data.join_url,
-                startUrl: response.data.start_url,
-                password: response.data.password,
-            };
+            return response.data;
         }
         catch (error) {
             const axiosError = error;
-            console.error('Error details:', (_a = axiosError.response) === null || _a === void 0 ? void 0 : _a.data); // Log detailed error response
             throw new Error(`Failed to create Zoom meeting: ${axiosError.message}`);
         }
     }
@@ -145,6 +148,8 @@ let ZoomService = class ZoomService {
 };
 ZoomService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService])
+    __param(1, (0, mongoose_1.InjectModel)(instructor_schema_1.Instructor.name)),
+    __metadata("design:paramtypes", [config_1.ConfigService,
+        mongoose_2.Model])
 ], ZoomService);
 exports.ZoomService = ZoomService;

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { S3 } from 'aws-sdk';
@@ -217,11 +217,16 @@ export class VideoService {
   }
 
   async recordView(id: string, userId: string) {
-    return this.videoModel.findByIdAndUpdate(
-      id,
-      { $inc: { views: 1 } },
-      { new: true }
-    );
+    const video = await this.videoModel.findById(id);
+    if (!video) {
+      throw new NotFoundException('Video not found');
+    }
+    
+    // Record the view with user information
+    await this.videoModel.findByIdAndUpdate(id, {
+      $addToSet: { views: userId },
+      $inc: { viewCount: 1 }
+    });
   }
 
   async toggleLike(id: string, userId: string) {
@@ -243,26 +248,27 @@ export class VideoService {
   }
 
   async getStreamUrl(id: string, quality: string, userId: string) {
-    const video = await this.videoModel.findById(id);
+    const video = await this.videoModel.findOne({ _id: id, 'allowedUsers': userId });
     if (!video) {
-      throw new NotFoundException('Video not found');
+      throw new UnauthorizedException('Not authorized to view this video');
     }
-
-    // Check if user has access to this video
-    // Implement your access control logic here
-
-    const key = quality ? 
-      `videos/${id}/${quality}.mp4` :
-      this.getKeyFromUrl(video.url);
-
-    return this.s3.getSignedUrlPromise('getObject', {
-      Bucket: this.bucketName,
-      Key: key,
-      Expires: 3600, // URL expires in 1 hour
-    });
+    
+    return this.generateSignedUrl(video.url, quality);
   }
 
   private getKeyFromUrl(url: string): string {
     return url.split('.com/')[1];
+  }
+
+  private async generateSignedUrl(videoUrl: string, quality?: string): Promise<string> {
+    const key = quality ? 
+      `videos/${videoUrl.split('/').pop()}/${quality}.mp4` :
+      this.getKeyFromUrl(videoUrl);
+
+    return this.s3.getSignedUrlPromise('getObject', {
+      Bucket: this.bucketName,
+      Key: key,
+      Expires: 3600 // URL expires in 1 hour
+    });
   }
 } 

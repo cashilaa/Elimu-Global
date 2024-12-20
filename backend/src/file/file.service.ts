@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { S3 } from 'aws-sdk';
@@ -78,15 +78,14 @@ export class FileService {
   }
 
   async getSignedUrl(fileId: string, userId: string) {
-    const file = await this.fileModel.findOne({ _id: fileId });
+    const file = await this.fileModel.findOne({ _id: fileId, owner: userId });
     if (!file) {
-      throw new BadRequestException('File not found');
+      throw new NotFoundException('File not found');
     }
-
-    return this.s3.getSignedUrlPromise('getObject', {
+    return this.s3.getSignedUrl('getObject', {
       Bucket: this.bucketName,
       Key: file.key,
-      Expires: 3600, // URL expires in 1 hour
+      Expires: 3600
     });
   }
 } 

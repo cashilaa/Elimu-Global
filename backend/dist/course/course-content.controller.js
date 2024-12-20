@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CourseContentController = void 0;
+exports.CourseContentGateway = exports.CourseContentController = void 0;
 const common_1 = require("@nestjs/common");
 const course_content_service_1 = require("./course-content.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
@@ -105,3 +105,13 @@ CourseContentController = __decorate([
     __metadata("design:paramtypes", [course_content_service_1.CourseContentService])
 ], CourseContentController);
 exports.CourseContentController = CourseContentController;
+let CourseContentGateway = class CourseContentGateway {
+};
+__decorate([
+    (0, websockets_1.WebSocketServer)(),
+    __metadata("design:type", socket_io_1.Server)
+], CourseContentGateway.prototype, "server", void 0);
+CourseContentGateway = __decorate([
+    (0, websockets_1.WebSocketGateway)({ namespace: 'course-content' })
+], CourseContentGateway);
+exports.CourseContentGateway = CourseContentGateway;

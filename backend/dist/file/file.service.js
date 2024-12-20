@@ -76,14 +76,14 @@ let FileService = class FileService {
         return this.fileModel.findByIdAndDelete(fileId);
     }
     async getSignedUrl(fileId, userId) {
-        const file = await this.fileModel.findOne({ _id: fileId });
+        const file = await this.fileModel.findOne({ _id: fileId, owner: userId });
         if (!file) {
-            throw new common_1.BadRequestException('File not found');
+            throw new common_1.NotFoundException('File not found');
         }
-        return this.s3.getSignedUrlPromise('getObject', {
+        return this.s3.getSignedUrl('getObject', {
             Bucket: this.bucketName,
             Key: file.key,
-            Expires: 3600, // URL expires in 1 hour
+            Expires: 3600
         });
     }
 };

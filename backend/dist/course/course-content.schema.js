@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CourseContent = void 0;
+exports.CourseContentSchema = exports.CourseContent = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let CourseContent = class CourseContent {
 };
@@ -73,3 +73,4 @@ CourseContent = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], CourseContent);
 exports.CourseContent = CourseContent;
+exports.CourseContentSchema = mongoose_1.SchemaFactory.createForClass(CourseContent);

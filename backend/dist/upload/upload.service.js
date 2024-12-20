@@ -104,9 +104,16 @@ let UploadService = class UploadService {
     }
     // Helper method for video transcoding status check
     async checkTranscodingStatus(videoKey) {
-        // Implement video transcoding status check
-        // This could integrate with AWS Elastic Transcoder or similar service
-        return 'completed';
+        try {
+            await this.s3.headObject({
+                Bucket: this.configService.get('AWS_S3_BUCKET'),
+                Key: `transcoded/${videoKey}`
+            }).promise();
+            return 'completed';
+        }
+        catch (error) {
+            return 'processing';
+        }
     }
 };
 UploadService = __decorate([

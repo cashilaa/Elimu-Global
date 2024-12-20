@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Instructor } from '../instructor/instructor.schema';
+import { InstructorService } from '../instructor/instructor.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -10,28 +11,22 @@ export class AuthService {
   constructor(
     @InjectModel(Instructor.name) private instructorModel: Model<Instructor>,
     private jwtService: JwtService,
+    private instructorService: InstructorService,
   ) {}
 
   async register(createInstructorDto: any, file?: Express.Multer.File) {
     const { email } = createInstructorDto;
-
-    // Check if instructor already exists
     const existingInstructor = await this.instructorModel.findOne({ email: email.toLowerCase() });
+    
     if (existingInstructor) {
       throw new HttpException('Email already exists', HttpStatus.BAD_REQUEST);
     }
 
-    // Create new instructor
-    const instructor = new this.instructorModel({
+    return this.instructorService.create({
       ...createInstructorDto,
       email: email.toLowerCase(),
+      profilePicture: file ? await this.instructorService.uploadProfilePicture(file) : null
     });
-
-    const savedInstructor = await instructor.save();
-    const instructorData = savedInstructor.toObject();
-    const { password, ...rest } = instructorData;
-
-    return rest;
   }
 
   async login(email: string, password: string) {

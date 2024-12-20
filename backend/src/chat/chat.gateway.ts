@@ -19,10 +19,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor(private chatService: ChatService) {}
 
-  @SubscribeMessage('sendMessage')
+  @SubscribeMessage('message')
   async handleMessage(client: Socket, payload: any) {
     const message = await this.chatService.sendMessage(payload);
-    this.server.to(payload.conversationId).emit('newMessage', message);
+    const room = `chat:${payload.courseId}`;
+    client.to(room).emit('message', {
+      ...message,
+      timestamp: new Date()
+    });
   }
 
   @SubscribeMessage('joinRoom')

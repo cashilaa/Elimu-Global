@@ -19,9 +19,11 @@ const mongoose_2 = require("mongoose");
 const message_schema_1 = require("./message.schema");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
+const course_service_1 = require("../course/course.service");
 let ChatService = class ChatService {
-    constructor(messageModel) {
+    constructor(messageModel, courseService) {
         this.messageModel = messageModel;
+        this.courseService = courseService;
     }
     async getMessages(conversationId) {
         return this.messageModel.find({ conversationId })
@@ -35,11 +37,12 @@ let ChatService = class ChatService {
         this.server.to(messageData.conversationId).emit('newMessage', savedMessage);
         return savedMessage;
     }
-    handleConnection(client) {
-        console.log(`Client connected: ${client.id}`);
-        // Join rooms based on user's conversations
+    async handleConnection(client) {
         const userId = client.handshake.query.userId;
-        // Implement room joining logic
+        const userCourses = await this.courseService.getUserCourses(userId);
+        userCourses.forEach(course => {
+            client.join(`chat:${course.id}`);
+        });
     }
     handleDisconnect(client) {
         console.log(`Client disconnected: ${client.id}`);
@@ -57,6 +60,7 @@ ChatService = __decorate([
     }),
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(message_schema_1.Message.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        course_service_1.CourseService])
 ], ChatService);
 exports.ChatService = ChatService;

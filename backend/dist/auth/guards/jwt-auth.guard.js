@@ -10,8 +10,17 @@ exports.JwtAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
 let JwtAuthGuard = class JwtAuthGuard {
     canActivate(context) {
-        // Implement your JWT authentication logic here
+        const request = context.switchToHttp().getRequest();
+        const token = this.extractTokenFromHeader(request);
+        if (!token) {
+            throw new common_1.UnauthorizedException();
+        }
         return true;
+    }
+    extractTokenFromHeader(request) {
+        var _a, _b;
+        const [type, token] = (_b = (_a = request.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')) !== null && _b !== void 0 ? _b : [];
+        return type === 'Bearer' ? token : undefined;
     }
 };
 JwtAuthGuard = __decorate([

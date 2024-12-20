@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Instructor } from './instructor.schema';
@@ -9,6 +9,9 @@ import { Student } from '../student/student.schema';
 import { Session } from '../session/session.schema';
 import { Resource } from '../shared/types/resource';
 import { Notification } from '../shared/types/notification';
+import { Analytics } from '../analytics/analytics.schema';
+import { S3 } from 'aws-sdk';
+import { ConfigService } from '@nestjs/config';
 
 interface SessionQuery {
   instructor: string;
@@ -17,14 +20,26 @@ interface SessionQuery {
 
 @Injectable()
 export class InstructorService {
+  private s3: S3;
+  private readonly bucketName: string;
+
   constructor(
     @InjectModel('Instructor') private instructorModel: Model<Instructor>,
     @InjectModel('Course') private courseModel: Model<Course>,
     @InjectModel('Student') private studentModel: Model<Student>,
     @InjectModel('Session') private sessionModel: Model<Session>,
     @InjectModel('Resource') private resourceModel: Model<Resource>,
-    @InjectModel('Notification') private notificationModel: Model<Notification>
-  ) {}
+    @InjectModel('Notification') private notificationModel: Model<Notification>,
+    @InjectModel('Analytics') private analyticsModel: Model<Analytics>,
+    private configService: ConfigService
+  ) {
+    this.bucketName = this.configService.get('AWS_BUCKET_NAME') || '';
+    this.s3 = new S3({
+      accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
+      secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
+      region: this.configService.get('AWS_REGION'),
+    });
+  }
 
   async findAll() {
     return this.instructorModel.find().exec();
@@ -115,8 +130,14 @@ export class InstructorService {
   }
 
   async getAnalytics(id: string, startDate?: string, endDate?: string) {
-    // Implement analytics logic
-    return {};
+    const query: any = { instructorId: id };
+    if (startDate && endDate) {
+      query.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
+    }
+    return this.analyticsModel.find(query).exec();
   }
 
   async getSessions(id: string, status?: 'upcoming' | 'past' | 'all') {
@@ -152,11 +173,33 @@ export class InstructorService {
   }
 
   async markNotificationAsRead(id: string, notificationId: string) {
-    return this.notificationModel.findByIdAndUpdate(
-      notificationId,
-      { read: true },
-      { new: true }
-    ).exec();
+    return this.instructorModel.findByIdAndUpdate(
+      id,
+      {
+        $set: { 'notifications.$[elem].read': true }
+      },
+      {
+        arrayFilters: [{ 'elem._id': new Types.ObjectId(notificationId) }]
+      }
+    );
+  }
+
+  async create(createInstructorDto: CreateInstructorDto): Promise<Instructor> {
+    const newInstructor = new this.instructorModel(createInstructorDto);
+    return newInstructor.save();
+  }
+
+  async uploadProfilePicture(file: Express.Multer.File): Promise<string> {
+    const key = `profile-pictures/${Date.now()}-${file.originalname}`;
+    
+    await this.s3.upload({
+      Bucket: this.bucketName,
+      Key: key,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    }).promise();
+
+    return `https://${this.bucketName}.s3.amazonaws.com/${key}`;
   }
 
   // Add any other methods you need

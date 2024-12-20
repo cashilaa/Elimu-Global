@@ -12,16 +12,18 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CourseService } from './course.service';
-import { Course } from './course.schema';
 import { Types } from 'mongoose';
 import { CreateCourseDto, UpdateCourseDto, CreateReviewDto } from './dto';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
-@Controller('api/courses')
-@UseGuards(JwtAuthGuard)
+@Controller('courses')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
+  @Roles('instructor')
   async create(@Body() createCourseDto: CreateCourseDto) {
     try {
       const course = await this.courseService.create(createCourseDto);
@@ -78,6 +80,7 @@ export class CourseController {
   }
 
   @Put(':id')
+  @Roles('instructor')
   async update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
     try {
       const course = await this.courseService.update(id, updateCourseDto);
@@ -98,6 +101,7 @@ export class CourseController {
   }
 
   @Delete(':id')
+  @Roles('instructor')
   async remove(@Param('id') id: string) {
     try {
       const course = await this.courseService.delete(id);

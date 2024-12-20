@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstructorController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const instructor_service_1 = require("./instructor.service");
 const create_instructor_dto_1 = require("./dto/create-instructor.dto");
@@ -240,7 +241,8 @@ __decorate([
 ], InstructorController.prototype, "markNotificationAsRead", null);
 InstructorController = __decorate([
     (0, common_1.Controller)('api/instructors'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('instructor', 'admin'),
     __metadata("design:paramtypes", [instructor_service_1.InstructorService,
         auth_service_1.AuthService])
 ], InstructorController);

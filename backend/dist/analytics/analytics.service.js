@@ -17,17 +17,19 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const course_schema_1 = require("../course/course.schema");
+const analytics_schema_1 = require("./analytics.schema");
 let AnalyticsService = class AnalyticsService {
-    constructor(courseModel) {
+    constructor(courseModel, analyticsModel) {
         this.courseModel = courseModel;
+        this.analyticsModel = analyticsModel;
     }
     async getChartData(courseIds, startDate, endDate) {
-        // Convert ObjectIds to strings if needed
+        // Convert ObjectIds to strings and use them in the query
         const stringIds = courseIds.map(id => id.toString());
         const enrollmentData = await this.courseModel.aggregate([
             {
                 $match: {
-                    _id: { $in: courseIds },
+                    _id: { $in: stringIds },
                     createdAt: {
                         $gte: startDate || new Date(0),
                         $lte: endDate || new Date()
@@ -44,10 +46,18 @@ let AnalyticsService = class AnalyticsService {
         ]);
         return enrollmentData;
     }
+    async getCourseAnalytics(courseIds) {
+        const stringIds = courseIds.map(id => id.toString());
+        return this.analyticsModel.find({
+            courseId: { $in: stringIds }
+        }).exec();
+    }
 };
 AnalyticsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(course_schema_1.Course.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, mongoose_1.InjectModel)(analytics_schema_1.Analytics.name)),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model])
 ], AnalyticsService);
 exports.AnalyticsService = AnalyticsService;

@@ -127,6 +127,14 @@ let CourseService = class CourseService {
             return 0;
         return course.reviews.reduce((acc, review) => acc + review.rating, 0) / course.reviews.length;
     }
+    async getUserCourses(userId) {
+        return this.courseModel.find({
+            $or: [
+                { instructor: userId },
+                { students: userId }
+            ]
+        }).exec();
+    }
 };
 CourseService = __decorate([
     (0, common_1.Injectable)(),

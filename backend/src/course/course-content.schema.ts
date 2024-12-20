@@ -84,3 +84,5 @@ export class CourseContent {
     estimatedDuration: number;
   };
 }
+
+export const CourseContentSchema = SchemaFactory.createForClass(CourseContent);

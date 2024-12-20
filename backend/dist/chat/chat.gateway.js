@@ -19,7 +19,8 @@ let ChatGateway = class ChatGateway {
     }
     async handleMessage(client, payload) {
         const message = await this.chatService.sendMessage(payload);
-        this.server.to(payload.conversationId).emit('newMessage', message);
+        const room = `chat:${payload.courseId}`;
+        client.to(room).emit('message', Object.assign(Object.assign({}, message), { timestamp: new Date() }));
     }
     handleJoinRoom(client, room) {
         client.join(room);
@@ -39,7 +40,7 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], ChatGateway.prototype, "server", void 0);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('sendMessage'),
+    (0, websockets_1.SubscribeMessage)('message'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
     __metadata("design:returntype", Promise)

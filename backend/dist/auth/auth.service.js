@@ -52,25 +52,21 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const jwt_1 = require("@nestjs/jwt");
 const instructor_schema_1 = require("../instructor/instructor.schema");
+const instructor_service_1 = require("../instructor/instructor.service");
 const bcrypt = __importStar(require("bcrypt"));
 let AuthService = class AuthService {
-    constructor(instructorModel, jwtService) {
+    constructor(instructorModel, jwtService, instructorService) {
         this.instructorModel = instructorModel;
         this.jwtService = jwtService;
+        this.instructorService = instructorService;
     }
     async register(createInstructorDto, file) {
         const { email } = createInstructorDto;
-        // Check if instructor already exists
         const existingInstructor = await this.instructorModel.findOne({ email: email.toLowerCase() });
         if (existingInstructor) {
             throw new common_1.HttpException('Email already exists', common_1.HttpStatus.BAD_REQUEST);
         }
-        // Create new instructor
-        const instructor = new this.instructorModel(Object.assign(Object.assign({}, createInstructorDto), { email: email.toLowerCase() }));
-        const savedInstructor = await instructor.save();
-        const instructorData = savedInstructor.toObject();
-        const { password } = instructorData, rest = __rest(instructorData, ["password"]);
-        return rest;
+        return this.instructorService.create(Object.assign(Object.assign({}, createInstructorDto), { email: email.toLowerCase(), profilePicture: file ? await this.instructorService.uploadProfilePicture(file) : null }));
     }
     async login(email, password) {
         try {
@@ -109,6 +105,7 @@ AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(instructor_schema_1.Instructor.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        instructor_service_1.InstructorService])
 ], AuthService);
 exports.AuthService = AuthService;

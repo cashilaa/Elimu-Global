@@ -68,12 +68,7 @@ let StudentService = class StudentService {
             .exec();
     }
     async updateProgress(studentId, courseId, progress) {
-        const student = await this.studentModel.findById(studentId);
-        if (!student) {
-            throw new common_1.NotFoundException(`Student with ID ${studentId} not found`);
-        }
-        // Update progress logic here
-        return student.save();
+        return this.studentModel.findOneAndUpdate({ _id: studentId, 'courses.courseId': courseId }, { $set: { 'courses.$.progress': progress } }, { new: true });
     }
 };
 StudentService = __decorate([

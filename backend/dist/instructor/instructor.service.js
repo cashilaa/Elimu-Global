@@ -16,14 +16,24 @@ exports.InstructorService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
+const aws_sdk_1 = require("aws-sdk");
+const config_1 = require("@nestjs/config");
 let InstructorService = class InstructorService {
-    constructor(instructorModel, courseModel, studentModel, sessionModel, resourceModel, notificationModel) {
+    constructor(instructorModel, courseModel, studentModel, sessionModel, resourceModel, notificationModel, analyticsModel, configService) {
         this.instructorModel = instructorModel;
         this.courseModel = courseModel;
         this.studentModel = studentModel;
         this.sessionModel = sessionModel;
         this.resourceModel = resourceModel;
         this.notificationModel = notificationModel;
+        this.analyticsModel = analyticsModel;
+        this.configService = configService;
+        this.bucketName = this.configService.get('AWS_BUCKET_NAME') || '';
+        this.s3 = new aws_sdk_1.S3({
+            accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
+            secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
+            region: this.configService.get('AWS_REGION'),
+        });
     }
     async findAll() {
         return this.instructorModel.find().exec();
@@ -98,8 +108,14 @@ let InstructorService = class InstructorService {
         return this.studentModel.find(query).exec();
     }
     async getAnalytics(id, startDate, endDate) {
-        // Implement analytics logic
-        return {};
+        const query = { instructorId: id };
+        if (startDate && endDate) {
+            query.createdAt = {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate)
+            };
+        }
+        return this.analyticsModel.find(query).exec();
     }
     async getSessions(id, status) {
         const query = { instructor: id };
@@ -123,7 +139,25 @@ let InstructorService = class InstructorService {
         return this.notificationModel.find({ userId: id }).exec();
     }
     async markNotificationAsRead(id, notificationId) {
-        return this.notificationModel.findByIdAndUpdate(notificationId, { read: true }, { new: true }).exec();
+        return this.instructorModel.findByIdAndUpdate(id, {
+            $set: { 'notifications.$[elem].read': true }
+        }, {
+            arrayFilters: [{ 'elem._id': new mongoose_2.Types.ObjectId(notificationId) }]
+        });
+    }
+    async create(createInstructorDto) {
+        const newInstructor = new this.instructorModel(createInstructorDto);
+        return newInstructor.save();
+    }
+    async uploadProfilePicture(file) {
+        const key = `profile-pictures/${Date.now()}-${file.originalname}`;
+        await this.s3.upload({
+            Bucket: this.bucketName,
+            Key: key,
+            Body: file.buffer,
+            ContentType: file.mimetype,
+        }).promise();
+        return `https://${this.bucketName}.s3.amazonaws.com/${key}`;
     }
 };
 InstructorService = __decorate([
@@ -134,11 +168,14 @@ InstructorService = __decorate([
     __param(3, (0, mongoose_1.InjectModel)('Session')),
     __param(4, (0, mongoose_1.InjectModel)('Resource')),
     __param(5, (0, mongoose_1.InjectModel)('Notification')),
+    __param(6, (0, mongoose_1.InjectModel)('Analytics')),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
-        mongoose_2.Model])
+        mongoose_2.Model,
+        mongoose_2.Model,
+        config_1.ConfigService])
 ], InstructorService);
 exports.InstructorService = InstructorService;

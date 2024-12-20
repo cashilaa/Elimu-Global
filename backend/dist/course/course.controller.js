@@ -18,6 +18,8 @@ const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const course_service_1 = require("./course.service");
 const mongoose_1 = require("mongoose");
 const dto_1 = require("./dto");
+const roles_guard_1 = require("../auth/guards/roles.guard");
+const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 let CourseController = class CourseController {
     constructor(courseService) {
         this.courseService = courseService;
@@ -109,6 +111,7 @@ let CourseController = class CourseController {
 };
 __decorate([
     (0, common_1.Post)(),
+    (0, roles_decorator_1.Roles)('instructor'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [dto_1.CreateCourseDto]),
@@ -129,6 +132,7 @@ __decorate([
 ], CourseController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Put)(':id'),
+    (0, roles_decorator_1.Roles)('instructor'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -137,6 +141,7 @@ __decorate([
 ], CourseController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, roles_decorator_1.Roles)('instructor'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -159,8 +164,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CourseController.prototype, "addReview", null);
 CourseController = __decorate([
-    (0, common_1.Controller)('api/courses'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.Controller)('courses'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [course_service_1.CourseService])
 ], CourseController);
 exports.CourseController = CourseController;

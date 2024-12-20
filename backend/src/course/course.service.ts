@@ -165,4 +165,13 @@ export class CourseService {
     if (!course.reviews?.length) return 0;
     return course.reviews.reduce((acc: number, review: Review) => acc + review.rating, 0) / course.reviews.length;
   }
+
+  async getUserCourses(userId: string) {
+    return this.courseModel.find({
+      $or: [
+        { instructor: userId },
+        { students: userId }
+      ]
+    }).exec();
+  }
 }

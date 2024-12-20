@@ -1,22 +1,32 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { Module, forwardRef } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthController } from './auth.controller';
+import { PassportModule } from '@nestjs/passport';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
-import { Instructor, InstructorSchema } from '../instructor/instructor.schema';
+import { AuthController } from './auth.controller';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { InstructorModule } from '../instructor/instructor.module';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: Instructor.name, schema: InstructorSchema }
-    ]),
-    JwtModule.register({
-      secret: 'e4d5f3h2j7k8m9p1q4w8x5c6v7b3n9m2',
-      signOptions: { expiresIn: '24h' },
+    ConfigModule,
+    SharedModule,
+    forwardRef(() => InstructorModule),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '1d'),
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService],
+  exports: [AuthService, JwtStrategy, PassportModule],
 })
 export class AuthModule {}

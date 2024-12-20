@@ -8,7 +8,8 @@ import { UpdateInstructorDto } from './dto/update-instructor.dto';
 import { AuthService } from '../auth/auth.service';
 
 @Controller('api/instructors')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('instructor', 'admin')
 export class InstructorController {
   constructor(
     private readonly instructorService: InstructorService,

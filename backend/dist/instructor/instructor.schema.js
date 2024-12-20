@@ -36,6 +36,7 @@ exports.InstructorSchema = exports.Instructor = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const bcrypt = __importStar(require("bcrypt"));
+const notification_schema_1 = require("../shared/schemas/notification.schema");
 let Instructor = class Instructor extends mongoose_2.Document {
     validatePassword(password) {
         return bcrypt.compare(password, this.password);
@@ -54,72 +55,30 @@ __decorate([
     __metadata("design:type", String)
 ], Instructor.prototype, "email", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: true, select: false }),
     __metadata("design:type", String)
 ], Instructor.prototype, "password", void 0);
 __decorate([
-    (0, mongoose_1.Prop)(),
+    (0, mongoose_1.Prop)({ default: 'UTC' }),
     __metadata("design:type", String)
-], Instructor.prototype, "phoneNumber", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Instructor.prototype, "expertise", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Instructor.prototype, "experience", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Instructor.prototype, "education", void 0);
-__decorate([
-    (0, mongoose_1.Prop)(),
-    __metadata("design:type", String)
-], Instructor.prototype, "certification", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: [String], required: true }),
-    __metadata("design:type", Array)
-], Instructor.prototype, "teachingAreas", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
-], Instructor.prototype, "bio", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({
-        type: {
-            linkedin: String,
-            twitter: String,
-            website: String,
-        },
-    }),
-    __metadata("design:type", Object)
-], Instructor.prototype, "socialLinks", void 0);
+], Instructor.prototype, "timezone", void 0);
 __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Instructor.prototype, "profilePicture", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: false }),
-    __metadata("design:type", Boolean)
-], Instructor.prototype, "isVerified", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ default: 'pending', enum: ['pending', 'active', 'suspended'] }),
-    __metadata("design:type", String)
-], Instructor.prototype, "status", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: [{ type: String, ref: 'Course' }] }),
+    (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Course' }] }),
     __metadata("design:type", Array)
 ], Instructor.prototype, "courses", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: Object }),
-    __metadata("design:type", Object)
-], Instructor.prototype, "analytics", void 0);
+    (0, mongoose_1.Prop)({ type: [notification_schema_1.NotificationSchema], default: [] }),
+    __metadata("design:type", Array)
+], Instructor.prototype, "notifications", void 0);
 Instructor = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,
         toJSON: {
-            transform: (doc, ret) => {
+            transform: (_doc, ret) => {
                 delete ret.password;
                 return ret;
             },

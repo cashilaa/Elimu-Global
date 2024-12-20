@@ -8,27 +8,37 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
-const mongoose_1 = require("@nestjs/mongoose");
 const jwt_1 = require("@nestjs/jwt");
-const auth_controller_1 = require("./auth.controller");
+const passport_1 = require("@nestjs/passport");
+const config_1 = require("@nestjs/config");
 const auth_service_1 = require("./auth.service");
-const instructor_schema_1 = require("../instructor/instructor.schema");
+const auth_controller_1 = require("./auth.controller");
+const jwt_strategy_1 = require("./strategies/jwt.strategy");
+const instructor_module_1 = require("../instructor/instructor.module");
+const shared_module_1 = require("../shared/shared.module");
 let AuthModule = class AuthModule {
 };
 AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([
-                { name: instructor_schema_1.Instructor.name, schema: instructor_schema_1.InstructorSchema }
-            ]),
-            jwt_1.JwtModule.register({
-                secret: 'e4d5f3h2j7k8m9p1q4w8x5c6v7b3n9m2',
-                signOptions: { expiresIn: '24h' },
+            config_1.ConfigModule,
+            shared_module_1.SharedModule,
+            (0, common_1.forwardRef)(() => instructor_module_1.InstructorModule),
+            passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
+            jwt_1.JwtModule.registerAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: async (configService) => ({
+                    secret: configService.get('JWT_SECRET'),
+                    signOptions: {
+                        expiresIn: configService.get('JWT_EXPIRES_IN', '1d'),
+                    },
+                }),
+                inject: [config_1.ConfigService],
             }),
         ],
+        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService],
-        exports: [auth_service_1.AuthService],
+        exports: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, passport_1.PassportModule],
     })
 ], AuthModule);
 exports.AuthModule = AuthModule;

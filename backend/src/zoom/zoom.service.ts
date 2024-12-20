@@ -1,5 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Instructor } from '../instructor/instructor.schema';
 import axios, { AxiosError } from 'axios';
 
 @Injectable()
@@ -11,7 +14,10 @@ export class ZoomService {
   private accessToken: string | null = null;
   private tokenExpiry: number = 0;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    @InjectModel(Instructor.name) private instructorModel: Model<Instructor>
+  ) {
     const clientId = this.configService.get<string>('ZOOM_CLIENT_ID');
     const clientSecret = this.configService.get<string>('ZOOM_API_SECRET');
     const accountId = this.configService.get<string>('ZOOM_ACCOUNT_ID');
@@ -58,33 +64,32 @@ export class ZoomService {
     }
   }
 
-  async createMeeting(instructorId: string, courseData: {
-    topic: string;
-    startTime: string;
-    duration: number;
-    agenda?: string;
-  }) {
+  async createMeeting(instructorId: string, courseData: any) {
+    const instructor = await this.instructorModel.findById(instructorId);
+    if (!instructor) {
+      throw new NotFoundException('Instructor not found');
+    }
+
     const token = await this.getAccessToken();
-    
+    const meetingOptions = {
+      topic: courseData.title,
+      type: 2,
+      start_time: courseData.startTime,
+      duration: courseData.duration,
+      timezone: instructor.timezone || 'UTC',
+      settings: {
+        host_video: true,
+        participant_video: true,
+        join_before_host: false,
+        mute_upon_entry: true,
+        waiting_room: true
+      }
+    };
+
     try {
       const response = await axios.post(
         `${this.baseUrl}/users/me/meetings`,
-        {
-          topic: courseData.topic,
-          type: 2, // Scheduled meeting
-          start_time: courseData.startTime,
-          duration: courseData.duration,
-          timezone: 'UTC',
-          agenda: courseData.agenda,
-          settings: {
-            host_video: true,
-            participant_video: true,
-            join_before_host: false,
-            mute_upon_entry: true,
-            waiting_room: true,
-            meeting_authentication: true,
-          },
-        },
+        meetingOptions,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -93,15 +98,9 @@ export class ZoomService {
         }
       );
 
-      return {
-        meetingId: response.data.id,
-        joinUrl: response.data.join_url,
-        startUrl: response.data.start_url,
-        password: response.data.password,
-      };
+      return response.data;
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('Error details:', axiosError.response?.data); // Log detailed error response
       throw new Error(`Failed to create Zoom meeting: ${axiosError.message}`);
     }
   }

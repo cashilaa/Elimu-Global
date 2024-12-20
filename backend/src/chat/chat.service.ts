@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Message } from './message.schema';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { CourseService } from '../course/course.service';
 
 @WebSocketGateway({
   cors: {
@@ -16,7 +17,8 @@ export class ChatService {
   server: Server;
 
   constructor(
-    @InjectModel(Message.name) private messageModel: Model<Message>
+    @InjectModel(Message.name) private messageModel: Model<Message>,
+    private courseService: CourseService
   ) {}
 
   async getMessages(conversationId: string) {
@@ -35,11 +37,12 @@ export class ChatService {
     return savedMessage;
   }
 
-  handleConnection(client: Socket) {
-    console.log(`Client connected: ${client.id}`);
-    // Join rooms based on user's conversations
+  async handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
-    // Implement room joining logic
+    const userCourses = await this.courseService.getUserCourses(userId);
+    userCourses.forEach(course => {
+      client.join(`chat:${course.id}`);
+    });
   }
 
   handleDisconnect(client: Socket) {

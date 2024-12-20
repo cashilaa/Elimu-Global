@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { NotificationSchema, Notification } from '../shared/schemas/notification.schema';
 
 @Schema({
   timestamps: true,
   toJSON: {
-    transform: (doc, ret) => {
+    transform: (_doc, ret) => {
       delete ret.password;
       return ret;
     },
@@ -21,62 +22,20 @@ export class Instructor extends Document {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, select: false })
   password: string;
 
-  @Prop()
-  phoneNumber: string;
-
-  @Prop({ required: true })
-  expertise: string;
-
-  @Prop({ required: true })
-  experience: string;
-
-  @Prop({ required: true })
-  education: string;
+  @Prop({ default: 'UTC' })
+  timezone: string;
 
   @Prop()
-  certification: string;
+  profilePicture?: string;
 
-  @Prop({ type: [String], required: true })
-  teachingAreas: string[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Course' }] })
+  courses: Types.ObjectId[];
 
-  @Prop({ required: true })
-  bio: string;
-
-  @Prop({
-    type: {
-      linkedin: String,
-      twitter: String,
-      website: String,
-    },
-  })
-  socialLinks: {
-    linkedin?: string;
-    twitter?: string;
-    website?: string;
-  };
-
-  @Prop()
-  profilePicture: string;
-
-  @Prop({ default: false })
-  isVerified: boolean;
-
-  @Prop({ default: 'pending', enum: ['pending', 'active', 'suspended'] })
-  status: string;
-
-  @Prop({ type: [{ type: String, ref: 'Course' }] })
-  courses: string[];
-
-  @Prop({ type: Object })
-  analytics: {
-    totalStudents?: number;
-    averageRating?: number;
-    totalCourses?: number;
-    totalRevenue?: number;
-  };
+  @Prop({ type: [NotificationSchema], default: [] })
+  notifications: Notification[];
 
   validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);

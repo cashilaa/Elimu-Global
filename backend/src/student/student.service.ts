@@ -65,12 +65,10 @@ export class StudentService {
   }
 
   async updateProgress(studentId: string, courseId: string, progress: number) {
-    const student = await this.studentModel.findById(studentId);
-    if (!student) {
-      throw new NotFoundException(`Student with ID ${studentId} not found`);
-    }
-
-    // Update progress logic here
-    return student.save();
+    return this.studentModel.findOneAndUpdate(
+      { _id: studentId, 'courses.courseId': courseId },
+      { $set: { 'courses.$.progress': progress } },
+      { new: true }
+    );
   }
 } 

@@ -7,8 +7,6 @@ import {
   Body,
   Param,
   UseGuards,
-  HttpStatus,
-  HttpException,
 } from '@nestjs/common';
 import { CourseContentService } from './course-content.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -88,4 +86,10 @@ export class CourseContentController {
   ) {
     return this.courseContentService.getContentById(courseId, moduleId, contentId);
   }
+}
+
+@WebSocketGateway({ namespace: 'course-content' })
+export class CourseContentGateway {
+  @WebSocketServer()
+  server: Server;
 }
