@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Timer, ChevronLeft, ChevronRight } from 'lucide-react';
-import Button from '../ui/Button';
+import { Button } from '../ui/Button';
+import { Quiz, Question } from '../../types';
 
-export const QuizTaker = ({ quiz, onSubmit }) => {
+interface QuizTakerProps {
+  quiz: Quiz;
+  onSubmit: (answers: Record<number, string | boolean | number>) => void;
+}
+
+export const QuizTaker: React.FC<QuizTakerProps> = ({ quiz, onSubmit }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(quiz.timeLimit * 60);
+  const [answers, setAnswers] = useState<Record<number, string | boolean | number>>({});
+  const [timeLeft, setTimeLeft] = useState(quiz.timeLimit ? quiz.timeLimit * 60 : 0);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -20,7 +26,7 @@ export const QuizTaker = ({ quiz, onSubmit }) => {
     }
   }, [timeLeft, isSubmitted]);
 
-  const handleAnswer = (answer) => {
+  const handleAnswer = (answer: string | boolean | number) => {
     setAnswers(prev => ({
       ...prev,
       [currentQuestion]: answer
@@ -32,11 +38,13 @@ export const QuizTaker = ({ quiz, onSubmit }) => {
     onSubmit(answers);
   };
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  const currentQuestionData = quiz.questions[currentQuestion];
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -44,10 +52,12 @@ export const QuizTaker = ({ quiz, onSubmit }) => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>{quiz.title}</CardTitle>
-            <div className="flex items-center gap-2 text-orange-600">
-              <Timer className="w-5 h-5" />
-              <span className="font-mono">{formatTime(timeLeft)}</span>
-            </div>
+            {quiz.timeLimit && (
+              <div className="flex items-center gap-2 text-orange-600">
+                <Timer className="w-5 h-5" />
+                <span className="font-mono">{formatTime(timeLeft)}</span>
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -58,37 +68,37 @@ export const QuizTaker = ({ quiz, onSubmit }) => {
 
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-lg font-medium">
-                {quiz.questions[currentQuestion].text}
+                {currentQuestionData.text}
               </p>
 
               <div className="mt-4 space-y-2">
-                {quiz.questions[currentQuestion].type === 'multiple-choice' ? (
-                  quiz.questions[currentQuestion].options.map((option, index) => (
+                {currentQuestionData.type === 'multiple-choice' && currentQuestionData.options ? (
+                  currentQuestionData.options.map((option, index) => (
                     <label
                       key={index}
                       className={`
                         flex items-center p-3 rounded-lg border cursor-pointer
-                        ${answers[currentQuestion] === index ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}
+                        ${answers[currentQuestion] === option ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}
                       `}
                     >
                       <input
                         type="radio"
                         name={`question-${currentQuestion}`}
-                        checked={answers[currentQuestion] === index}
-                        onChange={() => handleAnswer(index)}
+                        checked={answers[currentQuestion] === option}
+                        onChange={() => handleAnswer(option)}
                         className="hidden"
                       />
                       <span>{option}</span>
                     </label>
                   ))
-                ) : (
+                ) : currentQuestionData.type === 'true-false' ? (
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
                       <input
                         type="radio"
                         name={`question-${currentQuestion}`}
-                        checked={answers[currentQuestion] === true}
-                        onChange={() => handleAnswer(true)}
+                        checked={answers[currentQuestion] === 'true'}
+                        onChange={() => handleAnswer('true')}
                       />
                       True
                     </label>
@@ -96,12 +106,20 @@ export const QuizTaker = ({ quiz, onSubmit }) => {
                       <input
                         type="radio"
                         name={`question-${currentQuestion}`}
-                        checked={answers[currentQuestion] === false}
-                        onChange={() => handleAnswer(false)}
+                        checked={answers[currentQuestion] === 'false'}
+                        onChange={() => handleAnswer('false')}
                       />
                       False
                     </label>
                   </div>
+                ) : (
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded"
+                    value={answers[currentQuestion] as string || ''}
+                    onChange={e => handleAnswer(e.target.value)}
+                    placeholder="Type your answer here..."
+                  />
                 )}
               </div>
             </div>
@@ -114,14 +132,15 @@ export const QuizTaker = ({ quiz, onSubmit }) => {
               >
                 <ChevronLeft className="w-4 h-4 mr-1" /> Previous
               </Button>
+
               {currentQuestion === quiz.questions.length - 1 ? (
-                <Button onClick={handleSubmit}>
+                <Button onClick={handleSubmit} disabled={isSubmitted}>
                   Submit Quiz
                 </Button>
               ) : (
                 <Button
                   onClick={() => setCurrentQuestion(prev => prev + 1)}
-                  disabled={answers[currentQuestion] === undefined}
+                  disabled={!answers[currentQuestion]}
                 >
                   Next <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
@@ -132,4 +151,6 @@ export const QuizTaker = ({ quiz, onSubmit }) => {
       </Card>
     </div>
   );
-}; 
+};
+
+export default QuizTaker;

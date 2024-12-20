@@ -63,3 +63,4 @@ export const TypewriterText: React.FC<TypewriterTextProps> = ({
     </motion.div>
   );
 };
+

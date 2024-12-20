@@ -119,3 +119,4 @@ export const CourseAnalytics = ({ analytics }: CourseAnalyticsProps) => {
 };
 
 export default CourseAnalytics;
+

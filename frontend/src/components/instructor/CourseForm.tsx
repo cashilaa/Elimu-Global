@@ -218,3 +218,4 @@ export const CourseForm = ({ course, onSubmit, onCancel }: CourseFormProps) => {
 };
 
 export default CourseForm;
+
