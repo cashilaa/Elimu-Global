@@ -4,12 +4,12 @@
   "description": "Backend for Elimu Global",
   "main": "dist/main.js",
   "scripts": {
-    "start": "node --max-old-space-size=2048 dist/main",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node --max-old-space-size=2048 dist/main",
+    "start": "node init && node --max-old-space-size=2048 dist/main",
+    "start:dev": "node init && nest start --watch",
+    "start:debug": "node init && nest start --debug --watch",
+    "start:prod": "node init && node --max-old-space-size=2048 dist/main",
     "prebuild": "npm install -g @nestjs/cli",
-    "build": "nest build",
+    "build": "node init && nest build",
     "postbuild": "npm prune --production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

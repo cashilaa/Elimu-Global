@@ -130,3 +130,4 @@ export const CourseCarousel: React.FC<CourseCarouselProps> = ({ courses, onSelec
     </div>
   );
 };
+

@@ -33,3 +33,4 @@ export const connectSocket = (userId: string) => {
 export const disconnectSocket = () => {
   socket.disconnect();
 };
+
