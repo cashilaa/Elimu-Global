@@ -16,10 +16,14 @@ exports.InstructorService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const instructor_schema_1 = require("./instructor.schema");
 let InstructorService = class InstructorService {
-    constructor(instructorModel) {
+    constructor(instructorModel, courseModel, studentModel, sessionModel, resourceModel, notificationModel) {
         this.instructorModel = instructorModel;
+        this.courseModel = courseModel;
+        this.studentModel = studentModel;
+        this.sessionModel = sessionModel;
+        this.resourceModel = resourceModel;
+        this.notificationModel = notificationModel;
     }
     async findAll() {
         return this.instructorModel.find().exec();
@@ -35,10 +39,106 @@ let InstructorService = class InstructorService {
     async remove(id) {
         return this.instructorModel.findByIdAndDelete(id).exec();
     }
+    async getInstructorStats(instructorId) {
+        const instructor = await this.instructorModel
+            .findById(instructorId)
+            .populate('courses')
+            .exec();
+        if (!instructor) {
+            throw new common_1.NotFoundException('Instructor not found');
+        }
+        // Fetch external platform stats
+        const externalStats = await this.fetchExternalPlatformStats(instructor.email);
+        return {
+            activeCourses: instructor.courses.length,
+            totalStudents: externalStats.totalStudents,
+            upcomingSessions: externalStats.upcomingSessions,
+            revenue: externalStats.revenue,
+            recentActivities: externalStats.recentActivities
+        };
+    }
+    async fetchExternalPlatformStats(instructorEmail) {
+        try {
+            // Replace with your external platform API endpoint
+            const response = await fetch('https://api.externalplatform.com/instructor-stats', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.EXTERNAL_API_KEY}`
+                },
+                body: JSON.stringify({ instructorEmail })
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch external stats');
+            }
+            return await response.json();
+        }
+        catch (error) {
+            console.error('External API error:', error);
+            // Return default values if external API fails
+            return {
+                totalStudents: 0,
+                upcomingSessions: 0,
+                revenue: 0,
+                recentActivities: []
+            };
+        }
+    }
+    async getInstructorCourses(id) {
+        return this.courseModel.find({ instructor: id }).exec();
+    }
+    async createCourse(id, courseData) {
+        const course = new this.courseModel(Object.assign(Object.assign({}, courseData), { instructor: id }));
+        return course.save();
+    }
+    async getStudents(id, courseId) {
+        const query = courseId
+            ? { enrolledCourses: courseId }
+            : { enrolledCourses: { $in: await this.getInstructorCourses(id) } };
+        return this.studentModel.find(query).exec();
+    }
+    async getAnalytics(id, startDate, endDate) {
+        // Implement analytics logic
+        return {};
+    }
+    async getSessions(id, status) {
+        const query = { instructor: id };
+        if (status && status !== 'all') {
+            query.status = status === 'upcoming' ? 'scheduled' : 'completed';
+        }
+        return this.sessionModel.find(query).exec();
+    }
+    async createSession(id, sessionData) {
+        const session = new this.sessionModel(Object.assign(Object.assign({}, sessionData), { instructor: id }));
+        return session.save();
+    }
+    async getResources(id) {
+        return this.resourceModel.find({ uploadedBy: id }).exec();
+    }
+    async uploadResource(id, resourceData) {
+        const resource = new this.resourceModel(Object.assign(Object.assign({}, resourceData), { uploadedBy: id }));
+        return resource.save();
+    }
+    async getNotifications(id) {
+        return this.notificationModel.find({ userId: id }).exec();
+    }
+    async markNotificationAsRead(id, notificationId) {
+        return this.notificationModel.findByIdAndUpdate(notificationId, { read: true }, { new: true }).exec();
+    }
 };
 InstructorService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, mongoose_1.InjectModel)(instructor_schema_1.Instructor.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(0, (0, mongoose_1.InjectModel)('Instructor')),
+    __param(1, (0, mongoose_1.InjectModel)('Course')),
+    __param(2, (0, mongoose_1.InjectModel)('Student')),
+    __param(3, (0, mongoose_1.InjectModel)('Session')),
+    __param(4, (0, mongoose_1.InjectModel)('Resource')),
+    __param(5, (0, mongoose_1.InjectModel)('Notification')),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model,
+        mongoose_2.Model])
 ], InstructorService);
 exports.InstructorService = InstructorService;

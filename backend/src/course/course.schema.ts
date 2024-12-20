@@ -1,75 +1,63 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { CourseContent } from '../shared/types/course-content';
 
-export type CourseDocument = Course & Document & { _id: Types.ObjectId };
+export interface Review {
+  student: Types.ObjectId;
+  rating: number;
+  comment?: string;
+  createdAt: Date;
+}
 
-@Schema()
-export class Course {
+@Schema({ timestamps: true })
+export class Course extends Document {
   @Prop({ required: true })
   title: string;
 
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true })
-  category: string;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  instructor: Types.ObjectId;
 
-  @Prop({ type: String, ref: 'Instructor', required: true })
-  instructor: string;
-
-  @Prop({ type: [String], default: [] })
-  students: string[];
-
-  @Prop({ type: [String], required: true })
-  learningObjectives: string[];
+  @Prop([{ type: Types.ObjectId, ref: 'User' }])
+  students: Types.ObjectId[];
 
   @Prop({ type: [Object], required: true })
-  modules: {
-    title: string;
-    description: string;
-    content: {
-      type: string; // 'video', 'document', 'quiz', etc.
-      url: string;
-      duration?: number;
-    }[];
-  }[];
+  content: CourseContent[];
 
-  @Prop({ type: Object, required: true })
+  @Prop({ type: String, enum: ['draft', 'published', 'archived'], default: 'draft' })
+  status: string;
+
+  @Prop([{
+    student: { type: Types.ObjectId, ref: 'User' },
+    rating: Number,
+    comment: String,
+    createdAt: Date
+  }])
+  reviews: Review[];
+
+  @Prop({ type: Object })
   pricing: {
     amount: number;
     currency: string;
-    discountPrice?: number;
-    discountValidUntil?: Date;
   };
 
-  @Prop({ type: Object, default: {} })
+  @Prop({ type: Object })
+  settings: {
+    enrollmentLimit?: number;
+    isPublic: boolean;
+    requiresApproval: boolean;
+    certificateEnabled: boolean;
+  };
+
+  @Prop({ type: Object })
   analytics: {
     enrollments: number;
-    completionRate: number;
     averageRating: number;
-    revenue: number;
     activeStudents: number;
+    revenue: number;
   };
-
-  @Prop({ type: [Object], default: [] })
-  reviews: {
-    student: string;
-    rating: number;
-    comment: string;
-    createdAt: Date;
-  }[];
-
-  @Prop({ type: String, enum: ['draft', 'pending', 'published', 'archived'], default: 'draft' })
-  status: string;
-
-  @Prop({ type: Date, default: Date.now })
-  createdAt: Date;
-
-  @Prop({ type: Date, default: Date.now })
-  updatedAt: Date;
-
-  @Prop({ type: Date })
-  publishedAt: Date;
 }
 
 export const CourseSchema = SchemaFactory.createForClass(Course);

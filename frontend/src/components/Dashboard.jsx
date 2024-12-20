@@ -1,82 +1,105 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
+import { LoadingSpinner } from './ui/LoadingSpinner';
 import { 
   BookOpen, Users, Calendar, TrendingUp, 
   Clock, Award, Bell, ChevronRight 
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const stats = [
+  const [instructor, setInstructor] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fallback data
+  const fallbackData = {
+    activeCourses: 0,
+    totalStudents: 0,
+    upcomingSessions: 0,
+    revenue: 0,
+    upcomingSessionsList: [
+      {
+        title: 'No upcoming sessions',
+        time: '-',
+        date: '-',
+        students: 0,
+        type: 'No Session'
+      }
+    ],
+    recentActivities: [
+      {
+        type: 'info',
+        message: 'No recent activities',
+        time: '-'
+      }
+    ]
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (!userData?._id) {
+          throw new Error('User data not found');
+        }
+
+        setInstructor(userData);
+
+        const response = await fetch(`http://localhost:3000/api/instructors/${userData._id}/stats`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch stats');
+        }
+
+        const { data } = await response.json();
+        setStats(data);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError(err.message);
+        // Use fallback data on error
+        setStats(fallbackData);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const statCards = [
     {
       title: 'Active Courses',
-      value: '12',
+      value: stats?.activeCourses?.toString() || '0',
       icon: BookOpen,
       change: '+2.5%',
       color: 'blue'
     },
     {
       title: 'Total Students',
-      value: '1,234',
+      value: stats?.totalStudents?.toLocaleString() || '0',
       icon: Users,
       change: '+12.3%',
       color: 'green'
     },
     {
       title: 'Upcoming Sessions',
-      value: '5',
+      value: stats?.upcomingSessions?.toString() || '0',
       icon: Calendar,
-      change: '2 this week',
+      change: stats?.upcomingSessions > 0 ? `${stats.upcomingSessions} this week` : 'No sessions',
       color: 'purple'
     },
     {
       title: 'Revenue',
-      value: '$12,345',
+      value: stats?.revenue ? `$${stats.revenue.toLocaleString()}` : '$0',
       icon: TrendingUp,
-      change: '+8.1%',
+      change: stats?.revenue > 0 ? '+8.1%' : 'No revenue',
       color: 'yellow'
     },
-  ];
-
-  const upcomingSessions = [
-    {
-      title: 'Introduction to React',
-      time: '2:00 PM - 3:30 PM',
-      date: 'Today',
-      students: 25,
-      type: 'Live Session'
-    },
-    {
-      title: 'Advanced JavaScript Concepts',
-      time: '4:00 PM - 5:30 PM',
-      date: 'Tomorrow',
-      students: 18,
-      type: 'Live Session'
-    },
-    {
-      title: 'Web Development Basics',
-      time: '10:00 AM - 11:30 AM',
-      date: 'Dec 22, 2023',
-      students: 30,
-      type: 'Live Session'
-    }
-  ];
-
-  const recentActivities = [
-    {
-      type: 'enrollment',
-      message: 'New student enrolled in React Fundamentals',
-      time: '2 hours ago'
-    },
-    {
-      type: 'completion',
-      message: 'Sarah completed JavaScript Basics course',
-      time: '4 hours ago'
-    },
-    {
-      type: 'review',
-      message: 'New 5-star review on Advanced React Patterns',
-      time: '6 hours ago'
-    }
   ];
 
   const StatCard = ({ stat }) => (
@@ -94,13 +117,28 @@ const Dashboard = () => {
     </Card>
   );
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Welcome Section */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome back, Instructor!</h1>
-          <p className="text-gray-600">Here's what's happening with your courses today.</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Welcome back, {instructor?.firstName || 'Instructor'}!
+          </h1>
+          <p className="text-gray-600">
+            {error 
+              ? 'Some data might be unavailable at the moment'
+              : "Here's what's happening with your courses today."
+            }
+          </p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
           <Bell size={20} />
@@ -110,7 +148,7 @@ const Dashboard = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {statCards.map((stat, index) => (
           <StatCard key={index} stat={stat} />
         ))}
       </div>
@@ -127,7 +165,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {upcomingSessions.map((session, index) => (
+              {(stats?.upcomingSessionsList || fallbackData.upcomingSessionsList).map((session, index) => (
                 <div 
                   key={index} 
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -159,7 +197,7 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
+              {(stats?.recentActivities || fallbackData.recentActivities).map((activity, index) => (
                 <div key={index} className="flex gap-4">
                   <div className="p-2 bg-gray-100 rounded-full h-fit">
                     <Award className="w-4 h-4 text-gray-600" />

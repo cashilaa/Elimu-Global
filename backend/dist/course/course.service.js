@@ -22,7 +22,12 @@ let CourseService = class CourseService {
         this.courseModel = courseModel;
     }
     async create(createCourseDto) {
-        const createdCourse = new this.courseModel(createCourseDto);
+        const createdCourse = new this.courseModel(Object.assign(Object.assign({}, createCourseDto), { instructor: new mongoose_2.Types.ObjectId(createCourseDto.instructor), status: 'draft', students: [], reviews: [], analytics: {
+                enrollments: 0,
+                averageRating: 0,
+                activeStudents: 0,
+                revenue: 0
+            } }));
         return createdCourse.save();
     }
     async findAll(filter = {}) {
@@ -39,6 +44,9 @@ let CourseService = class CourseService {
         return this.courseModel.find({ instructor: instructorId }).exec();
     }
     async update(id, updateCourseDto) {
+        if (updateCourseDto.instructor) {
+            updateCourseDto.instructor = new mongoose_2.Types.ObjectId(updateCourseDto.instructor);
+        }
         const updatedCourse = await this.courseModel
             .findByIdAndUpdate(id, updateCourseDto, { new: true })
             .exec();
@@ -70,7 +78,7 @@ let CourseService = class CourseService {
             .findByIdAndUpdate(courseId, {
             $push: {
                 reviews: {
-                    student: studentId,
+                    student: new mongoose_2.Types.ObjectId(studentId),
                     rating,
                     comment,
                     createdAt: new Date(),
@@ -84,20 +92,25 @@ let CourseService = class CourseService {
         return course;
     }
     async updateAnalytics(courseId) {
+        var _a;
         const course = await this.findOne(courseId);
         if (!course) {
             throw new common_1.NotFoundException(`Course with ID ${courseId} not found`);
         }
+        const averageRating = await this.calculateAverageRating(course);
         const analytics = {
             enrollments: course.students.length,
-            averageRating: course.reviews.reduce((acc, review) => acc + review.rating, 0) /
-                (course.reviews.length || 1),
+            averageRating,
             activeStudents: course.students.length,
-            revenue: course.students.length * course.pricing.amount,
+            revenue: course.students.length * (((_a = course.pricing) === null || _a === void 0 ? void 0 : _a.amount) || 0),
         };
-        return this.courseModel
+        const updatedCourse = await this.courseModel
             .findByIdAndUpdate(courseId, { 'analytics': analytics }, { new: true })
             .exec();
+        if (!updatedCourse) {
+            throw new common_1.NotFoundException(`Course with ID ${courseId} not found`);
+        }
+        return updatedCourse;
     }
     async delete(id) {
         const deletedCourse = await this.courseModel
@@ -107,6 +120,12 @@ let CourseService = class CourseService {
             throw new common_1.NotFoundException(`Course with ID ${id} not found`);
         }
         return deletedCourse;
+    }
+    async calculateAverageRating(course) {
+        var _a;
+        if (!((_a = course.reviews) === null || _a === void 0 ? void 0 : _a.length))
+            return 0;
+        return course.reviews.reduce((acc, review) => acc + review.rating, 0) / course.reviews.length;
     }
 };
 CourseService = __decorate([

@@ -7,8 +7,10 @@ import CourseForm from '../../components/instructor/CourseForm';
 import CourseAnalytics from '../../components/instructor/CourseAnalytics';
 import CourseContentManager from '../../components/instructor/CourseContentManager';
 import VideoUploader from '../../components/instructor/VideoUploader';
+import { useNavigate } from 'react-router-dom';
 
 const Courses = () => {
+  const navigate = useNavigate();
   const [showCourseForm, setShowCourseForm] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -143,13 +145,13 @@ const Courses = () => {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">My Courses</h1>
-        <Button 
-          className="flex items-center space-x-2"
-          onClick={() => setShowCourseForm(true)}
+        <button
+          onClick={() => navigate('/dashboard/courses/create')}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
         >
-          <Plus className="h-4 w-4" />
-          <span>Create Course</span>
-        </Button>
+          <Plus className="w-5 h-5" />
+          Create Course
+        </button>
       </div>
 
       {/* Course Form Modal */}

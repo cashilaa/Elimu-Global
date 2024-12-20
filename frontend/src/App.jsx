@@ -10,12 +10,30 @@ import Courses from './pages/instructor/Courses';
 import Students from './pages/instructor/Students';
 import Schedule from './pages/instructor/Schedule';
 import Settings from './pages/instructor/Settings';
-import CreateSession from './pages/instructor/CreateSession'; 
-import GroupManagement from './pages/instructor/GroupManagement'; // Assuming this is the correct import path
+import CreateSession from './pages/instructor/CreateSession';
+import GroupManagement from './pages/instructor/GroupManagement';
 import InstructorsLanding from './components/InstructorsLanding';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ResourcesPage } from './pages/instructor/ResourcesPage';
+import { ProgressPage } from './pages/instructor/ProgressPage';
+import { websocketService } from './services/websocket.service';
+import { useEffect } from 'react';
+import AssessmentsPage from './pages/instructor/AssessmentsPage';
+import { CreateCoursePage } from './pages/instructor/CreateCoursePage';
 
 function App() {
+  useEffect(() => {
+    // Connect to WebSocket when user is authenticated
+    const token = localStorage.getItem('token');
+    if (token) {
+      websocketService.connect();
+    }
+
+    return () => {
+      websocketService.disconnect();
+    };
+  }, []);
+
   return (
     <Router>
       <AnimatePresence mode="wait">
@@ -57,20 +75,28 @@ function App() {
                 <InstructorForm />
               </motion.div>
             } />
-            <Route path="/instructor/*" element={<DashboardLayout />}>
+            
+            {/* Dashboard Routes */}
+            <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
-              <Route path="dashboard" element={<Dashboard />} />
               <Route path="zoom-meetings" element={<ZoomMeetings />} />
+              <Route path="courses/create" element={<CreateCoursePage />} />
               <Route path="courses" element={<Courses />} />
               <Route path="students" element={<Students />} />
               <Route path="schedule" element={<Schedule />} />
               <Route path="settings" element={<Settings />} />
               <Route path="create-session" element={<CreateSession />} />
               <Route path="group-management" element={<GroupManagement />} />
+              <Route path="assessments" element={<AssessmentsPage />} />
+              <Route path="resources" element={<ResourcesPage />} />
+              <Route path="progress" element={<ProgressPage />} />
             </Route>
-            <Route path="/instructor/create-session" element={<CreateSession />} />
-            <Route path="/dashboard" element={<Navigate to="/instructor/dashboard" replace />} />
-            <Route path="/instructor/group-management" element={<GroupManagement />} />
+
+            {/* Redirect /instructor/* to /dashboard/* */}
+            <Route 
+              path="/instructor/*" 
+              element={<Navigate to="/dashboard" replace />} 
+            />
           </Routes>
         </motion.div>
       </AnimatePresence>

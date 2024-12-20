@@ -9,19 +9,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CourseModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
-const course_schema_1 = require("./course.schema");
-const course_service_1 = require("./course.service");
 const course_controller_1 = require("./course.controller");
+const course_service_1 = require("./course.service");
+const course_schema_1 = require("./course.schema");
 let CourseModule = class CourseModule {
 };
 CourseModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: course_schema_1.Course.name, schema: course_schema_1.CourseSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: course_schema_1.Course.name, schema: course_schema_1.CourseSchema }
+            ])
         ],
         controllers: [course_controller_1.CourseController],
         providers: [course_service_1.CourseService],
-        exports: [course_service_1.CourseService],
+        exports: [course_service_1.CourseService]
     })
 ], CourseModule);
 exports.CourseModule = CourseModule;

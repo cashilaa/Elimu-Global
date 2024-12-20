@@ -3,7 +3,8 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, BookOpen, Users, Calendar, Settings, 
-  LogOut, Menu, X, Bell, Search 
+  LogOut, Menu, X, Bell, Search, 
+  FileText, Upload, TrendingUp, BookCheck 
 } from 'lucide-react';
 
 const DashboardLayout = () => {
@@ -16,6 +17,9 @@ const DashboardLayout = () => {
     { name: 'Courses', href: '/dashboard/courses', icon: BookOpen },
     { name: 'Students', href: '/dashboard/students', icon: Users },
     { name: 'Schedule', href: '/dashboard/schedule', icon: Calendar },
+    { name: 'Assessments', href: '/dashboard/assessments', icon: FileText },
+    { name: 'Resources', href: '/dashboard/resources', icon: Upload },
+    { name: 'Progress', href: '/dashboard/progress', icon: TrendingUp },
     { name: 'Settings', href: '/dashboard/settings', icon: Settings },
   ];
 

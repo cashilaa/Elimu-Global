@@ -6,142 +6,154 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   UseGuards,
+  HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { CourseService } from './course.service';
-import { NotificationService } from '../notification/notification.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+import { CourseService } from './course.service';
+import { Course } from './course.schema';
+import { Types } from 'mongoose';
+import { CreateCourseDto, UpdateCourseDto, CreateReviewDto } from './dto';
 
-@Controller('courses')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('api/courses')
+@UseGuards(JwtAuthGuard)
 export class CourseController {
-  constructor(
-    private readonly courseService: CourseService,
-    private readonly notificationService: NotificationService,
-  ) {}
+  constructor(private readonly courseService: CourseService) {}
 
   @Post()
-  @Roles('instructor')
-  async createCourse(@Body() createCourseDto: any) {
-    const course = await this.courseService.create(createCourseDto);
-    if (course) {
-      await this.notificationService.notifyCourseCreated(
-        course._id.toString(),
-        course.instructor,
-        course.title,
+  async create(@Body() createCourseDto: CreateCourseDto) {
+    try {
+      const course = await this.courseService.create(createCourseDto);
+      return {
+        success: true,
+        data: course
+      };
+    } catch (error: any) {
+      throw new HttpException(
+        error.message || 'Failed to create course',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
-    } else {
-      throw new Error('Course not found');
     }
-    return course;
   }
 
   @Get()
-  async findAll(@Query() query: any) {
-    return this.courseService.findAll(query);
+  async findAll() {
+    try {
+      const courses = await this.courseService.findAll();
+      return {
+        success: true,
+        data: courses.map(course => ({
+          id: course._id instanceof Types.ObjectId ? course._id.toString() : course._id,
+          instructor: course.instructor instanceof Types.ObjectId ? course.instructor.toString() : course.instructor,
+          ...course.toObject()
+        }))
+      };
+    } catch (error: any) {
+      throw new HttpException(
+        error.message || 'Failed to fetch courses',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.courseService.findOne(id);
-  }
-
-  @Get('instructor/:instructorId')
-  async findByInstructor(@Param('instructorId') instructorId: string) {
-    return this.courseService.findByInstructor(instructorId);
+    try {
+      const course = await this.courseService.findOne(id);
+      return {
+        success: true,
+        data: {
+          id: course._id instanceof Types.ObjectId ? course._id.toString() : course._id,
+          instructor: course.instructor instanceof Types.ObjectId ? course.instructor.toString() : course.instructor,
+          ...course.toObject()
+        }
+      };
+    } catch (error: any) {
+      throw new HttpException(
+        error.message || 'Failed to fetch course',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 
   @Put(':id')
-  @Roles('instructor')
-  async update(@Param('id') id: string, @Body() updateCourseDto: any) {
-    return this.courseService.update(id, updateCourseDto);
-  }
-
-  @Put(':id/status')
-  @Roles('instructor', 'admin')
-  async updateStatus(
-    @Param('id') id: string,
-    @Body('status') status: string,
-  ) {
-    const course = await this.courseService.updateStatus(id, status);
-    if (course) {
-      if (status === 'published') {
-        await this.notificationService.notifyCourseApproved(
-          course._id.toString(),
-          course.instructor,
-          course.title,
-        );
-      }
-    } else {
-      throw new Error('Course not found');
-    }
-    return course;
-  }
-
-  @Post(':id/enroll')
-  @Roles('student')
-  async enrollStudent(
-    @Param('id') courseId: string,
-    @Body('studentId') studentId: string,
-  ) {
-    const course = await this.courseService.addStudent(courseId, studentId);
-    if (course) {
-      await this.notificationService.notifyNewEnrollment(
-        course._id.toString(),
-        course.instructor,
-        studentId,
-        course.title,
+  async update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
+    try {
+      const course = await this.courseService.update(id, updateCourseDto);
+      return {
+        success: true,
+        data: {
+          id: course._id instanceof Types.ObjectId ? course._id.toString() : course._id,
+          instructor: course.instructor instanceof Types.ObjectId ? course.instructor.toString() : course.instructor,
+          ...course.toObject()
+        }
+      };
+    } catch (error: any) {
+      throw new HttpException(
+        error.message || 'Failed to update course',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
       );
-    } else {
-      throw new Error('Course not found');
-    }
-    return course;
-  }
-
-  @Post(':id/review')
-  @Roles('student')
-  async addReview(
-    @Param('id') courseId: string,
-    @Body() reviewData: { studentId: string; rating: number; comment: string },
-  ) {
-    const course = await this.courseService.addReview(
-      courseId,
-      reviewData.studentId,
-      reviewData.rating,
-      reviewData.comment,
-    );
-    if (course) {
-      await this.notificationService.notifyNewReview(
-        course._id.toString(),
-        course.instructor,
-        reviewData.studentId,
-        course.title,
-        reviewData.rating,
-      );
-    } else {
-      throw new Error('Course not found');
-    }
-    return course;
-  }
-
-  @Get(':id/analytics')
-  @Roles('instructor', 'admin')
-  async getAnalytics(@Param('id') id: string) {
-    const course = await this.courseService.findOne(id);
-    if (course) {
-      return course.analytics;
-    } else {
-      throw new Error('Course not found');
     }
   }
 
   @Delete(':id')
-  @Roles('instructor', 'admin')
-  async delete(@Param('id') id: string) {
-    return this.courseService.delete(id);
+  async remove(@Param('id') id: string) {
+    try {
+      const course = await this.courseService.delete(id);
+      return {
+        success: true,
+        data: {
+          id: course._id instanceof Types.ObjectId ? course._id.toString() : course._id,
+          instructor: course.instructor instanceof Types.ObjectId ? course.instructor.toString() : course.instructor,
+          ...course.toObject()
+        }
+      };
+    } catch (error: any) {
+      throw new HttpException(
+        error.message || 'Failed to delete course',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post(':id/students')
+  async addStudent(@Param('id') id: string, @Body('studentId') studentId: string) {
+    try {
+      const course = await this.courseService.addStudent(id, studentId);
+      return {
+        success: true,
+        data: course
+      };
+    } catch (error: any) {
+      throw new HttpException(
+        error.message || 'Failed to add student',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  @Post(':id/reviews')
+  async addReview(
+    @Param('id') id: string,
+    @Body() reviewData: CreateReviewDto
+  ) {
+    try {
+      const course = await this.courseService.addReview(
+        id,
+        reviewData.studentId,
+        reviewData.rating,
+        reviewData.comment
+      );
+      return {
+        success: true,
+        data: course
+      };
+    } catch (error: any) {
+      throw new HttpException(
+        error.message || 'Failed to add review',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }
