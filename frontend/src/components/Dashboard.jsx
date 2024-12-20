@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from './ui/Card';
 import { LoadingSpinner } from './ui/LoadingSpinner';
 import { 
   BookOpen, Users, Calendar, TrendingUp, 
-  Clock, Award, Bell, ChevronRight 
+  Clock, Award, Bell, ChevronRight, MessageCircle 
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -100,6 +100,13 @@ const Dashboard = () => {
       change: stats?.revenue > 0 ? '+8.1%' : 'No revenue',
       color: 'yellow'
     },
+    {
+      title: 'Active Discussions',
+      value: stats?.discussions || 0,
+      icon: MessageCircle,
+      change: stats?.discussions > 0 ? `${stats.newDiscussions} new` : 'No new discussions',
+      color: 'purple'
+    }
   ];
 
   const StatCard = ({ stat }) => (

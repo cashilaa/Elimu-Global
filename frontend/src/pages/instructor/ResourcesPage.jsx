@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ResourceLibrary } from '../../components/resource/ResourceLibrary';
+import ResourceLibrary from '../../components/resource/ResourceLibrary';
 import { FileUpload } from '../../components/resource/FileUpload';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs';
 
