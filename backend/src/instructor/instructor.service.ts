@@ -10,8 +10,6 @@ import { Session } from '../session/session.schema';
 import { Resource } from '../shared/types/resource';
 import { Notification } from '../shared/types/notification';
 import { Analytics } from '../analytics/analytics.schema';
-import { S3 } from 'aws-sdk';
-import { ConfigService } from '@nestjs/config';
 
 interface SessionQuery {
   instructor: string;
@@ -20,9 +18,6 @@ interface SessionQuery {
 
 @Injectable()
 export class InstructorService {
-  private s3: S3;
-  private readonly bucketName: string;
-
   constructor(
     @InjectModel('Instructor') private instructorModel: Model<Instructor>,
     @InjectModel('Course') private courseModel: Model<Course>,
@@ -31,15 +26,7 @@ export class InstructorService {
     @InjectModel('Resource') private resourceModel: Model<Resource>,
     @InjectModel('Notification') private notificationModel: Model<Notification>,
     @InjectModel('Analytics') private analyticsModel: Model<Analytics>,
-    private configService: ConfigService
-  ) {
-    this.bucketName = this.configService.get('AWS_BUCKET_NAME') || '';
-    this.s3 = new S3({
-      accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
-      secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
-      region: this.configService.get('AWS_REGION'),
-    });
-  }
+  ) {}
 
   async findAll() {
     return this.instructorModel.find().exec();
@@ -160,11 +147,28 @@ export class InstructorService {
     return this.resourceModel.find({ uploadedBy: id }).exec();
   }
 
-  async uploadResource(id: string, resourceData: any) {
+  async uploadResource(id: string, resourceData: any, file?: Express.Multer.File) {
+    let fileData = null;
+    
+    if (file) {
+      // Convert file to base64
+      const base64String = file.buffer.toString('base64');
+      const fileType = file.mimetype;
+      fileData = {
+        dataUrl: `data:${fileType};base64,${base64String}`,
+        fileName: file.originalname,
+        fileSize: file.size,
+        mimeType: file.mimetype
+      };
+    }
+
     const resource = new this.resourceModel({
       ...resourceData,
-      uploadedBy: id
+      uploadedBy: id,
+      fileData: fileData,
+      uploadedAt: new Date()
     });
+
     return resource.save();
   }
 
@@ -190,17 +194,14 @@ export class InstructorService {
   }
 
   async uploadProfilePicture(file: Express.Multer.File): Promise<string> {
-    const key = `profile-pictures/${Date.now()}-${file.originalname}`;
+    // Convert file buffer to base64
+    const base64String = file.buffer.toString('base64');
+    const fileType = file.mimetype;
     
-    await this.s3.upload({
-      Bucket: this.bucketName,
-      Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    }).promise();
-
-    return `https://${this.bucketName}.s3.amazonaws.com/${key}`;
+    // Return the data URL directly
+    return `data:${fileType};base64,${base64String}`;
   }
 
   // Add any other methods you need
+  
 }

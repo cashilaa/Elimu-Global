@@ -10,27 +10,29 @@ export class Resource extends Document {
   description: string;
 
   @Prop({ required: true })
-  url: string;
-
-  @Prop({ required: true })
   type: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Instructor', required: true })
   uploadedBy: Types.ObjectId;
 
   @Prop({ type: Object })
-  metadata: {
-    fileSize?: number;
-    fileType?: string;
-    duration?: number;
-    dimensions?: {
-      width: number;
-      height: number;
-    };
+  fileData: {
+    dataUrl: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
   };
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Course' }] })
   associatedCourses: Types.ObjectId[];
+
+  @Prop({ type: Object })
+  metadata: {
+    lastUpdated: Date;
+    version: number;
+    downloadable: boolean;
+    estimatedDuration?: number;
+  };
 }
 
 export const ResourceSchema = SchemaFactory.createForClass(Resource); 

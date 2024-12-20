@@ -16,10 +16,8 @@ exports.InstructorService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const aws_sdk_1 = require("aws-sdk");
-const config_1 = require("@nestjs/config");
 let InstructorService = class InstructorService {
-    constructor(instructorModel, courseModel, studentModel, sessionModel, resourceModel, notificationModel, analyticsModel, configService) {
+    constructor(instructorModel, courseModel, studentModel, sessionModel, resourceModel, notificationModel, analyticsModel) {
         this.instructorModel = instructorModel;
         this.courseModel = courseModel;
         this.studentModel = studentModel;
@@ -27,13 +25,6 @@ let InstructorService = class InstructorService {
         this.resourceModel = resourceModel;
         this.notificationModel = notificationModel;
         this.analyticsModel = analyticsModel;
-        this.configService = configService;
-        this.bucketName = this.configService.get('AWS_BUCKET_NAME') || '';
-        this.s3 = new aws_sdk_1.S3({
-            accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
-            secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
-            region: this.configService.get('AWS_REGION'),
-        });
     }
     async findAll() {
         return this.instructorModel.find().exec();
@@ -131,8 +122,20 @@ let InstructorService = class InstructorService {
     async getResources(id) {
         return this.resourceModel.find({ uploadedBy: id }).exec();
     }
-    async uploadResource(id, resourceData) {
-        const resource = new this.resourceModel(Object.assign(Object.assign({}, resourceData), { uploadedBy: id }));
+    async uploadResource(id, resourceData, file) {
+        let fileData = null;
+        if (file) {
+            // Convert file to base64
+            const base64String = file.buffer.toString('base64');
+            const fileType = file.mimetype;
+            fileData = {
+                dataUrl: `data:${fileType};base64,${base64String}`,
+                fileName: file.originalname,
+                fileSize: file.size,
+                mimeType: file.mimetype
+            };
+        }
+        const resource = new this.resourceModel(Object.assign(Object.assign({}, resourceData), { uploadedBy: id, fileData: fileData, uploadedAt: new Date() }));
         return resource.save();
     }
     async getNotifications(id) {
@@ -150,14 +153,11 @@ let InstructorService = class InstructorService {
         return newInstructor.save();
     }
     async uploadProfilePicture(file) {
-        const key = `profile-pictures/${Date.now()}-${file.originalname}`;
-        await this.s3.upload({
-            Bucket: this.bucketName,
-            Key: key,
-            Body: file.buffer,
-            ContentType: file.mimetype,
-        }).promise();
-        return `https://${this.bucketName}.s3.amazonaws.com/${key}`;
+        // Convert file buffer to base64
+        const base64String = file.buffer.toString('base64');
+        const fileType = file.mimetype;
+        // Return the data URL directly
+        return `data:${fileType};base64,${base64String}`;
     }
 };
 InstructorService = __decorate([
@@ -175,7 +175,6 @@ InstructorService = __decorate([
         mongoose_2.Model,
         mongoose_2.Model,
         mongoose_2.Model,
-        mongoose_2.Model,
-        config_1.ConfigService])
+        mongoose_2.Model])
 ], InstructorService);
 exports.InstructorService = InstructorService;

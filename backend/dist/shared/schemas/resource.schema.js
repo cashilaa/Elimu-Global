@@ -25,10 +25,6 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
-], Resource.prototype, "url", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", String)
 ], Resource.prototype, "type", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'Instructor', required: true }),
@@ -37,11 +33,15 @@ __decorate([
 __decorate([
     (0, mongoose_1.Prop)({ type: Object }),
     __metadata("design:type", Object)
-], Resource.prototype, "metadata", void 0);
+], Resource.prototype, "fileData", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Types.ObjectId, ref: 'Course' }] }),
     __metadata("design:type", Array)
 ], Resource.prototype, "associatedCourses", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: Object }),
+    __metadata("design:type", Object)
+], Resource.prototype, "metadata", void 0);
 Resource = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Resource);

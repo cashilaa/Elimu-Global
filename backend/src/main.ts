@@ -13,9 +13,9 @@ async function bootstrap() {
   // Enable compression without type assertion
   app.use(compression());
   
-  // Enable CORS
+  // Enable CORS with production configuration
   app.enableCors({
-    origin: true,
+    origin: process.env.FRONTEND_URL,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
