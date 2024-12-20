@@ -78,7 +78,7 @@ export class VideoService {
 
   private async getVideoDuration(filePath: string): Promise<number> {
     return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(filePath, (err, metadata) => {
+      ffmpeg.ffprobe(filePath, (err: Error | null, metadata: any) => {
         if (err) reject(err);
         if (!metadata?.format?.duration) {
           reject(new Error('Could not determine video duration'));

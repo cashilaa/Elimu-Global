@@ -19,7 +19,6 @@ ZoomModule = __decorate([
         imports: [config_1.ConfigModule, notification_module_1.NotificationModule],
         controllers: [zoom_controller_1.ZoomController],
         providers: [zoom_service_1.ZoomService],
-        exports: [zoom_service_1.ZoomService, notification_module_1.NotificationModule], // Add NotificationModule here
     })
 ], ZoomModule);
 exports.ZoomModule = ZoomModule;

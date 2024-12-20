@@ -28,7 +28,7 @@ export class UploadService {
     await writeFile(tempFilePath, file.buffer);
 
     return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(tempFilePath, (err: Error, metadata: ffmpeg.FfprobeData) => {
+      ffmpeg.ffprobe(tempFilePath, (err: Error | null, metadata: any) => {
         unlink(tempFilePath).catch(console.error); // Clean up temp file
 
         if (err) {

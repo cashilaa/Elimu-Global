@@ -5,9 +5,8 @@ import { ZoomController } from './zoom.controller';
 import { ZoomService } from './zoom.service';
 
 @Module({
-  imports: [ConfigModule, NotificationModule], 
+  imports: [ConfigModule, NotificationModule],
   controllers: [ZoomController],
   providers: [ZoomService],
-  exports: [ZoomService, NotificationModule], // Add NotificationModule here
 })
 export class ZoomModule {}
