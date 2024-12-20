@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,19 +8,7 @@ import CourseAnalytics from './CourseAnalytics';
 import { LoadingSpinner } from '../shared/LoadingSpinner';
 import { TypewriterText } from '../shared/TypewriterText';
 import { CourseCarousel } from '../shared/CourseCarousel';
-
-interface Course {
-  _id: string;
-  title: string;
-  description: string;
-  status: string;
-  analytics: {
-    enrollments: number;
-    completionRate: number;
-    averageRating: number;
-    revenue: number;
-  };
-}
+import { Course } from '../../types';
 
 export default function CourseManagement() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +19,25 @@ export default function CourseManagement() {
     queryKey: ['courses'],
     queryFn: async () => {
       const { data } = await axios.get('/api/courses');
-      return data;
+      return data.map((course: any) => ({
+        id: course._id,
+        title: course.title,
+        description: course.description,
+        duration: course.duration || '',
+        price: course.price || 0,
+        maxStudents: course.maxStudents || 30,
+        level: course.level || 'beginner',
+        prerequisites: course.prerequisites,
+        objectives: course.objectives || '',
+        status: course.status || 'draft',
+        analytics: course.analytics || {
+          views: 0,
+          completionRate: 0,
+          averageRating: 0,
+          totalEnrollments: 0,
+          revenueGenerated: 0
+        }
+      }));
     },
   });
 
@@ -120,7 +126,7 @@ export default function CourseManagement() {
             >
               {courses?.map((course: Course) => (
                 <motion.div
-                  key={course._id}
+                  key={course.id}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -154,7 +160,7 @@ export default function CourseManagement() {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => deleteMutation.mutate(course._id)}
+                        onClick={() => deleteMutation.mutate(course.id)}
                         className="p-2 text-red-400 hover:text-red-500 transition-colors"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -207,7 +213,7 @@ export default function CourseManagement() {
                 course={selectedCourse}
                 onSubmit={async (data) => {
                   if (selectedCourse) {
-                    await axios.put(`/api/courses/${selectedCourse._id}`, data);
+                    await axios.put(`/api/courses/${selectedCourse.id}`, data);
                   } else {
                     await axios.post('/api/courses', data);
                   }

@@ -1,222 +1,155 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ChevronDown,
-  ChevronUp,
-  Plus,
-  Pencil,
-  Trash2,
-  GripVertical,
-  Video,
-  FileText,
-  Link,
-  Download
-} from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { Plus, GripVertical, Video, FileText, Link as LinkIcon, Download, X } from 'lucide-react';
+import { Course } from '../../types';
 
-const contentTypes = {
-  video: { icon: Video, label: "Video" },
-  document: { icon: FileText, label: "Document" },
-  link: { icon: Link, label: "External Link" },
-  download: { icon: Download, label: "Downloadable Resource" }
-};
+interface ContentItem {
+  id: string;
+  type: 'video' | 'document' | 'link' | 'download';
+  title: string;
+  duration?: string;
+  size?: string;
+  url?: string;
+}
 
-export const CourseContentManager = ({ courseId }) => {
-  const [sections, setSections] = useState([
-    {
-      id: "1",
-      title: "Introduction to the Course",
-      items: [
-        { id: "1-1", type: "video", title: "Welcome Video", duration: "5:30" },
-        { id: "1-2", type: "document", title: "Course Outline", size: "1.2 MB" }
-      ]
-    },
-    {
-      id: "2",
-      title: "Getting Started",
-      items: [
-        { id: "2-1", type: "video", title: "Setup Guide", duration: "12:45" },
-        { id: "2-2", type: "link", title: "Additional Resources", url: "https://example.com" }
-      ]
-    }
-  ]);
+interface Section {
+  id: string;
+  title: string;
+  items: ContentItem[];
+}
 
-  const [expandedSections, setExpandedSections] = useState(new Set(["1"]));
+interface CourseContentManagerProps {
+  course: Course;
+  onUpdate: (sections: Section[]) => Promise<void>;
+}
 
-  const toggleSection = (sectionId) => {
-    const newExpanded = new Set(expandedSections);
-    if (newExpanded.has(sectionId)) {
-      newExpanded.delete(sectionId);
-    } else {
-      newExpanded.add(sectionId);
-    }
-    setExpandedSections(newExpanded);
-  };
+const CourseContentManager = ({ course, onUpdate }: CourseContentManagerProps) => {
+  const [sections, setSections] = useState<Section[]>(
+    course.content?.sections || []
+  );
+  const [newSectionTitle, setNewSectionTitle] = useState('');
 
-  const handleDragEnd = (result) => {
+  useEffect(() => {
+    setSections(course.content?.sections || []);
+  }, [course]);
+
+  const handleDragEnd = (result: any) => {
     if (!result.destination) return;
 
     const { source, destination } = result;
-    const sourceSection = sections.find(s => s.id === source.droppableId);
-    const destSection = sections.find(s => s.id === destination.droppableId);
-
-    if (!sourceSection || !destSection) return;
-
     const newSections = [...sections];
-    const [movedItem] = sourceSection.items.splice(source.index, 1);
-    destSection.items.splice(destination.index, 0, movedItem);
+
+    if (source.droppableId === destination.droppableId) {
+      // Reordering within the same section
+      const section = newSections.find(s => s.id === source.droppableId);
+      if (!section) return;
+
+      const [removed] = section.items.splice(source.index, 1);
+      section.items.splice(destination.index, 0, removed);
+    } else {
+      // Moving between sections
+      const sourceSection = newSections.find(s => s.id === source.droppableId);
+      const destSection = newSections.find(s => s.id === destination.droppableId);
+      if (!sourceSection || !destSection) return;
+
+      const [removed] = sourceSection.items.splice(source.index, 1);
+      destSection.items.splice(destination.index, 0, removed);
+    }
 
     setSections(newSections);
+    onUpdate(newSections);
   };
 
-  const addNewSection = () => {
-    const newSection = {
-      id: `section-${Date.now()}`,
-      title: "New Section",
-      items: []
-    };
-    setSections([...sections, newSection]);
-    setExpandedSections(new Set([...expandedSections, newSection.id]));
-  };
+  const addSection = () => {
+    if (!newSectionTitle.trim()) return;
 
-  const addContentItem = (sectionId, type) => {
-    const newItem = {
-      id: `item-${Date.now()}`,
-      type,
-      title: `New ${contentTypes[type].label}`,
-      ...(type === 'video' ? { duration: "0:00" } : {}),
-      ...(type === 'document' ? { size: "0 KB" } : {}),
-      ...(type === 'link' ? { url: "" } : {})
-    };
-
-    setSections(sections.map(section => {
-      if (section.id === sectionId) {
-        return {
-          ...section,
-          items: [...section.items, newItem]
-        };
+    const newSections = [
+      ...sections,
+      {
+        id: `section-${Date.now()}`,
+        title: newSectionTitle,
+        items: []
       }
-      return section;
-    }));
+    ];
+    setSections(newSections);
+    setNewSectionTitle('');
+    onUpdate(newSections).catch(console.error);
+  };
+
+  const removeSection = (sectionId: string) => {
+    const newSections = sections.filter(section => section.id !== sectionId);
+    setSections(newSections);
+    onUpdate(newSections).catch(console.error);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Course Content</h2>
+      <div className="flex items-center space-x-4">
+        <input
+          type="text"
+          value={newSectionTitle}
+          onChange={(e) => setNewSectionTitle(e.target.value)}
+          placeholder="New Section Title"
+          className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
         <button
-          onClick={addNewSection}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          onClick={addSection}
+          className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <Plus className="h-4 w-4" />
-          <span>Add Section</span>
+          <Plus className="w-5 h-5" />
         </button>
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
         {sections.map((section) => (
-          <div key={section.id} className="border rounded-lg">
-            <div
-              className="flex items-center justify-between p-4 bg-gray-50 cursor-pointer"
-              onClick={() => toggleSection(section.id)}
-            >
-              <div className="flex items-center space-x-3">
-                <GripVertical className="h-5 w-5 text-gray-400" />
-                <h3 className="font-medium">{section.title}</h3>
-                <span className="text-sm text-gray-500">
-                  {section.items.length} items
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button className="p-1 hover:bg-gray-200 rounded">
-                  <Pencil className="h-4 w-4 text-gray-500" />
-                </button>
-                <button className="p-1 hover:bg-gray-200 rounded">
-                  <Trash2 className="h-4 w-4 text-gray-500" />
-                </button>
-                {expandedSections.has(section.id) ? (
-                  <ChevronUp className="h-5 w-5 text-gray-500" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-gray-500" />
-                )}
-              </div>
+          <div key={section.id} className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">{section.title}</h3>
+              <button
+                onClick={() => removeSection(section.id)}
+                className="text-red-500 hover:text-red-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <AnimatePresence>
-              {expandedSections.has(section.id) && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+            <Droppable droppableId={section.id}>
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="space-y-2"
                 >
-                  <Droppable droppableId={section.id}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        className="p-4 space-y-2"
-                      >
-                        {section.items.map((item, index) => {
-                          const ContentIcon = contentTypes[item.type].icon;
-                          return (
-                            <Draggable
-                              key={item.id}
-                              draggableId={item.id}
-                              index={index}
-                            >
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className="flex items-center space-x-3 p-3 bg-white border rounded-lg"
-                                >
-                                  <div
-                                    {...provided.dragHandleProps}
-                                    className="text-gray-400"
-                                  >
-                                    <GripVertical className="h-5 w-5" />
-                                  </div>
-                                  <ContentIcon className="h-5 w-5 text-gray-500" />
-                                  <div className="flex-1">
-                                    <h4 className="font-medium">{item.title}</h4>
-                                    <p className="text-sm text-gray-500">
-                                      {item.duration || item.size || item.url}
-                                    </p>
-                                  </div>
-                                  <div className="flex space-x-2">
-                                    <button className="p-1 hover:bg-gray-100 rounded">
-                                      <Pencil className="h-4 w-4 text-gray-500" />
-                                    </button>
-                                    <button className="p-1 hover:bg-gray-100 rounded">
-                                      <Trash2 className="h-4 w-4 text-gray-500" />
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-                            </Draggable>
-                          );
-                        })}
-                        {provided.placeholder}
-                        <div className="flex space-x-2 pt-2">
-                          {Object.entries(contentTypes).map(([type, { icon: Icon, label }]) => (
-                            <button
-                              key={type}
-                              onClick={() => addContentItem(section.id, type)}
-                              className="flex items-center space-x-1 px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-full hover:bg-gray-200"
-                            >
-                              <Plus className="h-3 w-3" />
-                              <Icon className="h-3 w-3" />
-                              <span>{label}</span>
-                            </button>
-                          ))}
+                  {section.items.map((item, index) => (
+                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg"
+                        >
+                          <div {...provided.dragHandleProps}>
+                            <GripVertical className="w-5 h-5 text-gray-400" />
+                          </div>
+                          {item.type === 'video' && <Video className="w-5 h-5 text-blue-500" />}
+                          {item.type === 'document' && <FileText className="w-5 h-5 text-green-500" />}
+                          {item.type === 'link' && <LinkIcon className="w-5 h-5 text-purple-500" />}
+                          {item.type === 'download' && <Download className="w-5 h-5 text-orange-500" />}
+                          <div className="flex-1">
+                            <h4 className="font-medium">{item.title}</h4>
+                            <div className="text-sm text-gray-500">
+                              {item.duration && <span>{item.duration}</span>}
+                              {item.size && <span> • {item.size}</span>}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </Droppable>
-                </motion.div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
               )}
-            </AnimatePresence>
+            </Droppable>
           </div>
         ))}
       </DragDropContext>

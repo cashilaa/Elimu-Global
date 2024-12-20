@@ -1,31 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BellIcon, CheckCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { BellIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { socket } from '../../services/socket';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-
-interface Notification {
-  _id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  category: string;
-  read: boolean;
-  createdAt: string;
-  metadata?: {
-    courseId?: string;
-    studentId?: string;
-    actionUrl?: string;
-  };
-}
+import { Notification } from '../../types';
 
 export const NotificationCenter: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const queryClient = useQueryClient();
 
-  const { data: notifications = [] } = useQuery({
+  const { data: notifications = [] } = useQuery<Notification[]>({
     queryKey: ['notifications'],
     queryFn: async () => {
       const { data } = await axios.get('/api/notifications');
@@ -87,6 +73,12 @@ export const NotificationCenter: React.FC = () => {
       Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
       'day'
     );
+  };
+
+  const handleActionClick = (notification: Notification) => {
+    if (notification.metadata?.actionUrl) {
+      window.location.href = notification.metadata.actionUrl;
+    }
   };
 
   return (
@@ -170,7 +162,7 @@ export const NotificationCenter: React.FC = () => {
                       {notification.metadata?.actionUrl && (
                         <div className="ml-4 flex-shrink-0">
                           <button
-                            onClick={() => window.location.href = notification.metadata.actionUrl}
+                            onClick={() => handleActionClick(notification)}
                             className="text-indigo-600 hover:text-indigo-800"
                           >
                             View

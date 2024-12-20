@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Video, Calendar, Clock, Users, Link as LinkIcon } from 'lucide-react';
+import { Video, Calendar, Clock, Link as LinkIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 const meetingSchema = z.object({

@@ -2,13 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { wrap } from 'popmotion';
-
-interface Course {
-  _id: string;
-  title: string;
-  description: string;
-  thumbnail?: string;
-}
+import { Course } from '../../types';
 
 interface CourseCarouselProps {
   courses: Course[];
@@ -48,6 +42,8 @@ export const CourseCarousel: React.FC<CourseCarouselProps> = ({ courses, onSelec
     setPage([page + newDirection, newDirection]);
   };
 
+  if (!courses.length) return null;
+
   return (
     <div className="relative h-[400px] w-full overflow-hidden bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl shadow-lg">
       <div className="absolute inset-0 flex items-center justify-center">
@@ -60,7 +56,7 @@ export const CourseCarousel: React.FC<CourseCarouselProps> = ({ courses, onSelec
 
         <AnimatePresence initial={false} custom={direction}>
           <motion.div
-            key={page}
+            key={courses[courseIndex].id}
             custom={direction}
             variants={variants}
             initial="enter"
@@ -74,7 +70,7 @@ export const CourseCarousel: React.FC<CourseCarouselProps> = ({ courses, onSelec
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={1}
-            onDragEnd={(e, { offset, velocity }) => {
+            onDragEnd={(_e, { offset, velocity }) => {
               const swipe = swipePower(offset.x, velocity.x);
 
               if (swipe < -swipeConfidenceThreshold) {
@@ -89,15 +85,13 @@ export const CourseCarousel: React.FC<CourseCarouselProps> = ({ courses, onSelec
               className="bg-white rounded-xl p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300"
               onClick={() => onSelect(courses[courseIndex])}
             >
-              {courses[courseIndex].thumbnail && (
-                <div className="relative h-48 w-full mb-6 overflow-hidden rounded-lg">
-                  <img
-                    src={courses[courseIndex].thumbnail}
-                    alt={courses[courseIndex].title}
-                    className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300"
-                  />
+              <div className="relative h-48 w-full mb-6 overflow-hidden rounded-lg bg-gradient-to-r from-purple-100 to-indigo-100">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <h3 className="text-2xl font-bold text-gray-700">
+                    {courses[courseIndex].title}
+                  </h3>
                 </div>
-              )}
+              </div>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

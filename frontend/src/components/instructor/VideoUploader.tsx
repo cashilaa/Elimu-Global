@@ -1,22 +1,22 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X } from "lucide-react";
-import LoadingSpinner from "../shared/LoadingSpinner";
+import { LoadingSpinner } from "../shared/LoadingSpinner";
 
-export const VideoUploader = ({
-  onUpload,
-  maxSize = 100 * 1024 * 1024, // 100MB
-  accept = {
-    'video/mp4': ['.mp4'],
-    'video/quicktime': ['.mov'],
-    'video/x-msvideo': ['.avi']
-  }
-}) => {
-  const [files, setFiles] = useState([]);
+interface VideoFile extends File {
+  preview?: string;
+}
+
+interface VideoUploaderProps {
+  onUpload: (file: File) => Promise<void>;
+}
+
+export const VideoUploader = ({ onUpload }: VideoUploaderProps) => {
+  const [files, setFiles] = useState<VideoFile[]>([]);
   const [uploading, setUploading] = useState(false);
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     setFiles(acceptedFiles.map(file => Object.assign(file, {
       preview: URL.createObjectURL(file)
     })));
@@ -24,8 +24,12 @@ export const VideoUploader = ({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept,
-    maxSize,
+    accept: {
+      'video/mp4': ['.mp4'],
+      'video/quicktime': ['.mov'],
+      'video/x-msvideo': ['.avi']
+    },
+    maxSize: 100 * 1024 * 1024, // 100MB
     multiple: false
   });
 
@@ -43,7 +47,7 @@ export const VideoUploader = ({
     }
   };
 
-  const removeFile = (file) => {
+  const removeFile = (file: VideoFile) => {
     const newFiles = files.filter(f => f !== file);
     setFiles(newFiles);
   };
@@ -68,7 +72,7 @@ export const VideoUploader = ({
             : "Drag and drop a video, or click to select"}
         </p>
         <p className="text-xs text-gray-500 mt-1">
-          MP4, MOV or AVI (max. {Math.floor(maxSize / 1024 / 1024)}MB)
+          MP4, MOV or AVI (max. {Math.floor(100 * 1024 * 1024 / 1024 / 1024)}MB)
         </p>
       </div>
 

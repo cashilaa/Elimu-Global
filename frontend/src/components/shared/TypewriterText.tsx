@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface TypewriterTextProps {
   text: string;
