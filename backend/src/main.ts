@@ -15,6 +15,6 @@ async function bootstrap() {
   });
 
   // Start the application
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();
