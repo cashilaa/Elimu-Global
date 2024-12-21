@@ -9,12 +9,16 @@ import {
   Query,
   UseGuards,
   HttpStatus,
+  Request,
 } from '@nestjs/common';
 import { CourseService } from './course.service';
-import { NotificationService } from '../notification/notification.service';
+import { NotificationService } from '../modules/notification/notification.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
+import { CourseDocument } from './schemas/course.schema';
 
 @Controller('courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -26,16 +30,14 @@ export class CourseController {
 
   @Post()
   @Roles('instructor')
-  async createCourse(@Body() createCourseDto: any) {
+  async createCourse(@Body() createCourseDto: CreateCourseDto) {
     const course = await this.courseService.create(createCourseDto);
     if (course) {
       await this.notificationService.notifyCourseCreated(
-        course._id.toString(),
-        course.instructor,
+        course.id,
+        course.instructor.toString(),
         course.title,
       );
-    } else {
-      throw new Error('Course not found');
     }
     return course;
   }
@@ -57,8 +59,16 @@ export class CourseController {
 
   @Put(':id')
   @Roles('instructor')
-  async update(@Param('id') id: string, @Body() updateCourseDto: any) {
-    return this.courseService.update(id, updateCourseDto);
+  async update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
+    const course = await this.courseService.update(id, updateCourseDto);
+    if (course) {
+      await this.notificationService.notifyCourseApproved(
+        course.id,
+        course.instructor.toString(),
+        course.title,
+      );
+    }
+    return course;
   }
 
   @Put(':id/status')
@@ -71,13 +81,11 @@ export class CourseController {
     if (course) {
       if (status === 'published') {
         await this.notificationService.notifyCourseApproved(
-          course._id.toString(),
-          course.instructor,
+          course.id,
+          course.instructor.toString(),
           course.title,
         );
       }
-    } else {
-      throw new Error('Course not found');
     }
     return course;
   }
@@ -91,13 +99,11 @@ export class CourseController {
     const course = await this.courseService.addStudent(courseId, studentId);
     if (course) {
       await this.notificationService.notifyNewEnrollment(
-        course._id.toString(),
-        course.instructor,
+        course.id,
+        course.instructor.toString(),
         studentId,
         course.title,
       );
-    } else {
-      throw new Error('Course not found');
     }
     return course;
   }
@@ -116,14 +122,12 @@ export class CourseController {
     );
     if (course) {
       await this.notificationService.notifyNewReview(
-        course._id.toString(),
-        course.instructor,
+        course.id,
+        course.instructor.toString(),
         reviewData.studentId,
         course.title,
         reviewData.rating,
       );
-    } else {
-      throw new Error('Course not found');
     }
     return course;
   }
@@ -134,9 +138,8 @@ export class CourseController {
     const course = await this.courseService.findOne(id);
     if (course) {
       return course.analytics;
-    } else {
-      throw new Error('Course not found');
     }
+    return null;
   }
 
   @Delete(':id')

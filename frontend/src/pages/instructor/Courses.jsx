@@ -1,217 +1,363 @@
-import React, { useState } from 'react';
-import Card from '../../components/ui/Card';
-import Badge from '../../components/ui/Badge';
-import Button from '../../components/ui/Button';
-import { Plus, Users, Clock, Star, Video, BarChart, Edit, Trash } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, Clock, Star, Video, BarChart, Edit, Trash, Plus, Search, Filter, Download, Upload, Book, Calendar, X } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Badge } from '../../components/ui/badge';
+import { Alert, AlertDescription } from '../../components/ui/alert';
+import { Button } from '../../components/ui/button';
+import { Avatar } from '../../components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import CourseForm from '../../components/instructor/CourseForm';
-import CourseAnalytics from '../../components/instructor/CourseAnalytics';
-import CourseContentManager from '../../components/instructor/CourseContentManager';
-import VideoUploader from '../../components/instructor/VideoUploader';
 
 const Courses = () => {
   const [showCourseForm, setShowCourseForm] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const courses = [
-    {
-      id: 1,
-      title: 'Introduction to Web Development',
-      description: 'Learn the basics of HTML, CSS, and JavaScript',
-      students: 45,
-      duration: '8 weeks',
-      rating: 4.8,
-      status: 'active',
-      analytics: {
-        completion_rate: 78,
-        avg_engagement: 85,
-        total_revenue: 4500
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const response = await fetch('/api/courses', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming you store the token in localStorage
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch courses');
       }
-    },
-    {
-      id: 2,
-      title: 'Advanced React Patterns',
-      description: 'Master advanced React concepts and patterns',
-      students: 32,
-      duration: '6 weeks',
-      rating: 4.9,
-      status: 'active',
-      analytics: {
-        completion_rate: 82,
-        avg_engagement: 89,
-        total_revenue: 3200
-      }
-    },
-    {
-      id: 3,
-      title: 'Python for Beginners',
-      description: 'Start your journey with Python programming',
-      students: 28,
-      duration: '10 weeks',
-      rating: 4.7,
-      status: 'draft',
-      analytics: {
-        completion_rate: 0,
-        avg_engagement: 0,
-        total_revenue: 0
-      }
+
+      const data = await response.json();
+      setCourses(data);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      setError('Failed to load courses');
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const handleCourseSelect = (course) => {
-    setSelectedCourse(course);
-    setActiveTab('overview');
   };
+
+  const filteredCourses = courses.filter(course => {
+    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         course.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || course.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  const renderAnalytics = (analytics) => {
+    const metrics = [
+      { label: 'Completion Rate', value: `${analytics.completion_rate}%`, icon: BarChart, color: 'blue' },
+      { label: 'Avg. Engagement', value: `${analytics.avg_engagement}%`, icon: Users, color: 'green' },
+      { label: 'Weekly Active Users', value: analytics.weekly_active_users, icon: Users, color: 'purple' },
+      { label: 'Total Hours Watched', value: analytics.total_hours_watched, icon: Clock, color: 'orange' }
+    ];
+
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {metrics.map((metric, index) => (
+          <Card key={index} className="bg-white">
+            <CardContent className="p-4">
+              <div className={`flex items-center justify-center h-12 w-12 rounded-full bg-${metric.color}-100 mb-4`}>
+                <metric.icon className={`h-6 w-6 text-${metric.color}-600`} />
+              </div>
+              <h3 className="text-lg font-semibold">{metric.value}</h3>
+              <p className="text-sm text-gray-600">{metric.label}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  };
+
+  const renderSchedule = (schedule) => (
+    <div className="space-y-4">
+      {schedule.length > 0 ? (
+        schedule.map((session, index) => (
+          <Card key={index} className="bg-gray-50">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Calendar className="h-5 w-5 text-gray-500" />
+                <div>
+                  <p className="font-medium">{session.day}</p>
+                  <p className="text-sm text-gray-600">{session.time}</p>
+                </div>
+              </div>
+              <Button variant="outline" size="sm">View Details</Button>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <Alert>
+          <AlertDescription>No scheduled sessions for this course yet.</AlertDescription>
+        </Alert>
+      )}
+    </div>
+  );
 
   const renderCourseDetails = () => {
     if (!selectedCourse) return null;
 
     return (
-      <div className="mt-6">
-        <Card>
-          <div className="border-b pb-4 mb-4">
-            <div className="flex justify-between items-start">
+      <Card className="mt-6">
+        <CardHeader className="border-b">
+          <div className="flex justify-between items-start">
+            <div className="flex items-start space-x-4">
+              <Avatar className="h-12 w-12">
+                <img src={selectedCourse.instructor.avatar} alt={selectedCourse.instructor.name} />
+              </Avatar>
               <div>
-                <h2 className="text-xl font-semibold">{selectedCourse.title}</h2>
-                <p className="text-gray-600">{selectedCourse.description}</p>
-              </div>
-              <div className="flex space-x-2">
-                <Button variant="secondary" size="sm">
-                  <Edit className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button variant="danger" size="sm">
-                  <Trash className="h-4 w-4 mr-1" />
-                  Delete
-                </Button>
+                <CardTitle>{selectedCourse.title}</CardTitle>
+                <p className="text-sm text-gray-600">
+                  Instructor: {selectedCourse.instructor.name} • {selectedCourse.instructor.department}
+                </p>
               </div>
             </div>
-          </div>
-
-          {/* Course Tabs */}
-          <div className="flex space-x-4 border-b mb-4">
-            {['overview', 'content', 'analytics', 'videos'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-2 px-1 font-medium capitalize ${
-                  activeTab === tab
-                    ? 'border-b-2 border-blue-500 text-blue-600'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Tab Content */}
-          {activeTab === 'overview' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <h3 className="font-medium text-blue-700">Students</h3>
-                <p className="text-2xl font-bold">{selectedCourse.students}</p>
-              </div>
-              <div className="p-4 bg-green-50 rounded-lg">
-                <h3 className="font-medium text-green-700">Duration</h3>
-                <p className="text-2xl font-bold">{selectedCourse.duration}</p>
-              </div>
-              <div className="p-4 bg-yellow-50 rounded-lg">
-                <h3 className="font-medium text-yellow-700">Rating</h3>
-                <p className="text-2xl font-bold">{selectedCourse.rating}</p>
-              </div>
+            <div className="flex space-x-2">
+              <Button variant="outline" size="sm">
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              <Button variant="destructive" size="sm">
+                <Trash className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
             </div>
-          )}
-
-          {activeTab === 'content' && (
-            <CourseContentManager courseId={selectedCourse.id} />
-          )}
-
-          {activeTab === 'analytics' && (
-            <CourseAnalytics analytics={selectedCourse.analytics} />
-          )}
-
-          {activeTab === 'videos' && (
-            <VideoUploader courseId={selectedCourse.id} />
-          )}
-        </Card>
-      </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="overview" className="mt-4">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="schedule">Schedule</TabsTrigger>
+              <TabsTrigger value="content">Content</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview" className="mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-500">Enrolled Students</p>
+                        <p className="text-2xl font-bold">{selectedCourse.students}</p>
+                      </div>
+                      <Users className="h-8 w-8 text-blue-500" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-500">Course Duration</p>
+                        <p className="text-2xl font-bold">{selectedCourse.duration}</p>
+                      </div>
+                      <Clock className="h-8 w-8 text-green-500" />
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-500">Average Rating</p>
+                        <p className="text-2xl font-bold">{selectedCourse.rating}</p>
+                      </div>
+                      <Star className="h-8 w-8 text-yellow-500" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+            <TabsContent value="analytics" className="mt-4">
+              {renderAnalytics(selectedCourse.analytics)}
+            </TabsContent>
+            <TabsContent value="schedule" className="mt-4">
+              {renderSchedule(selectedCourse.schedule)}
+            </TabsContent>
+            <TabsContent value="content" className="mt-4">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Course Content</h3>
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm">
+                      <Upload className="h-4 w-4 mr-1" />
+                      Import
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-1" />
+                      Export
+                    </Button>
+                  </div>
+                </div>
+                <Alert>
+                  <AlertDescription>
+                    Content management features will be implemented based on specific requirements.
+                  </AlertDescription>
+                </Alert>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     );
   };
 
+  const handleCreateCourse = async (courseData) => {
+    try {
+      const response = await fetch('/api/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...courseData,
+          instructor: {
+            name: 'Dr. Sarah Johnson', // This should come from your auth context
+            avatar: '/api/placeholder/32/32',
+            department: 'Computer Science'
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create course');
+      }
+
+      const newCourse = await response.json();
+      setCourses(prevCourses => [...prevCourses, newCourse]);
+      setShowCourseForm(false);
+    } catch (error) {
+      console.error('Error creating course:', error);
+      alert('Failed to create course. Please try again.');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Courses</h1>
-        <Button 
-          className="flex items-center space-x-2"
-          onClick={() => setShowCourseForm(true)}
-        >
-          <Plus className="h-4 w-4" />
-          <span>Create Course</span>
-        </Button>
+    <div className="p-6 space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <h1 className="text-2xl font-bold">Course Management</h1>
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search courses..."
+              className="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <select
+            className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="draft">Draft</option>
+          </select>
+          <Button 
+            onClick={() => setShowCourseForm(true)}
+            variant="default"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Course
+          </Button>
+        </div>
       </div>
 
-      {/* Course Form Modal */}
-      {showCourseForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Create New Course</h2>
-              <button
-                onClick={() => setShowCourseForm(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
-            </div>
-            <CourseForm onClose={() => setShowCourseForm(false)} />
-          </div>
-        </div>
-      )}
-
-      {/* Course Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
+        {filteredCourses.map((course) => (
           <Card 
-            key={course.id} 
-            className={`hover:shadow-lg transition-shadow cursor-pointer ${
+            key={course.id}
+            className={`cursor-pointer hover:shadow-lg transition-shadow ${
               selectedCourse?.id === course.id ? 'ring-2 ring-blue-500' : ''
             }`}
-            onClick={() => handleCourseSelect(course)}
+            onClick={() => setSelectedCourse(course)}
           >
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold">{course.title}</h3>
-              <Badge 
-                variant={course.status === 'active' ? 'success' : 'warning'}
-                size="sm"
-              >
-                {course.status}
-              </Badge>
-            </div>
-            <p className="text-gray-600 mb-4">{course.description}</p>
-            <div className="flex items-center justify-between text-sm text-gray-500">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-1">
-                  <Users className="h-4 w-4" />
-                  <span>{course.students}</span>
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-lg font-semibold">{course.title}</h3>
+                  <p className="text-sm text-gray-500">{course.instructor.name}</p>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{course.duration}</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Star className="h-4 w-4 text-yellow-500" />
-                  <span>{course.rating}</span>
+                <Badge variant={course.status === 'active' ? 'default' : 'secondary'}>
+                  {course.status}
+                </Badge>
+              </div>
+              <p className="text-gray-600 mb-4">{course.description}</p>
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-1">
+                    <Users className="h-4 w-4" />
+                    <span>{course.students}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{course.duration}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Star className="h-4 w-4 text-yellow-500" />
+                    <span>{course.rating}</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Selected Course Details */}
       {renderCourseDetails()}
+
+      {showCourseForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>Create New Course</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowCourseForm(false)}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <CourseForm 
+                onClose={() => setShowCourseForm(false)}
+                onSubmit={handleCreateCourse}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

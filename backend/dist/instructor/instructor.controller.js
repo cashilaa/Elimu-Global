@@ -15,21 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstructorController = void 0;
 const common_1 = require("@nestjs/common");
 const instructor_service_1 = require("./instructor.service");
-const create_instructor_dto_1 = require("./dto/create-instructor.dto");
 const update_instructor_dto_1 = require("./dto/update-instructor.dto");
-const auth_service_1 = require("../auth/auth.service");
+const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const roles_guard_1 = require("../auth/guards/roles.guard");
 let InstructorController = class InstructorController {
-    constructor(instructorService, authService) {
+    constructor(instructorService) {
         this.instructorService = instructorService;
-        this.authService = authService;
-    }
-    async create(createInstructorDto) {
-        // Use AuthService for registration instead
-        return this.authService.register(createInstructorDto);
-    }
-    async login(loginDto) {
-        // Use AuthService for login instead
-        return this.authService.login(loginDto.email, loginDto.password);
     }
     findAll() {
         return this.instructorService.findAll();
@@ -45,20 +36,6 @@ let InstructorController = class InstructorController {
     }
 };
 __decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_instructor_dto_1.CreateInstructorDto]),
-    __metadata("design:returntype", Promise)
-], InstructorController.prototype, "create", null);
-__decorate([
-    (0, common_1.Post)('login'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], InstructorController.prototype, "login", null);
-__decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
@@ -73,6 +50,7 @@ __decorate([
 ], InstructorController.prototype, "findOne", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -81,6 +59,7 @@ __decorate([
 ], InstructorController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
@@ -88,7 +67,6 @@ __decorate([
 ], InstructorController.prototype, "remove", null);
 InstructorController = __decorate([
     (0, common_1.Controller)('instructors'),
-    __metadata("design:paramtypes", [instructor_service_1.InstructorService,
-        auth_service_1.AuthService])
+    __metadata("design:paramtypes", [instructor_service_1.InstructorService])
 ], InstructorController);
 exports.InstructorController = InstructorController;

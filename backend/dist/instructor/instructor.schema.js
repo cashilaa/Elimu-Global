@@ -34,10 +34,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstructorSchema = exports.Instructor = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
 const bcrypt = __importStar(require("bcrypt"));
-let Instructor = class Instructor extends mongoose_2.Document {
-    validatePassword(password) {
+let Instructor = class Instructor {
+    async validatePassword(password) {
         return bcrypt.compare(password, this.password);
     }
 };
@@ -50,7 +49,7 @@ __decorate([
     __metadata("design:type", String)
 ], Instructor.prototype, "lastName", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, unique: true }),
+    (0, mongoose_1.Prop)({ required: true, unique: true, lowercase: true }),
     __metadata("design:type", String)
 ], Instructor.prototype, "email", void 0);
 __decorate([
@@ -62,15 +61,15 @@ __decorate([
     __metadata("design:type", String)
 ], Instructor.prototype, "phoneNumber", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Instructor.prototype, "expertise", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], Instructor.prototype, "experience", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], Instructor.prototype, "education", void 0);
 __decorate([
@@ -78,11 +77,11 @@ __decorate([
     __metadata("design:type", String)
 ], Instructor.prototype, "certification", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: [String], required: true }),
+    (0, mongoose_1.Prop)({ type: [String], required: false, default: [] }),
     __metadata("design:type", Array)
 ], Instructor.prototype, "teachingAreas", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true }),
+    (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
 ], Instructor.prototype, "bio", void 0);
 __decorate([
@@ -128,15 +127,21 @@ Instructor = __decorate([
 ], Instructor);
 exports.Instructor = Instructor;
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
-// Add password hashing middleware
-exports.InstructorSchema.pre('save', async function (next) {
-    if (this.isModified('password')) {
-        const salt = await bcrypt.genSalt();
-        this.password = await bcrypt.hash(this.password, salt);
-    }
-    next();
-});
-// Add password validation method
+// Add validatePassword to schema methods
 exports.InstructorSchema.methods.validatePassword = async function (password) {
     return bcrypt.compare(password, this.password);
 };
+// Pre-save middleware for password hashing
+exports.InstructorSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    }
+    catch (error) {
+        next(error);
+    }
+});

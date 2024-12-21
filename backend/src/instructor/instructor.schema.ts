@@ -1,6 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { CallbackError } from 'mongoose';
+
+export type InstructorDocument = Instructor & Document;
 
 @Schema({
   timestamps: true,
@@ -11,14 +14,14 @@ import * as bcrypt from 'bcrypt';
     },
   },
 })
-export class Instructor extends Document {
+export class Instructor {
   @Prop({ required: true })
   firstName: string;
 
   @Prop({ required: true })
   lastName: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, lowercase: true })
   email: string;
 
   @Prop({ required: true })
@@ -27,22 +30,22 @@ export class Instructor extends Document {
   @Prop()
   phoneNumber: string;
 
-  @Prop({ required: true })
+  @Prop()
   expertise: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   experience: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   education: string;
 
   @Prop()
   certification: string;
 
-  @Prop({ type: [String], required: true })
+  @Prop({ type: [String], required: false, default: [] })
   teachingAreas: string[];
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   bio: string;
 
   @Prop({
@@ -78,23 +81,29 @@ export class Instructor extends Document {
     totalRevenue?: number;
   };
 
-  validatePassword(password: string): Promise<boolean> {
+  async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
   }
 }
 
 export const InstructorSchema = SchemaFactory.createForClass(Instructor);
 
-// Add password hashing middleware
-InstructorSchema.pre('save', async function(next) {
-  if (this.isModified('password')) {
-    const salt = await bcrypt.genSalt();
-    this.password = await bcrypt.hash(this.password, salt);
-  }
-  next();
-});
-
-// Add password validation method
+// Add validatePassword to schema methods
 InstructorSchema.methods.validatePassword = async function(password: string): Promise<boolean> {
   return bcrypt.compare(password, this.password);
 };
+
+// Pre-save middleware for password hashing
+InstructorSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) {
+    return next();
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error as CallbackError);
+  }
+});

@@ -6,12 +6,20 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    if (!roles) {
+    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+    if (!requiredRoles) {
       return true;
     }
+
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    return roles.some((role) => user.roles?.includes(role));
+
+    if (!user) {
+      return false;
+    }
+
+    // Ensure user has a role property
+    const userRole = user.role || user.type; // Check both role and type properties
+    return requiredRoles.some((role) => userRole === role);
   }
 }

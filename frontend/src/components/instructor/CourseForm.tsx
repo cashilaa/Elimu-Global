@@ -5,6 +5,7 @@ import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { TypewriterText } from "../shared/TypewriterText";
 import { X, Save, Clock, DollarSign, Book, Users } from "lucide-react";
+import { Course } from "../../types";
 
 const courseSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
@@ -20,11 +21,12 @@ const courseSchema = z.object({
 type CourseFormData = z.infer<typeof courseSchema>;
 
 interface CourseFormProps {
-  onSubmit: (data: CourseFormData) => void;
-  onClose: () => void;
+  course?: Course | null;
+  onSubmit: (data: CourseFormData) => Promise<void>;
+  onCancel: () => void;
 }
 
-export const CourseForm = ({ onSubmit, onClose }: CourseFormProps) => {
+export const CourseForm = ({ course, onSubmit, onCancel }: CourseFormProps) => {
   const {
     register,
     handleSubmit,
@@ -41,7 +43,7 @@ export const CourseForm = ({ onSubmit, onClose }: CourseFormProps) => {
   const onSubmitForm = async (data: CourseFormData) => {
     try {
       await onSubmit(data);
-      onClose();
+      onCancel();
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -55,7 +57,7 @@ export const CourseForm = ({ onSubmit, onClose }: CourseFormProps) => {
           className="text-2xl font-bold text-gray-900"
         />
         <button
-          onClick={onClose}
+          onClick={onCancel}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
           <X className="h-5 w-5 text-gray-500" />
@@ -198,7 +200,7 @@ export const CourseForm = ({ onSubmit, onClose }: CourseFormProps) => {
         <div className="flex justify-end space-x-3">
           <button
             type="button"
-            onClick={onClose}
+            onClick={onCancel}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Cancel

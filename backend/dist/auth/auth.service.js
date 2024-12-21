@@ -34,17 +34,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
@@ -58,50 +47,81 @@ let AuthService = class AuthService {
         this.instructorModel = instructorModel;
         this.jwtService = jwtService;
     }
-    async register(createInstructorDto, file) {
-        const { email } = createInstructorDto;
-        // Check if instructor already exists
-        const existingInstructor = await this.instructorModel.findOne({ email: email.toLowerCase() });
-        if (existingInstructor) {
-            throw new common_1.HttpException('Email already exists', common_1.HttpStatus.BAD_REQUEST);
-        }
-        // Create new instructor
-        const instructor = new this.instructorModel(Object.assign(Object.assign({}, createInstructorDto), { email: email.toLowerCase() }));
-        const savedInstructor = await instructor.save();
-        const instructorData = savedInstructor.toObject();
-        const { password } = instructorData, rest = __rest(instructorData, ["password"]);
-        return rest;
-    }
-    async login(email, password) {
+    async login(loginDto) {
         try {
-            console.log('Attempting to find instructor with email:', email);
-            const instructor = await this.instructorModel.findOne({
-                email: email.toLowerCase()
-            }).select('+password');
+            // Find instructor and include password
+            const instructor = await this.instructorModel
+                .findOne({ email: loginDto.email.toLowerCase().trim() })
+                .select('+password')
+                .exec();
             if (!instructor) {
-                throw new common_1.UnauthorizedException('Invalid email or password');
+                throw new common_1.UnauthorizedException('Invalid credentials');
             }
-            console.log('Instructor found, verifying password');
-            const isPasswordValid = await bcrypt.compare(password, instructor.password);
+            // Verify password
+            const isPasswordValid = await bcrypt.compare(loginDto.password, instructor.password);
             if (!isPasswordValid) {
-                throw new common_1.UnauthorizedException('Invalid email or password');
+                throw new common_1.UnauthorizedException('Invalid credentials');
             }
-            console.log('Password verified, generating token');
+            // Generate JWT token
             const token = this.jwtService.sign({
-                id: instructor._id,
-                email: instructor.email
+                sub: instructor._id,
+                email: instructor.email,
+                role: 'instructor',
             });
-            const instructorData = instructor.toObject();
-            const { password: _ } = instructorData, rest = __rest(instructorData, ["password"]);
-            return {
-                success: true,
-                token,
-                instructor: rest
+            // Create response without password
+            const response = {
+                access_token: token,
+                instructor: {
+                    id: instructor._id,
+                    email: instructor.email,
+                    role: 'instructor',
+                    firstName: instructor.firstName,
+                    lastName: instructor.lastName,
+                },
             };
+            return response;
         }
         catch (error) {
-            console.error('Login service error:', error);
-            throw new common_1.HttpException((error === null || error === void 0 ? void 0 : error.message) || 'An error occurred during login', (error === null || error === void 0 ? void 0 : error.status) || common_1.HttpStatus.BAD_REQUEST);
+            console.error('Login error:', error);
+            throw new common_1.UnauthorizedException('Invalid credentials');
+        }
+    }
+    async findByEmail(email) {
+        return this.instructorModel
+            .findOne({ email: email.toLowerCase().trim() })
+            .exec();
+    }
+    async register(createInstructorDto) {
+        try {
+            const existingInstructor = await this.findByEmail(createInstructorDto.email);
+            if (existingInstructor) {
+                throw new common_1.HttpException('Email already exists', common_1.HttpStatus.BAD_REQUEST);
+            }
+            // Create new instructor
+            const newInstructor = new this.instructorModel(Object.assign(Object.assign({}, createInstructorDto), { email: createInstructorDto.email.toLowerCase() }));
+            // Password will be hashed by pre-save middleware
+            const savedInstructor = await newInstructor.save();
+            const token = this.jwtService.sign({
+                sub: savedInstructor._id,
+                email: savedInstructor.email,
+                role: 'instructor',
+            });
+            // Create response without password
+            const response = {
+                access_token: token,
+                instructor: {
+                    id: savedInstructor._id,
+                    email: savedInstructor.email,
+                    role: 'instructor',
+                    firstName: savedInstructor.firstName,
+                    lastName: savedInstructor.lastName,
+                },
+            };
+            return response;
+        }
+        catch (error) {
+            console.error('Registration error:', error);
+            throw new common_1.HttpException('Registration failed', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };

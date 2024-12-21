@@ -1,27 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Delete, Body, UseGuards } from '@nestjs/common';
 import { InstructorService } from './instructor.service';
-import { CreateInstructorDto } from './dto/create-instructor.dto';
 import { UpdateInstructorDto } from './dto/update-instructor.dto';
-import { AuthService } from '../auth/auth.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 
 @Controller('instructors')
 export class InstructorController {
   constructor(
     private readonly instructorService: InstructorService,
-    private readonly authService: AuthService
   ) {}
-
-  @Post()
-  async create(@Body() createInstructorDto: CreateInstructorDto) {
-    // Use AuthService for registration instead
-    return this.authService.register(createInstructorDto);
-  }
-
-  @Post('login')
-  async login(@Body() loginDto: { email: string; password: string }) {
-    // Use AuthService for login instead
-    return this.authService.login(loginDto.email, loginDto.password);
-  }
 
   @Get()
   findAll() {
@@ -34,11 +21,13 @@ export class InstructorController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   update(@Param('id') id: string, @Body() updateInstructorDto: UpdateInstructorDto) {
     return this.instructorService.update(id, updateInstructorDto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
   remove(@Param('id') id: string) {
     return this.instructorService.remove(id);
   }

@@ -25,21 +25,18 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: credentials.email.trim().toLowerCase(),
-          password: credentials.password
-        })
+        credentials: 'include',
+        body: JSON.stringify(credentials)
       });
 
       const data = await response.json();
-      console.log('Server response:', data);
-
+      
       if (response.ok) {
-        localStorage.setItem('token', data.token);
+        localStorage.setItem('token', data.access_token);
         localStorage.setItem('user', JSON.stringify(data.instructor));
-        navigate('/dashboard');
+        navigate('/instructor/dashboard');
       } else {
-        setError(data.message || 'Invalid credentials');
+        setError(data.message || 'Login failed');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -53,7 +50,7 @@ const Login = () => {
     const { name, value } = e.target;
     setCredentials(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'email' ? value.trim() : value
     }));
   };
 
@@ -159,7 +156,7 @@ const Login = () => {
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
                   Don't have an account?{' '}
-                  <a href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                  <a href="/instructorsform" className="font-medium text-blue-600 hover:text-blue-500">
                     Register here
                   </a>
                 </p>

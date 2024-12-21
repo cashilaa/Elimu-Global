@@ -34,10 +34,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UploadService = void 0;
 const common_1 = require("@nestjs/common");
-const aws_sdk_1 = require("aws-sdk");
 const config_1 = require("@nestjs/config");
-const uuid_1 = require("uuid");
-const ffmpeg = __importStar(require("fluent-ffmpeg"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const util_1 = require("util");
@@ -47,66 +44,32 @@ let UploadService = class UploadService {
     constructor(configService) {
         this.configService = configService;
         this.MAX_VIDEO_DURATION = 600; // 10 minutes in seconds
-        this.s3 = new aws_sdk_1.S3({
-            accessKeyId: this.configService.get('AWS_ACCESS_KEY_ID'),
-            secretAccessKey: this.configService.get('AWS_SECRET_ACCESS_KEY'),
-            region: this.configService.get('AWS_REGION'),
-        });
-    }
-    async validateVideo(file) {
-        const tempFilePath = path.join(__dirname, `${(0, uuid_1.v4)()}.mp4`);
-        await writeFile(tempFilePath, file.buffer);
-        return new Promise((resolve, reject) => {
-            ffmpeg.ffprobe(tempFilePath, (err, metadata) => {
-                unlink(tempFilePath).catch(console.error); // Clean up temp file
-                if (err) {
-                    return reject(new common_1.BadRequestException('Invalid video file'));
-                }
-                const duration = metadata.format.duration;
-                if (duration && duration > this.MAX_VIDEO_DURATION) {
-                    return reject(new common_1.BadRequestException('Video duration must not exceed 10 minutes'));
-                }
-                resolve();
-            });
-        });
-    }
-    async uploadFile(file, folder) {
-        if (file.mimetype.startsWith('video/')) {
-            await this.validateVideo(file);
+        this.uploadDir = path.join(__dirname, '../../uploads');
+        // Create uploads directory if it doesn't exist
+        if (!fs.existsSync(this.uploadDir)) {
+            fs.mkdirSync(this.uploadDir, { recursive: true });
         }
-        const key = `${folder}/${(0, uuid_1.v4)()}-${file.originalname}`;
-        const params = {
-            Bucket: this.configService.get('AWS_S3_BUCKET'),
-            Key: key,
-            Body: file.buffer,
-            ContentType: file.mimetype,
-            ACL: 'public-read',
-        };
-        const uploadResult = await this.s3.upload(params).promise();
-        return {
-            url: uploadResult.Location,
-            key: uploadResult.Key,
-        };
     }
-    async deleteFile(key) {
-        const params = {
-            Bucket: this.configService.get('AWS_S3_BUCKET'),
-            Key: key,
-        };
-        await this.s3.deleteObject(params).promise();
+    async uploadFile(file) {
+        const fileName = `${Date.now()}-${file.originalname}`;
+        const filePath = path.join(this.uploadDir, fileName);
+        try {
+            await writeFile(filePath, file.buffer);
+            const url = `/uploads/${fileName}`;
+            return { url };
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Failed to upload file');
+        }
     }
-    getSignedUrl(key) {
-        return this.s3.getSignedUrl('getObject', {
-            Bucket: this.configService.get('AWS_S3_BUCKET'),
-            Key: key,
-            Expires: 3600, // URL expires in 1 hour
-        });
-    }
-    // Helper method for video transcoding status check
-    async checkTranscodingStatus(videoKey) {
-        // Implement video transcoding status check
-        // This could integrate with AWS Elastic Transcoder or similar service
-        return 'completed';
+    async deleteFile(fileName) {
+        const filePath = path.join(this.uploadDir, fileName);
+        try {
+            await unlink(filePath);
+        }
+        catch (error) {
+            throw new common_1.BadRequestException('Failed to delete file');
+        }
     }
 };
 UploadService = __decorate([

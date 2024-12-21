@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Course, CourseDocument } from './course.schema';
+import { Course, CourseDocument } from './schemas/course.schema';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
 
 @Injectable()
 export class CourseService {
@@ -9,7 +11,7 @@ export class CourseService {
     @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
   ) {}
 
-  async create(createCourseDto: any): Promise<CourseDocument> {
+  async create(createCourseDto: CreateCourseDto): Promise<CourseDocument> {
     const createdCourse = new this.courseModel(createCourseDto);
     return createdCourse.save();
   }
@@ -30,7 +32,7 @@ export class CourseService {
     return this.courseModel.find({ instructor: instructorId }).exec();
   }
 
-  async update(id: string, updateCourseDto: any): Promise<CourseDocument | null> {
+  async update(id: string, updateCourseDto: UpdateCourseDto): Promise<CourseDocument | null> {
     const updatedCourse = await this.courseModel
       .findByIdAndUpdate(id, updateCourseDto, { new: true })
       .exec();
@@ -101,13 +103,13 @@ export class CourseService {
     if (!course) {
       throw new NotFoundException(`Course with ID ${courseId} not found`);
     }
+    
     const analytics = {
       enrollments: course.students.length,
-      averageRating:
-        course.reviews.reduce((acc, review) => acc + review.rating, 0) /
-        (course.reviews.length || 1),
-      activeStudents: course.students.length, // This should be calculated based on student activity
-      revenue: course.students.length * course.pricing.amount,
+      averageRating: course.reviews.reduce((acc: number, review) => acc + review.rating, 0) / 
+                    (course.reviews.length || 1),
+      activeStudents: course.students.length,
+      revenue: course.students.length * (course.pricing?.amount || 0),
     };
 
     return this.courseModel

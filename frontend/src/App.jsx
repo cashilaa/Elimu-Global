@@ -3,16 +3,17 @@ import { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import InstructorForm from './components/InstructorForm';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
-import DashboardLayout from './components/instructor/DashboardLayout';
+import Dashboard from './pages/instructor/Dashboard';
+import DashboardLayout from './components/layouts/DashboardLayout';
 import ZoomMeetings from './pages/instructor/ZoomMeetings';
 import Courses from './pages/instructor/Courses';
 import Students from './pages/instructor/Students';
 import Schedule from './pages/instructor/Schedule';
 import Settings from './pages/instructor/Settings';
 import CreateSession from './pages/instructor/CreateSession'; 
-import GroupManagement from './pages/instructor/GroupManagement'; // Assuming this is the correct import path
+import GroupManagement from './pages/instructor/GroupManagement';
 import InstructorsLanding from './components/InstructorsLanding';
+import CreateCourse from './pages/instructor/CreateCourse';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="zoom-meetings" element={<ZoomMeetings />} />
               <Route path="courses" element={<Courses />} />
+              <Route path="courses/new" element={<CreateCourse />} />
               <Route path="students" element={<Students />} />
               <Route path="schedule" element={<Schedule />} />
               <Route path="settings" element={<Settings />} />

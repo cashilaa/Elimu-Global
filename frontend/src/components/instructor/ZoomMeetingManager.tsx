@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Video, Calendar, Clock, Users, Link as LinkIcon } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'react-hot-toast';
 
 const meetingSchema = z.object({
   topic: z.string().min(5, 'Topic must be at least 5 characters'),
@@ -23,6 +24,40 @@ interface Meeting {
   startUrl: string;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+export const createMeeting = async (meetingData: {
+  topic: string;
+  startTime: string;
+  duration: number;
+  agenda?: string;
+}) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/zoom/meetings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({
+        ...meetingData,
+        duration: Number(meetingData.duration),
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create meeting');
+    }
+
+    const { data } = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error creating meeting:', error);
+    throw error;
+  }
+};
+
 export const ZoomMeetingManager = () => {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [isCreating, setIsCreating] = useState(false);
@@ -37,41 +72,22 @@ export const ZoomMeetingManager = () => {
     resolver: zodResolver(meetingSchema),
   });
 
-  const createMeeting = async (data: MeetingFormData) => {
-    const startTimeWithTimezone = new Date(data.startTime).toISOString();
-
-    // Validate start time to ensure it's in the future
-    const currentTime = new Date();
-    if (new Date(startTimeWithTimezone) <= currentTime) {
-      alert('Start time must be in the future.');
-      return;
-    }
-
-    const meetingData = {
-      ...data,
-      startTime: startTimeWithTimezone,
-    };
-
-    console.log('Creating meeting with data:', meetingData);
-    console.log('Start Time:', meetingData.startTime);
+  const handleCreateMeeting = async (formData: any) => {
+    setIsCreating(true);
     try {
-      const response = await fetch('/api/zoom/meetings', {
-        method: 'POST',
-        body: JSON.stringify(meetingData),
-        headers: { 'Content-Type': 'application/json' },
+      const meeting = await createMeeting({
+        topic: formData.topic,
+        startTime: formData.startTime,
+        duration: formData.duration,
+        agenda: formData.agenda,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to create meeting');
-      }
-
-      const meetingResponse = await response.json();
-      setCurrentMeeting(meetingResponse);
-      setMeetings([...meetings, meetingResponse]);
-      setIsCreating(false);
-      reset();
+      toast.success('Meeting created successfully!');
+      return meeting;
     } catch (error) {
-      console.error('Error creating meeting:', error);
+      toast.error('Failed to create meeting');
+      throw error;
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -106,7 +122,7 @@ export const ZoomMeetingManager = () => {
 
       {isCreating && (
         <div className="bg-white p-6 rounded-lg shadow">
-          <form onSubmit={handleSubmit(createMeeting)} className="space-y-6">
+          <form onSubmit={handleSubmit(handleCreateMeeting)} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">

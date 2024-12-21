@@ -15,10 +15,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CourseController = void 0;
 const common_1 = require("@nestjs/common");
 const course_service_1 = require("./course.service");
-const notification_service_1 = require("../notification/notification.service");
+const notification_service_1 = require("../modules/notification/notification.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
+const create_course_dto_1 = require("./dto/create-course.dto");
+const update_course_dto_1 = require("./dto/update-course.dto");
 let CourseController = class CourseController {
     constructor(courseService, notificationService) {
         this.courseService = courseService;
@@ -27,10 +29,7 @@ let CourseController = class CourseController {
     async createCourse(createCourseDto) {
         const course = await this.courseService.create(createCourseDto);
         if (course) {
-            await this.notificationService.notifyCourseCreated(course._id.toString(), course.instructor, course.title);
-        }
-        else {
-            throw new Error('Course not found');
+            await this.notificationService.notifyCourseCreated(course.id, course.instructor.toString(), course.title);
         }
         return course;
     }
@@ -44,37 +43,32 @@ let CourseController = class CourseController {
         return this.courseService.findByInstructor(instructorId);
     }
     async update(id, updateCourseDto) {
-        return this.courseService.update(id, updateCourseDto);
+        const course = await this.courseService.update(id, updateCourseDto);
+        if (course) {
+            await this.notificationService.notifyCourseApproved(course.id, course.instructor.toString(), course.title);
+        }
+        return course;
     }
     async updateStatus(id, status) {
         const course = await this.courseService.updateStatus(id, status);
         if (course) {
             if (status === 'published') {
-                await this.notificationService.notifyCourseApproved(course._id.toString(), course.instructor, course.title);
+                await this.notificationService.notifyCourseApproved(course.id, course.instructor.toString(), course.title);
             }
-        }
-        else {
-            throw new Error('Course not found');
         }
         return course;
     }
     async enrollStudent(courseId, studentId) {
         const course = await this.courseService.addStudent(courseId, studentId);
         if (course) {
-            await this.notificationService.notifyNewEnrollment(course._id.toString(), course.instructor, studentId, course.title);
-        }
-        else {
-            throw new Error('Course not found');
+            await this.notificationService.notifyNewEnrollment(course.id, course.instructor.toString(), studentId, course.title);
         }
         return course;
     }
     async addReview(courseId, reviewData) {
         const course = await this.courseService.addReview(courseId, reviewData.studentId, reviewData.rating, reviewData.comment);
         if (course) {
-            await this.notificationService.notifyNewReview(course._id.toString(), course.instructor, reviewData.studentId, course.title, reviewData.rating);
-        }
-        else {
-            throw new Error('Course not found');
+            await this.notificationService.notifyNewReview(course.id, course.instructor.toString(), reviewData.studentId, course.title, reviewData.rating);
         }
         return course;
     }
@@ -83,9 +77,7 @@ let CourseController = class CourseController {
         if (course) {
             return course.analytics;
         }
-        else {
-            throw new Error('Course not found');
-        }
+        return null;
     }
     async delete(id) {
         return this.courseService.delete(id);
@@ -96,7 +88,7 @@ __decorate([
     (0, roles_decorator_1.Roles)('instructor'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [create_course_dto_1.CreateCourseDto]),
     __metadata("design:returntype", Promise)
 ], CourseController.prototype, "createCourse", null);
 __decorate([
@@ -126,7 +118,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, update_course_dto_1.UpdateCourseDto]),
     __metadata("design:returntype", Promise)
 ], CourseController.prototype, "update", null);
 __decorate([

@@ -16,7 +16,7 @@ exports.CourseService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const course_schema_1 = require("./course.schema");
+const course_schema_1 = require("./schemas/course.schema");
 let CourseService = class CourseService {
     constructor(courseModel) {
         this.courseModel = courseModel;
@@ -84,6 +84,7 @@ let CourseService = class CourseService {
         return course;
     }
     async updateAnalytics(courseId) {
+        var _a;
         const course = await this.findOne(courseId);
         if (!course) {
             throw new common_1.NotFoundException(`Course with ID ${courseId} not found`);
@@ -93,7 +94,7 @@ let CourseService = class CourseService {
             averageRating: course.reviews.reduce((acc, review) => acc + review.rating, 0) /
                 (course.reviews.length || 1),
             activeStudents: course.students.length,
-            revenue: course.students.length * course.pricing.amount,
+            revenue: course.students.length * (((_a = course.pricing) === null || _a === void 0 ? void 0 : _a.amount) || 0),
         };
         return this.courseModel
             .findByIdAndUpdate(courseId, { 'analytics': analytics }, { new: true })

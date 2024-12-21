@@ -8,15 +8,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_module_1 = require("./auth/auth.module");
+const course_module_1 = require("./course/course.module");
+const notification_module_1 = require("./modules/notification/notification.module");
+const course_generation_module_1 = require("./modules/course-generation.module");
+const zoom_module_1 = require("./modules/zoom.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb+srv://Shilla:cashi7378@cluster0.20ozn.mongodb.net/elimu_global'),
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+            }),
+            mongoose_1.MongooseModule.forRootAsync({
+                useFactory: () => ({
+                    uri: process.env.MONGODB_URI || 'mongodb+srv://Shilla:cashi7378@cluster0.20ozn.mongodb.net/elimu_global',
+                }),
+            }),
+            notification_module_1.NotificationModule,
             auth_module_1.AuthModule,
+            course_module_1.CourseModule,
+            course_generation_module_1.CourseGenerationModule,
+            zoom_module_1.ZoomModule,
         ],
     })
 ], AppModule);

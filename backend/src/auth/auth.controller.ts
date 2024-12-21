@@ -1,57 +1,48 @@
-import { Controller, Post, Get, Body, Param, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, HttpException, HttpStatus, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Instructor } from '../instructor/instructor.schema';
+import { LoginDto } from './dto/login.dto';
+import { CreateInstructorDto } from '../instructor/dto/create-instructor.dto';
 
 @Controller('instructors')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    @InjectModel(Instructor.name) private instructorModel: Model<Instructor>
   ) {}
 
-  @Get('check/:email')
-  async checkInstructor(@Param('email') email: string) {
+  @Post('register')
+  async register(@Body() createInstructorDto: CreateInstructorDto) {
     try {
-      console.log('Checking instructor with email:', email);
-      const instructor = await this.instructorModel.findOne({ 
-        email: email.toLowerCase().trim() 
-      }).exec();
-      
-      console.log('Instructor found:', !!instructor);
-      return {
-        exists: !!instructor,
-        email: email,
-        found: instructor ? true : false
-      };
-    } catch (error: any) {
-      console.error('Check instructor error:', error);
+      const result = await this.authService.register(createInstructorDto);
+      return result;
+    } catch (error: unknown) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
-        'Error checking instructor',
-        HttpStatus.INTERNAL_SERVER_ERROR
+        error instanceof Error ? error.message : 'Registration failed',
+        HttpStatus.BAD_REQUEST
       );
     }
   }
 
   @Post('login')
-  async login(@Body() body: any) {
+  @HttpCode(HttpStatus.OK)
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.login(loginDto);
+  }
+
+  @Get('check/:email')
+  async checkInstructor(@Param('email') email: string) {
     try {
-      console.log('Login request received:', body);
-
-      if (!body.email || !body.password) {
-        throw new HttpException('Email and password are required', HttpStatus.BAD_REQUEST);
-      }
-
-      const result = await this.authService.login(body.email, body.password);
-      console.log('Login result:', result);
-      
-      return result;
-    } catch (error: any) {
-      console.error('Login error:', error);
+      const instructor = await this.authService.findByEmail(email);
+      return {
+        exists: !!instructor,
+        email: email
+      };
+    } catch (error) {
       throw new HttpException(
-        error?.message || 'Login failed',
-        error?.status || HttpStatus.INTERNAL_SERVER_ERROR
+        'Error checking instructor email',
+        HttpStatus.INTERNAL_SERVER_ERROR
       );
     }
   }

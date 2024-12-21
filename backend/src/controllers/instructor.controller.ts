@@ -1,0 +1,69 @@
+import { 
+  Controller, 
+  Post, 
+  Get,
+  Patch,
+  Delete,
+  Body, 
+  Param,
+  UseGuards, 
+  UseInterceptors, 
+  UploadedFile, 
+  Req 
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { S3Service } from '../services/s3.service';
+import { InstructorService } from '../services/instructor.service';
+import { UpdateInstructorDto } from '../dto/update-instructor.dto';
+
+@Controller('instructors')
+export class InstructorController {
+  constructor(
+    private readonly s3Service: S3Service,
+    private readonly instructorService: InstructorService,
+  ) {}
+
+  @Post('profile-picture')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfilePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: any
+  ) {
+    try {
+      const url = await this.s3Service.uploadProfilePicture(file, req.user.sub);
+      await this.instructorService.updateProfilePicture(req.user.sub, url);
+      return { url };
+    } catch (error) {
+      throw new Error('Failed to upload profile picture');
+    }
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  async findAll() {
+    return this.instructorService.findAll();
+  }
+
+  @Get(':id')
+  @UseGuards(JwtAuthGuard)
+  async findOne(@Param('id') id: string) {
+    return this.instructorService.findOne(id);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @Param('id') id: string,
+    @Body() updateInstructorDto: UpdateInstructorDto
+  ) {
+    return this.instructorService.update(id, updateInstructorDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  async remove(@Param('id') id: string) {
+    return this.instructorService.remove(id);
+  }
+} 

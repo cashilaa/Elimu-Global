@@ -15,48 +15,55 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const mongoose_1 = require("@nestjs/mongoose");
-const mongoose_2 = require("mongoose");
-const instructor_schema_1 = require("../instructor/instructor.schema");
+const login_dto_1 = require("./dto/login.dto");
+const create_instructor_dto_1 = require("../instructor/dto/create-instructor.dto");
 let AuthController = class AuthController {
-    constructor(authService, instructorModel) {
+    constructor(authService) {
         this.authService = authService;
-        this.instructorModel = instructorModel;
     }
-    async checkInstructor(email) {
+    async register(createInstructorDto) {
         try {
-            console.log('Checking instructor with email:', email);
-            const instructor = await this.instructorModel.findOne({
-                email: email.toLowerCase().trim()
-            }).exec();
-            console.log('Instructor found:', !!instructor);
-            return {
-                exists: !!instructor,
-                email: email,
-                found: instructor ? true : false
-            };
-        }
-        catch (error) {
-            console.error('Check instructor error:', error);
-            throw new common_1.HttpException('Error checking instructor', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    async login(body) {
-        try {
-            console.log('Login request received:', body);
-            if (!body.email || !body.password) {
-                throw new common_1.HttpException('Email and password are required', common_1.HttpStatus.BAD_REQUEST);
-            }
-            const result = await this.authService.login(body.email, body.password);
-            console.log('Login result:', result);
+            const result = await this.authService.register(createInstructorDto);
             return result;
         }
         catch (error) {
-            console.error('Login error:', error);
-            throw new common_1.HttpException((error === null || error === void 0 ? void 0 : error.message) || 'Login failed', (error === null || error === void 0 ? void 0 : error.status) || common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
+            throw new common_1.HttpException(error instanceof Error ? error.message : 'Registration failed', common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async login(loginDto) {
+        return this.authService.login(loginDto);
+    }
+    async checkInstructor(email) {
+        try {
+            const instructor = await this.authService.findByEmail(email);
+            return {
+                exists: !!instructor,
+                email: email
+            };
+        }
+        catch (error) {
+            throw new common_1.HttpException('Error checking instructor email', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 };
+__decorate([
+    (0, common_1.Post)('register'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_instructor_dto_1.CreateInstructorDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "register", null);
+__decorate([
+    (0, common_1.Post)('login'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [login_dto_1.LoginDto]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('check/:email'),
     __param(0, (0, common_1.Param)('email')),
@@ -64,17 +71,8 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "checkInstructor", null);
-__decorate([
-    (0, common_1.Post)('login'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "login", null);
 AuthController = __decorate([
     (0, common_1.Controller)('instructors'),
-    __param(1, (0, mongoose_1.InjectModel)(instructor_schema_1.Instructor.name)),
-    __metadata("design:paramtypes", [auth_service_1.AuthService,
-        mongoose_2.Model])
+    __metadata("design:paramtypes", [auth_service_1.AuthService])
 ], AuthController);
 exports.AuthController = AuthController;
