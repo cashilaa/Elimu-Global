@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Clock, Star, Video, BarChart, Edit, Trash, Plus, Search, Filter, Download, Upload, Book, Calendar, X } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/badge';
+import { Badge } from '../../components/ui/Badge';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Button } from '../../components/ui/button';
 import { Avatar } from '../../components/ui/avatar';
