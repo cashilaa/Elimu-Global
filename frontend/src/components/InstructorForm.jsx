@@ -8,6 +8,7 @@ import Testimonial from './ui/Testimonial';
 import BlobButton from './ui/BlobButton';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { API_URL } from '../config';
 
 // Move InputField outside the main component
 const InputField = ({ 
@@ -94,38 +95,39 @@ const InstructorForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
+
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!formData.email || !formData.password) {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const instructorData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email.toLowerCase(),
+      password: formData.password,
+      phoneNumber: formData.phoneNumber,
+      expertise: formData.expertise,
+      bio: formData.bio,
+      education: formData.education,
+      experience: formData.experience,
+      teachingAreas: [formData.expertise],
+    };
+
+    if (!instructorData.email || !instructorData.password) {
       toast.error('Email and password are required');
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (instructorData.password !== formData.confirmPassword) {
       toast.error('Passwords do not match');
       return;
     }
 
     try {
-      const response = await axios.post('http://localhost:3000/api/instructors/register', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email.toLowerCase(),
-        password: formData.password,
-        phoneNumber: formData.phoneNumber,
-        expertise: formData.expertise,
-        bio: formData.bio,
-        education: formData.education,
-        experience: formData.experience,
-        teachingAreas: [formData.expertise],
-      });
-
+      const response = await axios.post(`${API_URL}/api/instructors/register`, instructorData);
       if (response.data) {
         toast.success('Registration successful!');
         navigate('/login');
