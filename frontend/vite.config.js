@@ -16,5 +16,8 @@ export default defineConfig({
   server: {
     port: process.env.PORT || 3000,
     host: true
+  },
+  css: {
+    postcss: './postcss.config.cjs'
   }
 });
