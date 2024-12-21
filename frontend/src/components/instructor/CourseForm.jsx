@@ -1,7 +1,10 @@
 import React, { useState, useRef } from 'react';
+import axios from 'axios';
 import { Upload, X, FileText, Video, AlertCircle, Check } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
+
+const API_BASE_URL = 'https://elimu-instructor-bc.onrender.com'; // e.g., 'http://localhost:3000/api'
 
 const CourseForm = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -28,13 +31,43 @@ const CourseForm = ({ onClose, onSubmit }) => {
     setSuccess('');
     try {
       setUploading(true);
-      await onSubmit(formData);
+
+      const formDataToSend = new FormData();
+
+      const courseData = {
+        title: formData.title,
+        description: formData.description,
+        duration: formData.duration,
+        status: formData.status,
+        price: formData.price,
+        category: formData.category,
+        prerequisites: formData.prerequisites,
+        level: formData.level
+      };
+      formDataToSend.append('courseData', JSON.stringify(courseData));
+
+      formData.materials.forEach((file) => {
+        if (file.rawFile) {
+          formDataToSend.append('files', file.rawFile);
+        }
+      });
+
+      const response = await axios.post(`${API_BASE_URL}/courses`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
       setSuccess('Course created successfully!');
+      if (onSubmit) {
+        onSubmit(response.data);
+      }
       setTimeout(() => {
         onClose();
       }, 2000);
+
     } catch (error) {
-      setError('Error creating course. Please try again.');
+      setError(error.response?.data?.message || 'Error creating course. Please try again.');
       console.error('Error submitting form:', error);
     } finally {
       setUploading(false);
@@ -55,26 +88,22 @@ const CourseForm = ({ onClose, onSubmit }) => {
     setError('');
 
     try {
-      // Simulate file upload - in real implementation, you'd use your backend API
       const uploadedFiles = await Promise.all(files.map(async (file) => {
-        // Validate file size (10MB limit)
         if (file.size > 10 * 1024 * 1024) {
           throw new Error(`${file.name} exceeds 10MB limit`);
         }
-
-        // Validate file type
         if (type === 'pdf' && file.type !== 'application/pdf') {
           throw new Error(`${file.name} is not a PDF file`);
         }
         if (type === 'video' && !file.type.startsWith('video/')) {
           throw new Error(`${file.name} is not a video file`);
         }
-
         return {
           name: file.name,
           type: file.type,
           size: file.size,
-          url: URL.createObjectURL(file)
+          url: URL.createObjectURL(file),
+          rawFile: file
         };
       }));
 

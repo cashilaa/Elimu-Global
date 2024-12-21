@@ -114,24 +114,31 @@ const ChatInterface = ({ onClose }) => {
   };
 
   const handleSaveCourse = async () => {
-    if (!courseData) return;
-    
     setIsSaving(true);
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to save your course');
-        navigate('/login');
-        return;
-      }
 
+    try {
+      // Build course data from chat conversation
+      const course = {
+        title: messages.find(m => m.type === 'user' && m.content.includes('/title'))?.content.split('/title ')[1] || '',
+        description: messages.find(m => m.type === 'user' && m.content.includes('/description'))?.content.split('/description ')[1] || '',
+        duration: messages.find(m => m.type === 'user' && m.content.includes('/duration'))?.content.split('/duration ')[1] || '',
+        level: messages.find(m => m.type === 'user' && m.content.includes('/level'))?.content.split('/level ')[1] || '',
+        category: messages.find(m => m.type === 'user' && m.content.includes('/category'))?.content.split('/category ')[1] || '',
+        modules: messages
+          .filter(m => m.type === 'user' && m.content.includes('/module'))
+          .map(m => {
+            const [_, title, description] = m.content.split('/module ');
+            return { title, description };
+          })
+      };
+
+      // Save course to server
       const response = await fetch('http://localhost:3000/api/courses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(courseData),
+        body: JSON.stringify(course)
       });
 
       if (!response.ok) {
@@ -167,6 +174,59 @@ const ChatInterface = ({ onClose }) => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleSave = async () => {
+    const handleSaveCourse = async () => {
+      setIsSaving(true);
+
+      try {
+        // Build course data from chat conversation
+        const course = {
+          title: messages.find(m => m.type === 'user' && m.content.includes('/title'))?.content.split('/title ')[1] || '',
+          description: messages.find(m => m.type === 'user' && m.content.includes('/description'))?.content.split('/description ')[1] || '',
+          duration: messages.find(m => m.type === 'user' && m.content.includes('/duration'))?.content.split('/duration ')[1] || '',
+          level: messages.find(m => m.type === 'user' && m.content.includes('/level'))?.content.split('/level ')[1] || '',
+          category: messages.find(m => m.type === 'user' && m.content.includes('/category'))?.content.split('/category ')[1] || '',
+          modules: messages
+            .filter(m => m.type === 'user' && m.content.includes('/module'))
+            .map(m => {
+              const [_, title, description] = m.content.split('/module ');
+              return { title, description };
+            })
+        };
+
+        // Save course to server
+        const response = await fetch('http://localhost:3000/api/courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(course)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save course');
+        }
+
+        const result = await response.json();
+        toast.success('Course saved successfully!');
+
+        // Optionally handle the saved course data
+        console.log('Saved Course:', result);
+
+      } catch (error) {
+        toast.error(error.message || 'Error saving course. Please try again.');
+        console.error('Error saving course:', error);
+      } finally {
+        setIsSaving(false);
+      }
+    };
+
+    handleSaveCourse();
+  };
+
+  const handleClose = () => {
+    // Logic to close the chat interface
+    onClose();
   };
 
   // Add course preview component
@@ -246,9 +306,22 @@ const ChatInterface = ({ onClose }) => {
             <h2 className="text-xl font-semibold">AI Course Creator</h2>
             <p className="text-sm opacity-90">Let's create something amazing together</p>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-            <X className="h-6 w-6" />
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={handleSave}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <Save className="h-4 w-4" />
+              <span>Save Course</span>
+            </button>
+            <button
+              onClick={handleClose}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              <X className="h-4 w-4" />
+              <span>Close</span>
+            </button>
+          </div>
         </div>
 
         {/* Main Content */}
