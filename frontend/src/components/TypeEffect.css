@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto Serif");
+.typing-effect {
+    display: flex;
+    align-items: center;
+    border: none;
+  }
+  .text{
+    margin-left: 0%;
+    font-family: 'Roboto',sans-serif;
+    font-size: 24px;
+    color:rgba(0, 0, 0, 0.702);
+  }
+  
+  .cursor {
+    display: inline-block;
+    background-color: black;
+    margin-left: 2px;
+    width: 2px;
+    animation: blink 1s step-end infinite;
+  }
+  
+  @keyframes blink {
+    from, to {
+      background-color: black;
+    }
+    50% {
+      background-color: transparent;
+    }
+  }
+  
