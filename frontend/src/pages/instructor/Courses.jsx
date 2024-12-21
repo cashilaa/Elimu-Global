@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Clock, Star, Plus, Search, X } from 'lucide-react';
 import CourseForm from '../../components/instructor/CourseForm';
+import { API_URL } from '../../config';
 
 const Courses = () => {
   const [showCourseForm, setShowCourseForm] = useState(false);
@@ -204,7 +205,7 @@ const Courses = () => {
 
   const handleCreateCourse = async (courseData) => {
     try {
-      const response = await fetch('/api/courses', {
+      const response = await fetch(`${API_URL}/api/courses`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
