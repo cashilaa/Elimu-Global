@@ -17,12 +17,43 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const course_content_schema_1 = require("./course-content.schema");
+const aws_sdk_1 = require("aws-sdk");
+aws_sdk_1.default.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION,
+});
+const s3 = new aws_sdk_1.default.S3();
 let CourseContentService = class CourseContentService {
     constructor(contentModel) {
         this.contentModel = contentModel;
     }
     async createContent(courseId, moduleId, createContentDto) {
-        const newContent = new this.contentModel({ ...createContentDto, courseId, moduleId });
+        let videoUrl;
+        let pdfUrl;
+        if (createContentDto.video) {
+            const videoData = createContentDto.video;
+            const params = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `videos/${Date.now()}_${videoData.originalname}`,
+                Body: videoData.buffer,
+                ContentType: videoData.mimetype,
+            };
+            const uploadResult = await s3.upload(params).promise();
+            videoUrl = uploadResult.Location;
+        }
+        if (createContentDto.pdf) {
+            const pdfData = createContentDto.pdf;
+            const params = {
+                Bucket: process.env.S3_BUCKET_NAME,
+                Key: `pdfs/${Date.now()}_${pdfData.originalname}`,
+                Body: pdfData.buffer,
+                ContentType: pdfData.mimetype,
+            };
+            const uploadResult = await s3.upload(params).promise();
+            pdfUrl = uploadResult.Location;
+        }
+        const newContent = new this.contentModel({ ...createContentDto, courseId, moduleId, videoUrl, pdfUrl });
         return newContent.save();
     }
     async updateContent(courseId, moduleId, contentId, updateContentDto) {

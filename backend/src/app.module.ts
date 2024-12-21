@@ -6,6 +6,8 @@ import { CourseModule } from './course/course.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { CourseGenerationModule } from './modules/course-generation.module';
 import { ZoomModule } from './modules/zoom.module';
+import { CoursesModule } from './courses/courses.module';
+import { GroupModule } from './instructor/group.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { ZoomModule } from './modules/zoom.module';
     CourseModule,
     CourseGenerationModule,
     ZoomModule,
+    CoursesModule,
+    GroupModule,
   ],
 })
 export class AppModule {}

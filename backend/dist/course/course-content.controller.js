@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CourseContentController = void 0;
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const course_content_service_1 = require("./course-content.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("../auth/guards/roles.guard");
@@ -25,10 +26,24 @@ let CourseContentController = class CourseContentController {
     constructor(courseContentService) {
         this.courseContentService = courseContentService;
     }
-    async createContent(courseId, moduleId, createContentDto) {
-        const content = await this.courseContentService.createContent(courseId, moduleId, createContentDto);
-        this.server.emit('contentUpdate', { courseId, moduleId, content });
-        return content;
+    async createContent(courseId, moduleId, createContentDto, files) {
+        const videoFile = files.find(file => file.mimetype.startsWith('video/'));
+        const pdfFile = files.find(file => file.mimetype === 'application/pdf');
+        if (videoFile) {
+            createContentDto.video = {
+                originalname: videoFile.originalname,
+                buffer: videoFile.buffer,
+                mimetype: videoFile.mimetype,
+            };
+        }
+        if (pdfFile) {
+            createContentDto.pdf = {
+                originalname: pdfFile.originalname,
+                buffer: pdfFile.buffer,
+                mimetype: pdfFile.mimetype,
+            };
+        }
+        return this.courseContentService.createContent(courseId, moduleId, createContentDto);
     }
     async updateContent(courseId, moduleId, contentId, updateContentDto) {
         const content = await this.courseContentService.updateContent(courseId, moduleId, contentId, updateContentDto);
@@ -55,11 +70,13 @@ __decorate([
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)('instructor', 'admin'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('files')),
     __param(0, (0, common_1.Param)('courseId')),
     __param(1, (0, common_1.Param)('moduleId')),
     __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, content_dto_1.CreateContentDto]),
+    __metadata("design:paramtypes", [String, String, content_dto_1.CreateContentDto, Array]),
     __metadata("design:returntype", Promise)
 ], CourseContentController.prototype, "createContent", null);
 __decorate([

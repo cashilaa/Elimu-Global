@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CourseContent = void 0;
+exports.CourseContentSchema = exports.CourseContent = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let CourseContent = class CourseContent {
 };
@@ -35,42 +35,23 @@ __decorate([
     __metadata("design:type", Number)
 ], CourseContent.prototype, "contentIndex", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({
-        type: String,
-        enum: ['video', 'document', 'quiz', 'assignment'],
-        required: true,
-    }),
+    (0, mongoose_1.Prop)({ required: false }),
     __metadata("design:type", String)
-], CourseContent.prototype, "type", void 0);
+], CourseContent.prototype, "videoUrl", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: Object }),
-    __metadata("design:type", Object)
-], CourseContent.prototype, "videoContent", void 0);
+    (0, mongoose_1.Prop)({ required: false }),
+    __metadata("design:type", String)
+], CourseContent.prototype, "pdfUrl", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: Object }),
-    __metadata("design:type", Object)
-], CourseContent.prototype, "documentContent", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: Object }),
-    __metadata("design:type", Object)
-], CourseContent.prototype, "quizContent", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: Object }),
-    __metadata("design:type", Object)
-], CourseContent.prototype, "assignmentContent", void 0);
+    (0, mongoose_1.Prop)({ type: [String], default: [] }),
+    __metadata("design:type", Array)
+], CourseContent.prototype, "materials", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ type: [String], default: [] }),
     __metadata("design:type", Array)
 ], CourseContent.prototype, "prerequisites", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ default: true }),
-    __metadata("design:type", Boolean)
-], CourseContent.prototype, "isPublished", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ type: Object }),
-    __metadata("design:type", Object)
-], CourseContent.prototype, "metadata", void 0);
 exports.CourseContent = CourseContent = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], CourseContent);
+exports.CourseContentSchema = mongoose_1.SchemaFactory.createForClass(CourseContent);
 //# sourceMappingURL=course-content.schema.js.map

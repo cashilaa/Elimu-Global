@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { Upload, X, FileText, Video, AlertCircle, Check } from 'lucide-react';
 
-const API_BASE_URL = 'https://elimu-instructor-bc.onrender.com'; // e.g., 'http://localhost:3000/api'
+const API_BASE_URL = 'http://localhost:3000/api';
 
 const CourseForm = ({ onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -16,6 +16,8 @@ const CourseForm = ({ onClose, onSubmit }) => {
     materials: [],
     level: 'beginner'
   });
+
+  const [newCategory, setNewCategory] = useState('');
 
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -38,7 +40,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
         duration: formData.duration,
         status: formData.status,
         price: formData.price,
-        category: formData.category,
+        category: newCategory || formData.category,
         prerequisites: formData.prerequisites,
         level: formData.level
       };
@@ -50,10 +52,11 @@ const CourseForm = ({ onClose, onSubmit }) => {
         }
       });
 
-      const response = await axios.post(`${API_BASE_URL}/courses`, formDataToSend, {
+      const response = await axios.post(`${API_BASE_URL}/courses `, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
-        }
+        },
+        withCredentials: true,
       });
 
       setSuccess('Course created successfully!');
@@ -146,20 +149,97 @@ const CourseForm = ({ onClose, onSubmit }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700">Category</label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  required
-                >
-                  <option value="">Select a category</option>
-                  <option value="programming">Programming</option>
-                  <option value="design">Design</option>
-                  <option value="business">Business</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="other">Other</option>
-                </select>
+                <div className="flex flex-col">
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    required
+                  >
+                    <option value="">Select a category</option>
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Science">Science</option>
+                    <option value="Social Sciences">Social Sciences</option>
+                    <option value="English">English</option>
+                    <option value="History">History</option>
+                    <option value="Geography">Geography</option>
+                    <option value="Religion">Religion</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Art">Art</option>
+                    <option value="Music">Music</option>
+                    <option value="Physical Education">Physical Education</option>
+                    <option value="Health">Health</option>
+                    <option value="Business Studies">Business Studies</option>
+                    <option value="Environmental Science">Environmental Science</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Economics">Economics</option>
+                    <option value="Statistics">Statistics</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Information Technology">Information Technology</option>
+                    <option value="Agriculture">Agriculture</option>
+                    <option value="Architecture">Architecture</option>
+                    <option value="Aviation">Aviation</option>
+                    <option value="Biotechnology">Biotechnology</option>
+                    <option value="Civil Engineering">Civil Engineering</option>
+                    <option value="Communication">Communication</option>
+                    <option value="Computer Engineering">Computer Engineering</option>
+                    <option value="Construction Management">Construction Management</option>
+                    <option value="Culinary Arts">Culinary Arts</option>
+                    <option value="Dance">Dance</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Electrical Engineering">Electrical Engineering</option>
+                    <option value="Fashion Design">Fashion Design</option>
+                    <option value="Film">Film</option>
+                    <option value="Fine Arts">Fine Arts</option>
+                    <option value="Graphic Design">Graphic Design</option>
+                    <option value="Hospitality Management">Hospitality Management</option>
+                    <option value="Human Resources">Human Resources</option>
+                    <option value="Industrial Engineering">Industrial Engineering</option>
+                    <option value="Interior Design">Interior Design</option>
+                    <option value="International Business">International Business</option>
+                    <option value="Journalism">Journalism</option>
+                    <option value="Landscape Architecture">Landscape Architecture</option>
+                    <option value="Law">Law</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Mechanical Engineering">Mechanical Engineering</option>
+                    <option value="Media Studies">Media Studies</option>
+                    <option value="Medicine">Medicine</option>
+                    <option value="Music Education">Music Education</option>
+                    <option value="Nursing">Nursing</option>
+                    <option value="Nutrition">Nutrition</option>
+                    <option value="Occupational Therapy">Occupational Therapy</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Photography">Photography</option>
+                    <option value="Physical Therapy">Physical Therapy</option>
+                    <option value="Psychology">Psychology</option>
+                    <option value="Public Administration">Public Administration</option>
+                    <option value="Public Health">Public Health</option>
+                    <option value="Public Relations">Public Relations</option>
+                    <option value="Radio and Television">Radio and Television</option>
+                    <option value="Real Estate">Real Estate</option>
+                    <option value="Social Work">Social Work</option>
+                    <option value="Sociology">Sociology</option>
+                    <option value="Speech-Language Pathology">Speech-Language Pathology</option>
+                    <option value="Sports Management">Sports Management</option>
+                    <option value="Supply Chain Management">Supply Chain Management</option>
+                    <option value="Theater">Theater</option>
+                    <option value="Urban Planning">Urban Planning</option>
+                    <option value="Veterinary Medicine">Veterinary Medicine</option>
+                  </select>
+                  <div className="mt-2">
+                    <label className="block text-sm font-medium text-gray-700">Add New Category:</label>
+                    <input
+                      type="text"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      placeholder="Enter new category"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>

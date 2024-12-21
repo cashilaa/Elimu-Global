@@ -1,6 +1,20 @@
 import { IsString, IsOptional, IsEnum, IsNumber, IsBoolean } from 'class-validator';
 
 export class CreateContentDto {
+  @IsOptional()
+  video?: {
+    originalname: string;
+    buffer: Buffer;
+    mimetype: string;
+  };
+
+  @IsOptional()
+  pdf?: {
+    originalname: string;
+    buffer: Buffer;
+    mimetype: string;
+  };
+
   @IsString()
   title: string;
 
@@ -31,6 +45,14 @@ export class CreateContentDto {
   @IsOptional()
   thumbnailUrl?: string;
 
+  @IsString()
+  @IsOptional()
+  videoUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  pdfUrl?: string;
+
   @IsNumber()
   @IsOptional()
   moduleIndex?: number;
@@ -42,6 +64,14 @@ export class CreateContentDto {
   @IsBoolean()
   @IsOptional()
   isPublished?: boolean;
+
+  @IsString()
+  @IsOptional()
+  category?: string;
+
+  @IsString({ each: true })
+  @IsOptional()
+  materials?: string[];
 
   @IsOptional()
   metadata?: {

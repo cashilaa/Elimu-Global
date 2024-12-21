@@ -9,7 +9,10 @@ import {
   UseGuards,
   HttpStatus,
   HttpException,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CourseContentService } from './course-content.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -28,18 +31,33 @@ export class CourseContentController {
 
   @Post()
   @Roles('instructor', 'admin')
+  @UseInterceptors(FilesInterceptor('files'))
   async createContent(
     @Param('courseId') courseId: string,
     @Param('moduleId') moduleId: string,
     @Body() createContentDto: CreateContentDto,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    const content = await this.courseContentService.createContent(
-      courseId,
-      moduleId,
-      createContentDto,
-    );
-    this.server.emit('contentUpdate', { courseId, moduleId, content });
-    return content;
+    const videoFile = files.find(file => file.mimetype.startsWith('video/'));
+    const pdfFile = files.find(file => file.mimetype === 'application/pdf');
+
+    if (videoFile) {
+      createContentDto.video = {
+        originalname: videoFile.originalname,
+        buffer: videoFile.buffer,
+        mimetype: videoFile.mimetype,
+      };
+    }
+
+    if (pdfFile) {
+      createContentDto.pdf = {
+        originalname: pdfFile.originalname,
+        buffer: pdfFile.buffer,
+        mimetype: pdfFile.mimetype,
+      };
+    }
+
+    return this.courseContentService.createContent(courseId, moduleId, createContentDto);
   }
 
   @Put(':contentId')

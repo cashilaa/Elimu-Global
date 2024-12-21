@@ -15,6 +15,14 @@ class CreateContentDto {
 }
 exports.CreateContentDto = CreateContentDto;
 __decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateContentDto.prototype, "video", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateContentDto.prototype, "pdf", void 0);
+__decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateContentDto.prototype, "title", void 0);
@@ -53,6 +61,16 @@ __decorate([
     __metadata("design:type", String)
 ], CreateContentDto.prototype, "thumbnailUrl", void 0);
 __decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateContentDto.prototype, "videoUrl", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateContentDto.prototype, "pdfUrl", void 0);
+__decorate([
     (0, class_validator_1.IsNumber)(),
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
@@ -67,6 +85,16 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Boolean)
 ], CreateContentDto.prototype, "isPublished", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateContentDto.prototype, "category", void 0);
+__decorate([
+    (0, class_validator_1.IsString)({ each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateContentDto.prototype, "materials", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)

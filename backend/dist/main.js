@@ -13,7 +13,7 @@ async function bootstrap() {
     });
     app.use(compression());
     app.enableCors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+        origin: ['http://localhost:3001', 'https://elimu-instructor-fr.onrender.com'],
         credentials: true,
     });
     app.setGlobalPrefix('api');

@@ -87,9 +87,9 @@ const Courses = () => {
           </div>
         ))
       ) : (
-        <Alert>
-          <AlertDescription>No scheduled sessions for this course yet.</AlertDescription>
-        </Alert>
+        <div style={{ color: 'red', backgroundColor: '#f8d7da', padding: '10px', borderRadius: '5px' }}>
+          No scheduled sessions for this course yet.
+        </div>
       )}
     </div>
   );
@@ -190,11 +190,9 @@ const Courses = () => {
                     </button>
                   </div>
                 </div>
-                <Alert>
-                  <AlertDescription>
-                    Content management features will be implemented based on specific requirements.
-                  </AlertDescription>
-                </Alert>
+                <div style={{ color: 'red', backgroundColor: '#f8d7da', padding: '10px', borderRadius: '5px' }}>
+                  Content management features will be implemented based on specific requirements.
+                </div>
               </div>
             </TabsContent>
           </Tabs>
@@ -230,7 +228,7 @@ const Courses = () => {
       setShowCourseForm(false);
     } catch (error) {
       console.error('Error creating course:', error);
-      alert('Failed to create course. Please try again.');
+      setError('Failed to create course. Please try again.');
     }
   };
 
@@ -244,9 +242,9 @@ const Courses = () => {
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
+      <div style={{ color: 'red', backgroundColor: '#f8d7da', padding: '10px', borderRadius: '5px' }}>
+        {error}
+      </div>
     );
   }
 

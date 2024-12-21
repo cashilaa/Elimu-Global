@@ -14,6 +14,7 @@ import CreateSession from './pages/instructor/CreateSession';
 import GroupManagement from './pages/instructor/GroupManagement';
 import InstructorsLanding from './components/InstructorsLanding';
 import CreateCourse from './pages/instructor/CreateCourse';
+import CourseContentManager from './pages/instructor/CourseContentManager';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 function App() {
@@ -62,6 +63,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="zoom-meetings" element={<ZoomMeetings />} />
+              <Route path="content" element={<CourseContentManager />} />
               <Route path="courses" element={<Courses />} />
               <Route path="courses/new" element={<CreateCourse />} />
               <Route path="students" element={<Students />} />
@@ -72,7 +74,7 @@ function App() {
             </Route>
             <Route path="/instructor/create-session" element={<CreateSession />} />
             <Route path="/dashboard" element={<Navigate to="/instructor/dashboard" replace />} />
-            <Route path="/instructor/group-management" element={<GroupManagement />} />
+            
           </Routes>
         </motion.div>
       </AnimatePresence>

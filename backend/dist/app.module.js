@@ -15,6 +15,8 @@ const course_module_1 = require("./course/course.module");
 const notification_module_1 = require("./modules/notification/notification.module");
 const course_generation_module_1 = require("./modules/course-generation.module");
 const zoom_module_1 = require("./modules/zoom.module");
+const courses_module_1 = require("./courses/courses.module");
+const group_module_1 = require("./instructor/group.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -34,6 +36,8 @@ exports.AppModule = AppModule = __decorate([
             course_module_1.CourseModule,
             course_generation_module_1.CourseGenerationModule,
             zoom_module_1.ZoomModule,
+            courses_module_1.CoursesModule,
+            group_module_1.GroupModule,
         ],
     })
 ], AppModule);

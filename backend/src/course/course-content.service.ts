@@ -3,6 +3,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CourseContent, CourseContentDocument } from './course-content.schema';
 import { CreateContentDto, UpdateContentDto } from './dto/content.dto';
+import AWS from 'aws-sdk';
+
+// Configure AWS SDK
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+const s3 = new AWS.S3();
 
 @Injectable()
 export class CourseContentService {
@@ -11,7 +21,38 @@ export class CourseContentService {
   ) {}
 
   async createContent(courseId: string, moduleId: string, createContentDto: CreateContentDto): Promise<CourseContent> {
-    const newContent = new this.contentModel({ ...createContentDto, courseId, moduleId });
+    let videoUrl;
+    let pdfUrl;
+
+    // Handle video upload
+    if (createContentDto.video) {
+      const videoData = createContentDto.video; 
+      const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: `videos/${Date.now()}_${videoData.originalname}`,
+        Body: videoData.buffer,
+        ContentType: videoData.mimetype,
+      };
+
+      const uploadResult = await s3.upload(params).promise();
+      videoUrl = uploadResult.Location;
+    }
+
+    // Handle PDF upload
+    if (createContentDto.pdf) {
+      const pdfData = createContentDto.pdf; 
+      const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: `pdfs/${Date.now()}_${pdfData.originalname}`,
+        Body: pdfData.buffer,
+        ContentType: pdfData.mimetype,
+      };
+
+      const uploadResult = await s3.upload(params).promise();
+      pdfUrl = uploadResult.Location;
+    }
+
+    const newContent = new this.contentModel({ ...createContentDto, courseId, moduleId, videoUrl, pdfUrl });
     return newContent.save();
   }
 
