@@ -20,8 +20,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateContentDto, UpdateContentDto } from './dto/content.dto';
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import multer from 'multer';
-import { Request, Response } from 'express'; // Ensure you have the correct imports
+import { Express } from 'express';
 
 @Controller('courses/:courseId/modules/:moduleId/content')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -38,7 +37,7 @@ export class CourseContentController {
     @Param('courseId') courseId: string,
     @Param('moduleId') moduleId: string,
     @Body() createContentDto: CreateContentDto,
-    @UploadedFiles() files: Express.Multer.File[], // Use 'File' directly
+    @UploadedFiles() files: Express.Multer['File'][],
   ) {
     const videoFile = files.find(file => file.mimetype.startsWith('video/'));
     const pdfFile = files.find(file => file.mimetype === 'application/pdf');
