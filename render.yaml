@@ -7,15 +7,21 @@ services:
       rm -rf dist
       npm install
       npm run build
-    startCommand: cd backend && npm run start:prod
+    startCommand: cd backend && NODE_OPTIONS='--max-old-space-size=450' npm run start:prod
     envVars:
       - key: NODE_VERSION
         value: 18.17.0
       - key: PORT
         value: 3000
+      - key: NODE_ENV
+        value: production
     plan: starter
     scaling:
       minInstances: 1
       maxInstances: 1
     healthCheckPath: /api/health
     autoDeploy: false
+    disk:
+      name: tmp
+      mountPath: /tmp
+      sizeGB: 0.5
