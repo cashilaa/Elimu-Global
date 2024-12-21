@@ -3,7 +3,7 @@ import { Users, BookOpen, Clock, DollarSign, Calendar, Bell, Search, ChevronRigh
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Avatar } from '../../components/ui/avatar';
-import { Badge } from '../../components/ui/badge';
+import { Badge } from '../../components/ui';
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
