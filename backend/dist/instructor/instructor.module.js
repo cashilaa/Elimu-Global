@@ -15,7 +15,8 @@ const instructor_schema_1 = require("./instructor.schema");
 const auth_module_1 = require("../auth/auth.module");
 let InstructorModule = class InstructorModule {
 };
-InstructorModule = __decorate([
+exports.InstructorModule = InstructorModule;
+exports.InstructorModule = InstructorModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: instructor_schema_1.Instructor.name, schema: instructor_schema_1.InstructorSchema }]),
@@ -26,5 +27,4 @@ InstructorModule = __decorate([
         exports: [instructor_service_1.InstructorService],
     })
 ], InstructorModule);
-exports.InstructorModule = InstructorModule;
 //# sourceMappingURL=instructor.module.js.map

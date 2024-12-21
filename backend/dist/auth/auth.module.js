@@ -20,7 +20,8 @@ const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const instructor_schema_1 = require("../instructor/instructor.schema");
 let AuthModule = class AuthModule {
 };
-AuthModule = __decorate([
+exports.AuthModule = AuthModule;
+exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
         imports: [
             passport_1.PassportModule,
@@ -44,5 +45,4 @@ AuthModule = __decorate([
         exports: [auth_service_1.AuthService, jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, jwt_1.JwtModule],
     })
 ], AuthModule);
-exports.AuthModule = AuthModule;
 //# sourceMappingURL=auth.module.js.map

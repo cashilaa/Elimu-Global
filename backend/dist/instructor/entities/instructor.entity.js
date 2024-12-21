@@ -14,6 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Instructor = class Instructor extends mongoose_2.Document {
 };
+exports.Instructor = Instructor;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -82,9 +83,8 @@ __decorate([
     (0, mongoose_1.Prop)({ default: Date.now }),
     __metadata("design:type", Date)
 ], Instructor.prototype, "updatedAt", void 0);
-Instructor = __decorate([
+exports.Instructor = Instructor = __decorate([
     (0, mongoose_1.Schema)()
 ], Instructor);
-exports.Instructor = Instructor;
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
 //# sourceMappingURL=instructor.entity.js.map

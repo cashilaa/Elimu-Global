@@ -14,7 +14,8 @@ const group_service_1 = require("./group.service");
 const group_controller_1 = require("./group.controller");
 let GroupModule = class GroupModule {
 };
-GroupModule = __decorate([
+exports.GroupModule = GroupModule;
+exports.GroupModule = GroupModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([{ name: group_schema_1.Group.name, schema: group_schema_1.GroupSchema }]),
@@ -24,5 +25,4 @@ GroupModule = __decorate([
         exports: [group_service_1.GroupService],
     })
 ], GroupModule);
-exports.GroupModule = GroupModule;
 //# sourceMappingURL=group.module.js.map

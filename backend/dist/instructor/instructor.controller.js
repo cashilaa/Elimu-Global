@@ -35,6 +35,7 @@ let InstructorController = class InstructorController {
         return this.instructorService.remove(id);
     }
 };
+exports.InstructorController = InstructorController;
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -65,9 +66,8 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], InstructorController.prototype, "remove", null);
-InstructorController = __decorate([
+exports.InstructorController = InstructorController = __decorate([
     (0, common_1.Controller)('instructors'),
     __metadata("design:paramtypes", [instructor_service_1.InstructorService])
 ], InstructorController);
-exports.InstructorController = InstructorController;
 //# sourceMappingURL=instructor.controller.js.map

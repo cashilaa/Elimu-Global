@@ -27,9 +27,9 @@ let NotificationService = class NotificationService {
         console.log(`New review for ${courseTitle} by student ${studentId} with rating ${rating}`);
     }
 };
-NotificationService = __decorate([
+exports.NotificationService = NotificationService;
+exports.NotificationService = NotificationService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [])
 ], NotificationService);
-exports.NotificationService = NotificationService;
 //# sourceMappingURL=notification.service.js.map

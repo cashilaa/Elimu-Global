@@ -15,8 +15,8 @@ let MailService = class MailService {
         console.log(`Text: ${mailOptions.text}`);
     }
 };
-MailService = __decorate([
+exports.MailService = MailService;
+exports.MailService = MailService = __decorate([
     (0, common_1.Injectable)()
 ], MailService);
-exports.MailService = MailService;
 //# sourceMappingURL=mail.service.js.map

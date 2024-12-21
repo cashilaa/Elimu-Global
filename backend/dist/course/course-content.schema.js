@@ -13,6 +13,7 @@ exports.CourseContent = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let CourseContent = class CourseContent {
 };
+exports.CourseContent = CourseContent;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -69,8 +70,7 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Object }),
     __metadata("design:type", Object)
 ], CourseContent.prototype, "metadata", void 0);
-CourseContent = __decorate([
+exports.CourseContent = CourseContent = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], CourseContent);
-exports.CourseContent = CourseContent;
 //# sourceMappingURL=course-content.schema.js.map

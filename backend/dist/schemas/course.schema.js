@@ -14,6 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Course = class Course {
 };
+exports.Course = Course;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -67,9 +68,8 @@ __decorate([
     (0, mongoose_1.Prop)({ type: [{ type: mongoose_2.Schema.Types.ObjectId, ref: 'Student' }] }),
     __metadata("design:type", Array)
 ], Course.prototype, "students", void 0);
-Course = __decorate([
+exports.Course = Course = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Course);
-exports.Course = Course;
 exports.CourseSchema = mongoose_1.SchemaFactory.createForClass(Course);
 //# sourceMappingURL=course.schema.js.map

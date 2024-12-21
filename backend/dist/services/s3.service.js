@@ -44,9 +44,9 @@ let S3Service = class S3Service {
         await this.s3.deleteObject(params).promise();
     }
 };
-S3Service = __decorate([
+exports.S3Service = S3Service;
+exports.S3Service = S3Service = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], S3Service);
-exports.S3Service = S3Service;
 //# sourceMappingURL=s3.service.js.map

@@ -13,6 +13,7 @@ exports.UpdateContentDto = exports.CreateContentDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateContentDto {
 }
+exports.CreateContentDto = CreateContentDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -70,7 +71,6 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)
 ], CreateContentDto.prototype, "metadata", void 0);
-exports.CreateContentDto = CreateContentDto;
 class UpdateContentDto extends CreateContentDto {
 }
 exports.UpdateContentDto = UpdateContentDto;

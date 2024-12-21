@@ -17,6 +17,7 @@ let Instructor = class Instructor {
         return bcrypt.compare(password, this.password);
     }
 };
+exports.Instructor = Instructor;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -91,7 +92,7 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Object }),
     __metadata("design:type", Object)
 ], Instructor.prototype, "analytics", void 0);
-Instructor = __decorate([
+exports.Instructor = Instructor = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,
         toJSON: {
@@ -102,7 +103,6 @@ Instructor = __decorate([
         },
     })
 ], Instructor);
-exports.Instructor = Instructor;
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
 exports.InstructorSchema.methods.validatePassword = async function (password) {
     return bcrypt.compare(password, this.password);

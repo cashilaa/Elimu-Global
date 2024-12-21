@@ -12,11 +12,11 @@ const course_generation_controller_1 = require("../controllers/course-generation
 const gemini_service_1 = require("../services/gemini.service");
 let CourseGenerationModule = class CourseGenerationModule {
 };
-CourseGenerationModule = __decorate([
+exports.CourseGenerationModule = CourseGenerationModule;
+exports.CourseGenerationModule = CourseGenerationModule = __decorate([
     (0, common_1.Module)({
         controllers: [course_generation_controller_1.CourseGenerationController],
         providers: [gemini_service_1.GeminiService],
     })
 ], CourseGenerationModule);
-exports.CourseGenerationModule = CourseGenerationModule;
 //# sourceMappingURL=course-generation.module.js.map

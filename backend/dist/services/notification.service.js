@@ -20,8 +20,8 @@ let NotificationService = class NotificationService {
         return this.sendNotification(instructorId, `Course "${courseTitle}" has been updated`, 'course_update');
     }
 };
-NotificationService = __decorate([
+exports.NotificationService = NotificationService;
+exports.NotificationService = NotificationService = __decorate([
     (0, common_1.Injectable)()
 ], NotificationService);
-exports.NotificationService = NotificationService;
 //# sourceMappingURL=notification.service.js.map

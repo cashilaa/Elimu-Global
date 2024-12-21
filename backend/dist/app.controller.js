@@ -9,24 +9,21 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CourseGenerationDto = void 0;
-const class_validator_1 = require("class-validator");
-class CourseGenerationDto {
-}
-exports.CourseGenerationDto = CourseGenerationDto;
+exports.AppController = void 0;
+const common_1 = require("@nestjs/common");
+let AppController = class AppController {
+    healthCheck() {
+        return { status: 'ok' };
+    }
+};
+exports.AppController = AppController;
 __decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CourseGenerationDto.prototype, "subject", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CourseGenerationDto.prototype, "educationLevel", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CourseGenerationDto.prototype, "term", void 0);
-//# sourceMappingURL=course-generation.dto.js.map
+    (0, common_1.Get)('health'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], AppController.prototype, "healthCheck", null);
+exports.AppController = AppController = __decorate([
+    (0, common_1.Controller)()
+], AppController);
+//# sourceMappingURL=app.controller.js.map

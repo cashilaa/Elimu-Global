@@ -69,10 +69,10 @@ let GroupService = class GroupService {
         return group;
     }
 };
-GroupService = __decorate([
+exports.GroupService = GroupService;
+exports.GroupService = GroupService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(group_entity_1.Group.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], GroupService);
-exports.GroupService = GroupService;
 //# sourceMappingURL=group.service.js.map

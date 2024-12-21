@@ -83,6 +83,7 @@ let CourseController = class CourseController {
         return this.courseService.delete(id);
     }
 };
+exports.CourseController = CourseController;
 __decorate([
     (0, common_1.Post)(),
     (0, roles_decorator_1.Roles)('instructor'),
@@ -164,11 +165,10 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CourseController.prototype, "delete", null);
-CourseController = __decorate([
+exports.CourseController = CourseController = __decorate([
     (0, common_1.Controller)('courses'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [course_service_1.CourseService,
         notification_service_1.NotificationService])
 ], CourseController);
-exports.CourseController = CourseController;
 //# sourceMappingURL=course.controller.js.map

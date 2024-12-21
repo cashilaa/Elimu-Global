@@ -59,10 +59,10 @@ let InstructorService = class InstructorService {
         return deletedInstructor;
     }
 };
-InstructorService = __decorate([
+exports.InstructorService = InstructorService;
+exports.InstructorService = InstructorService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(instructor_schema_1.Instructor.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], InstructorService);
-exports.InstructorService = InstructorService;
 //# sourceMappingURL=instructor.service.js.map

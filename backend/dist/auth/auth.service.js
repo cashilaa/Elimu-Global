@@ -98,11 +98,11 @@ let AuthService = class AuthService {
         }
     }
 };
-AuthService = __decorate([
+exports.AuthService = AuthService;
+exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(instructor_schema_1.Instructor.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         jwt_1.JwtService])
 ], AuthService);
-exports.AuthService = AuthService;
 //# sourceMappingURL=auth.service.js.map

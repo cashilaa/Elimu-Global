@@ -42,6 +42,7 @@ let CourseGenerationController = class CourseGenerationController {
         }
     }
 };
+exports.CourseGenerationController = CourseGenerationController;
 __decorate([
     (0, common_1.Post)('generate'),
     __param(0, (0, common_1.Body)()),
@@ -49,9 +50,8 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], CourseGenerationController.prototype, "generateCourse", null);
-CourseGenerationController = __decorate([
+exports.CourseGenerationController = CourseGenerationController = __decorate([
     (0, common_1.Controller)('ai'),
     __metadata("design:paramtypes", [gemini_service_1.GeminiService])
 ], CourseGenerationController);
-exports.CourseGenerationController = CourseGenerationController;
 //# sourceMappingURL=course-generation.controller.js.map

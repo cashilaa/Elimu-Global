@@ -46,6 +46,7 @@ let ZoomController = class ZoomController {
         return this.zoomService.deleteMeeting(meetingId);
     }
 };
+exports.ZoomController = ZoomController;
 __decorate([
     (0, common_1.Post)('meetings'),
     (0, swagger_1.ApiOperation)({ summary: 'Create a new Zoom meeting' }),
@@ -93,11 +94,10 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ZoomController.prototype, "deleteMeeting", null);
-ZoomController = __decorate([
+exports.ZoomController = ZoomController = __decorate([
     (0, swagger_1.ApiTags)('zoom'),
     (0, common_1.Controller)('zoom'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [zoom_service_1.ZoomService, notification_service_1.NotificationService])
 ], ZoomController);
-exports.ZoomController = ZoomController;
 //# sourceMappingURL=zoom.controller.js.map

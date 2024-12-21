@@ -134,11 +134,12 @@ let NotificationService = class NotificationService {
         }
     }
 };
+exports.NotificationService = NotificationService;
 __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
 ], NotificationService.prototype, "server", void 0);
-NotificationService = __decorate([
+exports.NotificationService = NotificationService = __decorate([
     (0, common_1.Injectable)(),
     (0, websockets_1.WebSocketGateway)({
         cors: {
@@ -150,5 +151,4 @@ NotificationService = __decorate([
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model])
 ], NotificationService);
-exports.NotificationService = NotificationService;
 //# sourceMappingURL=notification.service.js.map

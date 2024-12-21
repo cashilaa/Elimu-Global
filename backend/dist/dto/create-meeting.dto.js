@@ -13,6 +13,7 @@ exports.CreateMeetingDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateMeetingDto {
 }
+exports.CreateMeetingDto = CreateMeetingDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -30,5 +31,4 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateMeetingDto.prototype, "agenda", void 0);
-exports.CreateMeetingDto = CreateMeetingDto;
 //# sourceMappingURL=create-meeting.dto.js.map

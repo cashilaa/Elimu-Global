@@ -15,7 +15,8 @@ const course_schema_1 = require("./schemas/course.schema");
 const notification_module_1 = require("../modules/notification/notification.module");
 let CourseModule = class CourseModule {
 };
-CourseModule = __decorate([
+exports.CourseModule = CourseModule;
+exports.CourseModule = CourseModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
@@ -28,5 +29,4 @@ CourseModule = __decorate([
         exports: [course_service_1.CourseService]
     })
 ], CourseModule);
-exports.CourseModule = CourseModule;
 //# sourceMappingURL=course.module.js.map

@@ -15,7 +15,8 @@ const s3_service_1 = require("../services/s3.service");
 const instructor_schema_1 = require("../schemas/instructor.schema");
 let InstructorModule = class InstructorModule {
 };
-InstructorModule = __decorate([
+exports.InstructorModule = InstructorModule;
+exports.InstructorModule = InstructorModule = __decorate([
     (0, common_1.Module)({
         imports: [
             mongoose_1.MongooseModule.forFeature([
@@ -27,5 +28,4 @@ InstructorModule = __decorate([
         exports: [instructor_service_1.InstructorService]
     })
 ], InstructorModule);
-exports.InstructorModule = InstructorModule;
 //# sourceMappingURL=instructor.module.js.map

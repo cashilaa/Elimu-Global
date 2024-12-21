@@ -13,6 +13,7 @@ exports.GroupSchema = exports.Group = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let Group = class Group {
 };
+exports.Group = Group;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -21,9 +22,8 @@ __decorate([
     (0, mongoose_1.Prop)({ default: [] }),
     __metadata("design:type", Array)
 ], Group.prototype, "members", void 0);
-Group = __decorate([
+exports.Group = Group = __decorate([
     (0, mongoose_1.Schema)()
 ], Group);
-exports.Group = Group;
 exports.GroupSchema = mongoose_1.SchemaFactory.createForClass(Group);
 //# sourceMappingURL=group.schema.js.map

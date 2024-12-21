@@ -38,6 +38,7 @@ let GroupController = class GroupController {
         return this.groupService.removeStudent(id, studentId);
     }
 };
+exports.GroupController = GroupController;
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
@@ -82,9 +83,8 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], GroupController.prototype, "removeStudent", null);
-GroupController = __decorate([
+exports.GroupController = GroupController = __decorate([
     (0, common_1.Controller)('groups'),
     __metadata("design:paramtypes", [group_service_1.GroupService])
 ], GroupController);
-exports.GroupController = GroupController;
 //# sourceMappingURL=group.controller.js.map

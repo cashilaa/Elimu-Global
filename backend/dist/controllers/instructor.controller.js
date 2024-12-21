@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InstructorController = void 0;
 const common_1 = require("@nestjs/common");
@@ -47,6 +48,7 @@ let InstructorController = class InstructorController {
         return this.instructorService.remove(id);
     }
 };
+exports.InstructorController = InstructorController;
 __decorate([
     (0, common_1.Post)('profile-picture'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
@@ -54,7 +56,7 @@ __decorate([
     __param(0, (0, common_1.UploadedFile)()),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [typeof (_a = typeof common_1.UploadedFile !== "undefined" && common_1.UploadedFile) === "function" ? _a : Object, Object]),
     __metadata("design:returntype", Promise)
 ], InstructorController.prototype, "uploadProfilePicture", null);
 __decorate([
@@ -89,10 +91,9 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], InstructorController.prototype, "remove", null);
-InstructorController = __decorate([
+exports.InstructorController = InstructorController = __decorate([
     (0, common_1.Controller)('instructors'),
     __metadata("design:paramtypes", [s3_service_1.S3Service,
         instructor_service_1.InstructorService])
 ], InstructorController);
-exports.InstructorController = InstructorController;
 //# sourceMappingURL=instructor.controller.js.map

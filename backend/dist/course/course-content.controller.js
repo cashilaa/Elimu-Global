@@ -47,6 +47,7 @@ let CourseContentController = class CourseContentController {
         return this.courseContentService.getContentById(courseId, moduleId, contentId);
     }
 };
+exports.CourseContentController = CourseContentController;
 __decorate([
     (0, websockets_1.WebSocketServer)(),
     __metadata("design:type", socket_io_1.Server)
@@ -99,10 +100,9 @@ __decorate([
     __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], CourseContentController.prototype, "getContentById", null);
-CourseContentController = __decorate([
+exports.CourseContentController = CourseContentController = __decorate([
     (0, common_1.Controller)('courses/:courseId/modules/:moduleId/content'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [course_content_service_1.CourseContentService])
 ], CourseContentController);
-exports.CourseContentController = CourseContentController;
 //# sourceMappingURL=course-content.controller.js.map

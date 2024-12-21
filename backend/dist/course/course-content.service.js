@@ -49,10 +49,10 @@ let CourseContentService = class CourseContentService {
         return content;
     }
 };
-CourseContentService = __decorate([
+exports.CourseContentService = CourseContentService;
+exports.CourseContentService = CourseContentService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(course_content_schema_1.CourseContent.name)),
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], CourseContentService);
-exports.CourseContentService = CourseContentService;
 //# sourceMappingURL=course-content.service.js.map

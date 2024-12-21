@@ -13,6 +13,7 @@ exports.CreateInstructorDto = void 0;
 const class_validator_1 = require("class-validator");
 class CreateInstructorDto {
 }
+exports.CreateInstructorDto = CreateInstructorDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -63,5 +64,4 @@ __decorate([
     (0, class_validator_1.IsArray)(),
     __metadata("design:type", Object)
 ], CreateInstructorDto.prototype, "socialLinks", void 0);
-exports.CreateInstructorDto = CreateInstructorDto;
 //# sourceMappingURL=create-instructor.dto.js.map

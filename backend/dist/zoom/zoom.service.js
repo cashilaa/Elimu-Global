@@ -139,9 +139,9 @@ let ZoomService = class ZoomService {
         }
     }
 };
-ZoomService = __decorate([
+exports.ZoomService = ZoomService;
+exports.ZoomService = ZoomService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], ZoomService);
-exports.ZoomService = ZoomService;
 //# sourceMappingURL=zoom.service.js.map

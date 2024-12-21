@@ -31,6 +31,7 @@ __decorate([
 ], SocialLinksDto.prototype, "website", void 0);
 class CreateInstructorDto {
 }
+exports.CreateInstructorDto = CreateInstructorDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -88,5 +89,4 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], CreateInstructorDto.prototype, "profilePicture", void 0);
-exports.CreateInstructorDto = CreateInstructorDto;
 //# sourceMappingURL=create-instructor.dto.js.map

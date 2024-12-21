@@ -169,9 +169,9 @@ let GeminiService = class GeminiService {
         return 'final';
     }
 };
-GeminiService = __decorate([
+exports.GeminiService = GeminiService;
+exports.GeminiService = GeminiService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], GeminiService);
-exports.GeminiService = GeminiService;
 //# sourceMappingURL=gemini.service.js.map

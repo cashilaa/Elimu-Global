@@ -24,6 +24,7 @@ let UploadController = class UploadController {
         return this.uploadService.uploadFile(file);
     }
 };
+exports.UploadController = UploadController;
 __decorate([
     (0, common_1.Post)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
@@ -32,9 +33,8 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UploadController.prototype, "uploadFile", null);
-UploadController = __decorate([
+exports.UploadController = UploadController = __decorate([
     (0, common_1.Controller)('upload'),
     __metadata("design:paramtypes", [upload_service_1.UploadService])
 ], UploadController);
-exports.UploadController = UploadController;
 //# sourceMappingURL=upload.controller.js.map

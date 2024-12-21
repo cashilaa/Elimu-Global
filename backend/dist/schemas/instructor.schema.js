@@ -13,6 +13,7 @@ exports.InstructorSchema = exports.Instructor = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let Instructor = class Instructor {
 };
+exports.Instructor = Instructor;
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -69,7 +70,7 @@ __decorate([
     (0, mongoose_1.Prop)({ default: 'pending', enum: ['pending', 'active', 'suspended'] }),
     __metadata("design:type", String)
 ], Instructor.prototype, "status", void 0);
-Instructor = __decorate([
+exports.Instructor = Instructor = __decorate([
     (0, mongoose_1.Schema)({
         timestamps: true,
         toJSON: {
@@ -80,6 +81,5 @@ Instructor = __decorate([
         },
     })
 ], Instructor);
-exports.Instructor = Instructor;
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
 //# sourceMappingURL=instructor.schema.js.map

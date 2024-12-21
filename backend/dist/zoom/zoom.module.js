@@ -14,7 +14,8 @@ const zoom_controller_1 = require("./zoom.controller");
 const zoom_service_1 = require("./zoom.service");
 let ZoomModule = class ZoomModule {
 };
-ZoomModule = __decorate([
+exports.ZoomModule = ZoomModule;
+exports.ZoomModule = ZoomModule = __decorate([
     (0, common_1.Module)({
         imports: [config_1.ConfigModule, notification_module_1.NotificationModule],
         controllers: [zoom_controller_1.ZoomController],
@@ -22,5 +23,4 @@ ZoomModule = __decorate([
         exports: [zoom_service_1.ZoomService, notification_module_1.NotificationModule],
     })
 ], ZoomModule);
-exports.ZoomModule = ZoomModule;
 //# sourceMappingURL=zoom.module.js.map

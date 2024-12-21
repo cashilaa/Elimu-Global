@@ -17,7 +17,8 @@ const course_generation_module_1 = require("./modules/course-generation.module")
 const zoom_module_1 = require("./modules/zoom.module");
 let AppModule = class AppModule {
 };
-AppModule = __decorate([
+exports.AppModule = AppModule;
+exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({
@@ -36,5 +37,4 @@ AppModule = __decorate([
         ],
     })
 ], AppModule);
-exports.AppModule = AppModule;
 //# sourceMappingURL=app.module.js.map

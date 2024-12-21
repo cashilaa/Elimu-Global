@@ -42,6 +42,7 @@ let ZoomController = class ZoomController {
         }
     }
 };
+exports.ZoomController = ZoomController;
 __decorate([
     (0, common_1.Post)('meetings'),
     (0, roles_decorator_1.Roles)('instructor', 'admin'),
@@ -50,10 +51,9 @@ __decorate([
     __metadata("design:paramtypes", [create_meeting_dto_1.CreateMeetingDto]),
     __metadata("design:returntype", Promise)
 ], ZoomController.prototype, "createMeeting", null);
-ZoomController = __decorate([
+exports.ZoomController = ZoomController = __decorate([
     (0, common_1.Controller)('zoom'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     __metadata("design:paramtypes", [zoom_service_1.ZoomService])
 ], ZoomController);
-exports.ZoomController = ZoomController;
 //# sourceMappingURL=zoom.controller.js.map

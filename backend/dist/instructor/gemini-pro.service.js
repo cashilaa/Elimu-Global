@@ -28,9 +28,9 @@ let GeminiProService = class GeminiProService {
         return response.data;
     }
 };
-GeminiProService = __decorate([
+exports.GeminiProService = GeminiProService;
+exports.GeminiProService = GeminiProService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [axios_1.HttpService])
 ], GeminiProService);
-exports.GeminiProService = GeminiProService;
 //# sourceMappingURL=gemini-pro.service.js.map

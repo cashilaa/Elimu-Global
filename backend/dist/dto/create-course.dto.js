@@ -53,6 +53,7 @@ __decorate([
 ], ModuleDto.prototype, "content", void 0);
 class CreateCourseDto {
 }
+exports.CreateCourseDto = CreateCourseDto;
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -89,5 +90,4 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateCourseDto.prototype, "status", void 0);
-exports.CreateCourseDto = CreateCourseDto;
 //# sourceMappingURL=create-course.dto.js.map
