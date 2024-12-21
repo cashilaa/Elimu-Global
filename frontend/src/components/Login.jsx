@@ -4,6 +4,8 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Testimonial from '../components/ui/Testimonial';
 import BlobButton from './ui/BlobButton';
 
+const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://elimu-instructor-bc.onrender.com';
+
 const Login = () => {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ 
@@ -14,13 +16,13 @@ const Login = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3000/api/instructors/login', {
+      const response = await fetch(`${API_URL}/api/instructors/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,6 +51,7 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials(prev => ({
+
       ...prev,
       [name]: name === 'email' ? value.trim() : value
     }));

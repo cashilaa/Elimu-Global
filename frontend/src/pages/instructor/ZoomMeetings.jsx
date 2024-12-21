@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, Video, MessageSquare, BookOpen, Settings, Monitor, FileText, Plus, Share2, Download, Search, Bell, ChevronDown, Filter, MoreVertical, Edit2, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
+import { API_URL } from '../../config';
 
 const ZoomClassroom = () => {
   const [meetings, setMeetings] = useState([]);
@@ -27,6 +28,7 @@ const ZoomClassroom = () => {
 
   useEffect(() => {
     // Simulating API fetch with more detailed data
+
     setTimeout(() => {
       setMeetings([
         {
@@ -83,6 +85,34 @@ const ZoomClassroom = () => {
   const handleCreateMeeting = (e) => {
     e.preventDefault();
     // Implement API call to create meeting
+    fetch(`${API_URL}/api/zoom/meetings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(newMeeting),
+    })
+      .then(res => res.json())
+      .then(data => {
+        setMeetings([...meetings, data]);
+        setNewMeeting({
+          title: '',
+          date: '',
+          time: '',
+          duration: 60,
+          description: '',
+          recurring: false,
+          maxParticipants: 100,
+          requiresRegistration: false,
+          materials: [],
+        });
+      })
+      .catch(err => {
+        console.error('Failed to create meeting:', err);
+        toast.error('Failed to create meeting');
+      });
+
     const newMeetingData = {
       ...newMeeting,
       id: meetings.length + 1,
@@ -95,17 +125,6 @@ const ZoomClassroom = () => {
     };
     setMeetings([...meetings, newMeetingData]);
     setShowCreateModal(false);
-    setNewMeeting({
-      title: '',
-      date: '',
-      time: '',
-      duration: 60,
-      description: '',
-      recurring: false,
-      maxParticipants: 100,
-      requiresRegistration: false,
-      materials: [],
-    });
   };
 
   const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
