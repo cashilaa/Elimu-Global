@@ -1,5 +1,5 @@
-export { Badge } from './Badge.jsx'
-export { Button } from './Button.jsx'
+export { Badge } from './Badge.jsx';
+// export { Button } from './Button.jsx';
 export { 
   Card, 
   CardHeader, 
@@ -7,4 +7,4 @@ export {
   CardTitle, 
   CardDescription, 
   CardContent 
-} from './Card.jsx'
+} from './Card.jsx';

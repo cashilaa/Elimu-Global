@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Clock, Star, Video, BarChart, Edit, Trash, Plus, Search, Filter, Download, Upload, Book, Calendar, X } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui';
-import { Badge } from '../../components/ui';
-import { Alert, AlertDescription } from '../../components/ui/alert';
-import { Button } from '../../components/ui';
-import { Avatar } from '../../components/ui/avatar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Users, Clock, Star, Plus, Search, X } from 'lucide-react';
 import CourseForm from '../../components/instructor/CourseForm';
 
 const Courses = () => {
@@ -62,15 +56,13 @@ const Courses = () => {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {metrics.map((metric, index) => (
-          <Card key={index} className="bg-white">
-            <CardContent className="p-4">
-              <div className={`flex items-center justify-center h-12 w-12 rounded-full bg-${metric.color}-100 mb-4`}>
-                <metric.icon className={`h-6 w-6 text-${metric.color}-600`} />
-              </div>
-              <h3 className="text-lg font-semibold">{metric.value}</h3>
-              <p className="text-sm text-gray-600">{metric.label}</p>
-            </CardContent>
-          </Card>
+          <div key={index} className="bg-white">
+            <div className={`flex items-center justify-center h-12 w-12 rounded-full bg-${metric.color}-100 mb-4`}>
+              <metric.icon className={`h-6 w-6 text-${metric.color}-600`} />
+            </div>
+            <h3 className="text-lg font-semibold">{metric.value}</h3>
+            <p className="text-sm text-gray-600">{metric.label}</p>
+          </div>
         ))}
       </div>
     );
@@ -80,8 +72,8 @@ const Courses = () => {
     <div className="space-y-4">
       {schedule.length > 0 ? (
         schedule.map((session, index) => (
-          <Card key={index} className="bg-gray-50">
-            <CardContent className="p-4 flex items-center justify-between">
+          <div key={index} className="bg-gray-50">
+            <div className="p-4 flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Calendar className="h-5 w-5 text-gray-500" />
                 <div>
@@ -89,9 +81,9 @@ const Courses = () => {
                   <p className="text-sm text-gray-600">{session.time}</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">View Details</Button>
-            </CardContent>
-          </Card>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-md">View Details</button>
+            </div>
+          </div>
         ))
       ) : (
         <Alert>
@@ -105,33 +97,33 @@ const Courses = () => {
     if (!selectedCourse) return null;
 
     return (
-      <Card className="mt-6">
-        <CardHeader className="border-b">
+      <div className="mt-6">
+        <div className="border-b">
           <div className="flex justify-between items-start">
             <div className="flex items-start space-x-4">
               <Avatar className="h-12 w-12">
                 <img src={selectedCourse.instructor.avatar} alt={selectedCourse.instructor.name} />
               </Avatar>
               <div>
-                <CardTitle>{selectedCourse.title}</CardTitle>
+                <h1 className="text-2xl font-bold">{selectedCourse.title}</h1>
                 <p className="text-sm text-gray-600">
                   Instructor: {selectedCourse.instructor.name} • {selectedCourse.instructor.department}
                 </p>
               </div>
             </div>
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
                 <Edit className="h-4 w-4 mr-1" />
                 Edit
-              </Button>
-              <Button variant="destructive" size="sm">
+              </button>
+              <button className="px-4 py-2 bg-red-600 text-white rounded-md">
                 <Trash className="h-4 w-4 mr-1" />
                 Delete
-              </Button>
+              </button>
             </div>
           </div>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="mt-4">
           <Tabs defaultValue="overview" className="mt-4">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -141,8 +133,8 @@ const Courses = () => {
             </TabsList>
             <TabsContent value="overview" className="mt-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardContent className="p-4">
+                <div className="bg-white">
+                  <div className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-500">Enrolled Students</p>
@@ -150,10 +142,10 @@ const Courses = () => {
                       </div>
                       <Users className="h-8 w-8 text-blue-500" />
                     </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
+                  </div>
+                </div>
+                <div className="bg-white">
+                  <div className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-500">Course Duration</p>
@@ -161,10 +153,10 @@ const Courses = () => {
                       </div>
                       <Clock className="h-8 w-8 text-green-500" />
                     </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4">
+                  </div>
+                </div>
+                <div className="bg-white">
+                  <div className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-500">Average Rating</p>
@@ -172,8 +164,8 @@ const Courses = () => {
                       </div>
                       <Star className="h-8 w-8 text-yellow-500" />
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="analytics" className="mt-4">
@@ -187,14 +179,14 @@ const Courses = () => {
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold">Course Content</h3>
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
                       <Upload className="h-4 w-4 mr-1" />
                       Import
-                    </Button>
-                    <Button variant="outline" size="sm">
+                    </button>
+                    <button className="px-4 py-2 bg-blue-600 text-white rounded-md">
                       <Download className="h-4 w-4 mr-1" />
                       Export
-                    </Button>
+                    </button>
                   </div>
                 </div>
                 <Alert>
@@ -205,8 +197,8 @@ const Courses = () => {
               </div>
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   };
 
@@ -281,26 +273,26 @@ const Courses = () => {
             <option value="active">Active</option>
             <option value="draft">Draft</option>
           </select>
-          <Button 
+          <button 
             onClick={() => setShowCourseForm(true)}
-            variant="default"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create Course
-          </Button>
+          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
-          <Card 
+          <div 
             key={course.id}
             className={`cursor-pointer hover:shadow-lg transition-shadow ${
               selectedCourse?.id === course.id ? 'ring-2 ring-blue-500' : ''
             }`}
             onClick={() => setSelectedCourse(course)}
           >
-            <CardContent className="p-6">
+            <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-lg font-semibold">{course.title}</h3>
@@ -327,8 +319,8 @@ const Courses = () => {
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
@@ -336,26 +328,21 @@ const Courses = () => {
 
       {showCourseForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Create New Course</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowCourseForm(false)}
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <CourseForm 
-                onClose={() => setShowCourseForm(false)}
-                onSubmit={handleCreateCourse}
-              />
-            </CardContent>
-          </Card>
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto m-4">
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-bold">Create New Course</h1>
+              <button
+                onClick={() => setShowCourseForm(false)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <CourseForm 
+              onClose={() => setShowCourseForm(false)}
+              onSubmit={handleCreateCourse}
+            />
+          </div>
         </div>
       )}
     </div>
