@@ -29,3 +29,4 @@ __decorate([
     __metadata("design:type", String)
 ], CourseGenerationDto.prototype, "term", void 0);
 exports.CourseGenerationDto = CourseGenerationDto;
+//# sourceMappingURL=course-generation.dto.js.map

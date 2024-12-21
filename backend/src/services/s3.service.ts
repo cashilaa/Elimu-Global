@@ -3,6 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { S3 } from 'aws-sdk';
 import { v4 as uuid } from 'uuid';
 
+interface UploadedFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
+
 @Injectable()
 export class S3Service {
   private s3: S3;
@@ -16,7 +25,7 @@ export class S3Service {
   }
 
   async uploadProfilePicture(
-    file: Express.Multer.File,
+    file: UploadedFile,
     instructorId: string,
   ): Promise<string> {
     const key = `profile-pictures/${instructorId}/${uuid()}-${file.originalname}`;

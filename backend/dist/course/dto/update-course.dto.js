@@ -6,3 +6,4 @@ const create_course_dto_1 = require("./create-course.dto");
 class UpdateCourseDto extends (0, mapped_types_1.PartialType)(create_course_dto_1.CreateCourseDto) {
 }
 exports.UpdateCourseDto = UpdateCourseDto;
+//# sourceMappingURL=update-course.dto.js.map

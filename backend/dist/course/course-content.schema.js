@@ -73,3 +73,4 @@ CourseContent = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], CourseContent);
 exports.CourseContent = CourseContent;
+//# sourceMappingURL=course-content.schema.js.map

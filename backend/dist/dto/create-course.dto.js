@@ -90,3 +90,4 @@ __decorate([
     __metadata("design:type", String)
 ], CreateCourseDto.prototype, "status", void 0);
 exports.CreateCourseDto = CreateCourseDto;
+//# sourceMappingURL=create-course.dto.js.map

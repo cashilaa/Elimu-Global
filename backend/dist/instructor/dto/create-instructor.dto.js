@@ -89,3 +89,4 @@ __decorate([
     __metadata("design:type", String)
 ], CreateInstructorDto.prototype, "profilePicture", void 0);
 exports.CreateInstructorDto = CreateInstructorDto;
+//# sourceMappingURL=create-instructor.dto.js.map

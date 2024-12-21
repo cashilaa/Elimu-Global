@@ -87,3 +87,4 @@ GroupController = __decorate([
     __metadata("design:paramtypes", [group_service_1.GroupService])
 ], GroupController);
 exports.GroupController = GroupController;
+//# sourceMappingURL=group.controller.js.map

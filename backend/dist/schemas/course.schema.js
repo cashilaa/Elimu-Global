@@ -72,3 +72,4 @@ Course = __decorate([
 ], Course);
 exports.Course = Course;
 exports.CourseSchema = mongoose_1.SchemaFactory.createForClass(Course);
+//# sourceMappingURL=course.schema.js.map

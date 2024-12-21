@@ -54,3 +54,4 @@ CourseGenerationController = __decorate([
     __metadata("design:paramtypes", [gemini_service_1.GeminiService])
 ], CourseGenerationController);
 exports.CourseGenerationController = CourseGenerationController;
+//# sourceMappingURL=course-generation.controller.js.map

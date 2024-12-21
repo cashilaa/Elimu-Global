@@ -19,3 +19,4 @@ CourseGenerationModule = __decorate([
     })
 ], CourseGenerationModule);
 exports.CourseGenerationModule = CourseGenerationModule;
+//# sourceMappingURL=course-generation.module.js.map

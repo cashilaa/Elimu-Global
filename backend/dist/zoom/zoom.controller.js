@@ -39,7 +39,6 @@ let ZoomController = class ZoomController {
     }
     async createGroupMeeting(groupId, createMeetingDto) {
         const meeting = await this.zoomService.createMeeting(createMeetingDto.instructorId, createMeetingDto);
-        // Notify all students in the group
         await this.notificationService.notifyGroupMeeting(groupId, meeting);
         return meeting;
     }
@@ -101,3 +100,4 @@ ZoomController = __decorate([
     __metadata("design:paramtypes", [zoom_service_1.ZoomService, notification_service_1.NotificationService])
 ], ZoomController);
 exports.ZoomController = ZoomController;
+//# sourceMappingURL=zoom.controller.js.map

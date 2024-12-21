@@ -7,20 +7,27 @@ import { promisify } from 'util';
 const writeFile = promisify(fs.writeFile);
 const unlink = promisify(fs.unlink);
 
+interface UploadedFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
+
 @Injectable()
 export class UploadService {
   private readonly uploadDir: string;
-  private readonly MAX_VIDEO_DURATION = 600; // 10 minutes in seconds
 
   constructor(private configService: ConfigService) {
     this.uploadDir = path.join(__dirname, '../../uploads');
-    // Create uploads directory if it doesn't exist
     if (!fs.existsSync(this.uploadDir)) {
       fs.mkdirSync(this.uploadDir, { recursive: true });
     }
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<{ url: string }> {
+  async uploadFile(file: UploadedFile): Promise<{ url: string }> {
     const fileName = `${Date.now()}-${file.originalname}`;
     const filePath = path.join(this.uploadDir, fileName);
 

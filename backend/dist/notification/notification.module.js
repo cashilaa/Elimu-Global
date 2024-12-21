@@ -11,7 +11,7 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const notification_service_1 = require("./notification.service");
 const notification_schema_1 = require("./notification.schema");
-const group_schema_1 = require("../instructor/schemas/group.schema"); // Update the import path
+const group_schema_1 = require("../instructor/schemas/group.schema");
 let NotificationModule = class NotificationModule {
 };
 NotificationModule = __decorate([
@@ -27,3 +27,4 @@ NotificationModule = __decorate([
     })
 ], NotificationModule);
 exports.NotificationModule = NotificationModule;
+//# sourceMappingURL=notification.module.js.map

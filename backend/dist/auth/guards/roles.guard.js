@@ -26,8 +26,7 @@ let RolesGuard = class RolesGuard {
         if (!user) {
             return false;
         }
-        // Ensure user has a role property
-        const userRole = user.role || user.type; // Check both role and type properties
+        const userRole = user.role || user.type;
         return requiredRoles.some((role) => userRole === role);
     }
 };
@@ -36,3 +35,4 @@ RolesGuard = __decorate([
     __metadata("design:paramtypes", [core_1.Reflector])
 ], RolesGuard);
 exports.RolesGuard = RolesGuard;
+//# sourceMappingURL=roles.guard.js.map

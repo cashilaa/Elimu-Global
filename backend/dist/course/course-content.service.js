@@ -55,3 +55,4 @@ CourseContentService = __decorate([
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], CourseContentService);
 exports.CourseContentService = CourseContentService;
+//# sourceMappingURL=course-content.service.js.map

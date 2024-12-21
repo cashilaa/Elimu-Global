@@ -49,7 +49,6 @@ let AuthService = class AuthService {
     }
     async login(loginDto) {
         try {
-            // Find instructor and include password
             const instructor = await this.instructorModel
                 .findOne({ email: loginDto.email.toLowerCase().trim() })
                 .select('+password')
@@ -57,18 +56,15 @@ let AuthService = class AuthService {
             if (!instructor) {
                 throw new common_1.UnauthorizedException('Invalid credentials');
             }
-            // Verify password
             const isPasswordValid = await bcrypt.compare(loginDto.password, instructor.password);
             if (!isPasswordValid) {
                 throw new common_1.UnauthorizedException('Invalid credentials');
             }
-            // Generate JWT token
             const token = this.jwtService.sign({
                 sub: instructor._id,
                 email: instructor.email,
                 role: 'instructor',
             });
-            // Create response without password
             const response = {
                 access_token: token,
                 instructor: {
@@ -97,16 +93,13 @@ let AuthService = class AuthService {
             if (existingInstructor) {
                 throw new common_1.HttpException('Email already exists', common_1.HttpStatus.BAD_REQUEST);
             }
-            // Create new instructor
             const newInstructor = new this.instructorModel(Object.assign(Object.assign({}, createInstructorDto), { email: createInstructorDto.email.toLowerCase() }));
-            // Password will be hashed by pre-save middleware
             const savedInstructor = await newInstructor.save();
             const token = this.jwtService.sign({
                 sub: savedInstructor._id,
                 email: savedInstructor.email,
                 role: 'instructor',
             });
-            // Create response without password
             const response = {
                 access_token: token,
                 instructor: {
@@ -132,3 +125,4 @@ AuthService = __decorate([
         jwt_1.JwtService])
 ], AuthService);
 exports.AuthService = AuthService;
+//# sourceMappingURL=auth.service.js.map

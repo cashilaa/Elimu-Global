@@ -105,3 +105,4 @@ CourseContentController = __decorate([
     __metadata("design:paramtypes", [course_content_service_1.CourseContentService])
 ], CourseContentController);
 exports.CourseContentController = CourseContentController;
+//# sourceMappingURL=course-content.controller.js.map

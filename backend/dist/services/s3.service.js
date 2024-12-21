@@ -49,3 +49,4 @@ S3Service = __decorate([
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], S3Service);
 exports.S3Service = S3Service;
+//# sourceMappingURL=s3.service.js.map

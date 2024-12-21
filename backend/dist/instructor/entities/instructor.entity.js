@@ -87,3 +87,4 @@ Instructor = __decorate([
 ], Instructor);
 exports.Instructor = Instructor;
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
+//# sourceMappingURL=instructor.entity.js.map

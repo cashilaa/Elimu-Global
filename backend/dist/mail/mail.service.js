@@ -10,14 +10,13 @@ exports.MailService = void 0;
 const common_1 = require("@nestjs/common");
 let MailService = class MailService {
     async sendMail(mailOptions) {
-        // Placeholder implementation for sending an email
         console.log(`Sending email to: ${mailOptions.to}`);
         console.log(`Subject: ${mailOptions.subject}`);
         console.log(`Text: ${mailOptions.text}`);
-        // In a real implementation, you would use a library like Nodemailer to send the email
     }
 };
 MailService = __decorate([
     (0, common_1.Injectable)()
 ], MailService);
 exports.MailService = MailService;
+//# sourceMappingURL=mail.service.js.map

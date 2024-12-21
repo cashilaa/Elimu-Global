@@ -127,11 +127,9 @@ Instructor = __decorate([
 ], Instructor);
 exports.Instructor = Instructor;
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
-// Add validatePassword to schema methods
 exports.InstructorSchema.methods.validatePassword = async function (password) {
     return bcrypt.compare(password, this.password);
 };
-// Pre-save middleware for password hashing
 exports.InstructorSchema.pre('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
@@ -145,3 +143,4 @@ exports.InstructorSchema.pre('save', async function (next) {
         next(error);
     }
 });
+//# sourceMappingURL=instructor.schema.js.map

@@ -17,6 +17,15 @@ import { S3Service } from '../services/s3.service';
 import { InstructorService } from '../services/instructor.service';
 import { UpdateInstructorDto } from '../dto/update-instructor.dto';
 
+interface UploadedFile {
+  fieldname: string;
+  originalname: string;
+  encoding: string;
+  mimetype: string;
+  buffer: Buffer;
+  size: number;
+}
+
 @Controller('instructors')
 export class InstructorController {
   constructor(
@@ -28,7 +37,7 @@ export class InstructorController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadProfilePicture(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: UploadedFile,
     @Req() req: any
   ) {
     try {

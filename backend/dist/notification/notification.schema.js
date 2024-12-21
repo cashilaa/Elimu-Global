@@ -58,3 +58,4 @@ Notification = __decorate([
 ], Notification);
 exports.Notification = Notification;
 exports.NotificationSchema = mongoose_1.SchemaFactory.createForClass(Notification);
+//# sourceMappingURL=notification.schema.js.map

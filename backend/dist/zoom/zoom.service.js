@@ -92,7 +92,7 @@ let ZoomService = class ZoomService {
         }
         catch (error) {
             const axiosError = error;
-            console.error('Error details:', (_a = axiosError.response) === null || _a === void 0 ? void 0 : _a.data); // Log detailed error response
+            console.error('Error details:', (_a = axiosError.response) === null || _a === void 0 ? void 0 : _a.data);
             throw new Error(`Failed to create Zoom meeting: ${axiosError.message}`);
         }
     }
@@ -148,3 +148,4 @@ ZoomService = __decorate([
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], ZoomService);
 exports.ZoomService = ZoomService;
+//# sourceMappingURL=zoom.service.js.map

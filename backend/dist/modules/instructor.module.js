@@ -28,3 +28,4 @@ InstructorModule = __decorate([
     })
 ], InstructorModule);
 exports.InstructorModule = InstructorModule;
+//# sourceMappingURL=instructor.module.js.map

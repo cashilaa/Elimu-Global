@@ -89,3 +89,4 @@ CourseController = __decorate([
         notification_service_1.NotificationService])
 ], CourseController);
 exports.CourseController = CourseController;
+//# sourceMappingURL=course.controller.js.map

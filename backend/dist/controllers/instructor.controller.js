@@ -95,3 +95,4 @@ InstructorController = __decorate([
         instructor_service_1.InstructorService])
 ], InstructorController);
 exports.InstructorController = InstructorController;
+//# sourceMappingURL=instructor.controller.js.map

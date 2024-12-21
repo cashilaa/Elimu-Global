@@ -25,3 +25,4 @@ GroupModule = __decorate([
     })
 ], GroupModule);
 exports.GroupModule = GroupModule;
+//# sourceMappingURL=group.module.js.map

@@ -64,3 +64,4 @@ __decorate([
     __metadata("design:type", Object)
 ], CreateInstructorDto.prototype, "socialLinks", void 0);
 exports.CreateInstructorDto = CreateInstructorDto;
+//# sourceMappingURL=create-instructor.dto.js.map

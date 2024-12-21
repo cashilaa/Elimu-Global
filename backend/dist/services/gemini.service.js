@@ -58,7 +58,6 @@ let GeminiService = class GeminiService {
     }
     async generateCourseStructure(context) {
         try {
-            // Extract information from the conversation
             const userInputs = context
                 .filter(msg => msg.role === 'user')
                 .map(msg => msg.content);
@@ -103,7 +102,6 @@ let GeminiService = class GeminiService {
       `;
             const result = await this.model.generateContent(prompt);
             const response = result.response.text();
-            // Clean the response
             const cleanedResponse = response
                 .replace(/```json\s*/g, '')
                 .replace(/```\s*$/g, '')
@@ -129,14 +127,11 @@ let GeminiService = class GeminiService {
     }
     validateCourseStructure(data) {
         try {
-            // Basic structure check
             if (!data || typeof data !== 'object')
                 return false;
-            // Required fields check
             const requiredFields = ['title', 'description', 'modules', 'level', 'duration', 'category'];
             if (!requiredFields.every(field => field in data))
                 return false;
-            // Type checks
             if (typeof data.title !== 'string' ||
                 typeof data.description !== 'string' ||
                 !Array.isArray(data.modules) ||
@@ -145,7 +140,6 @@ let GeminiService = class GeminiService {
                 typeof data.category !== 'string') {
                 return false;
             }
-            // Modules validation
             return data.modules.every((module) => typeof module.title === 'string' &&
                 typeof module.description === 'string' &&
                 Array.isArray(module.content) &&
@@ -180,3 +174,4 @@ GeminiService = __decorate([
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], GeminiService);
 exports.GeminiService = GeminiService;
+//# sourceMappingURL=gemini.service.js.map

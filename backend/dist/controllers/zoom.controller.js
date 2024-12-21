@@ -56,3 +56,4 @@ ZoomController = __decorate([
     __metadata("design:paramtypes", [zoom_service_1.ZoomService])
 ], ZoomController);
 exports.ZoomController = ZoomController;
+//# sourceMappingURL=zoom.controller.js.map

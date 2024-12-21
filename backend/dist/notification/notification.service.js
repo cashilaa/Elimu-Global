@@ -19,7 +19,7 @@ const mongoose_2 = require("mongoose");
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 const notification_schema_1 = require("./notification.schema");
-const group_entity_1 = require("../instructor/entities/group.entity"); // Importing Group type
+const group_entity_1 = require("../instructor/entities/group.entity");
 let NotificationService = class NotificationService {
     constructor(notificationModel, groupModel) {
         this.notificationModel = notificationModel;
@@ -28,7 +28,6 @@ let NotificationService = class NotificationService {
     async create(createNotificationDto) {
         const notification = new this.notificationModel(createNotificationDto);
         const savedNotification = await notification.save();
-        // Emit real-time notification
         this.server.to(createNotificationDto.userId).emit('notification', savedNotification);
         return savedNotification;
     }
@@ -53,7 +52,6 @@ let NotificationService = class NotificationService {
             .findByIdAndUpdate(id, { active: false }, { new: true })
             .exec();
     }
-    // Helper methods for creating specific notifications
     async notifyCourseCreated(courseId, instructorId, courseTitle) {
         return this.create({
             userId: instructorId,
@@ -106,7 +104,7 @@ let NotificationService = class NotificationService {
         }
     }
     async notifyGroupMeeting(groupId, meeting) {
-        const group = await this.groupModel.findById(groupId); // Ensure group is fetched
+        const group = await this.groupModel.findById(groupId);
         if (!group)
             return;
         for (const studentId of group.studentIds) {
@@ -153,3 +151,4 @@ NotificationService = __decorate([
         mongoose_2.Model])
 ], NotificationService);
 exports.NotificationService = NotificationService;
+//# sourceMappingURL=notification.service.js.map

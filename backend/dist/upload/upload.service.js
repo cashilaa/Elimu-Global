@@ -43,9 +43,7 @@ const unlink = (0, util_1.promisify)(fs.unlink);
 let UploadService = class UploadService {
     constructor(configService) {
         this.configService = configService;
-        this.MAX_VIDEO_DURATION = 600; // 10 minutes in seconds
         this.uploadDir = path.join(__dirname, '../../uploads');
-        // Create uploads directory if it doesn't exist
         if (!fs.existsSync(this.uploadDir)) {
             fs.mkdirSync(this.uploadDir, { recursive: true });
         }
@@ -77,3 +75,4 @@ UploadService = __decorate([
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], UploadService);
 exports.UploadService = UploadService;
+//# sourceMappingURL=upload.service.js.map

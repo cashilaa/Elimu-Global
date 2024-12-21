@@ -35,3 +35,4 @@ Group = __decorate([
 ], Group);
 exports.Group = Group;
 exports.GroupSchema = mongoose_1.SchemaFactory.createForClass(Group);
+//# sourceMappingURL=group.schema.js.map

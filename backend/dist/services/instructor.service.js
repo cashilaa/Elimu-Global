@@ -65,3 +65,4 @@ InstructorService = __decorate([
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], InstructorService);
 exports.InstructorService = InstructorService;
+//# sourceMappingURL=instructor.service.js.map

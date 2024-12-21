@@ -31,3 +31,4 @@ __decorate([
     __metadata("design:type", String)
 ], CreateMeetingDto.prototype, "agenda", void 0);
 exports.CreateMeetingDto = CreateMeetingDto;
+//# sourceMappingURL=create-meeting.dto.js.map

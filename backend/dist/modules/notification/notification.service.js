@@ -13,7 +13,6 @@ exports.NotificationService = void 0;
 const common_1 = require("@nestjs/common");
 let NotificationService = class NotificationService {
     constructor() {
-        // Add any dependencies here if needed
     }
     async notifyCourseCreated(courseId, instructorId, courseTitle) {
         console.log(`Course ${courseTitle} created by instructor ${instructorId}`);
@@ -33,3 +32,4 @@ NotificationService = __decorate([
     __metadata("design:paramtypes", [])
 ], NotificationService);
 exports.NotificationService = NotificationService;
+//# sourceMappingURL=notification.service.js.map

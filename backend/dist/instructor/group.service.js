@@ -75,3 +75,4 @@ GroupService = __decorate([
     __metadata("design:paramtypes", [mongoose_2.Model])
 ], GroupService);
 exports.GroupService = GroupService;
+//# sourceMappingURL=group.service.js.map

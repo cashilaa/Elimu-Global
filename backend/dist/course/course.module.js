@@ -29,3 +29,4 @@ CourseModule = __decorate([
     })
 ], CourseModule);
 exports.CourseModule = CourseModule;
+//# sourceMappingURL=course.module.js.map

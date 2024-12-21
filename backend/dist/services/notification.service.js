@@ -10,7 +10,6 @@ exports.NotificationService = void 0;
 const common_1 = require("@nestjs/common");
 let NotificationService = class NotificationService {
     async sendNotification(userId, message, type) {
-        // Implement notification logic here (e.g., email, push notification)
         console.log(`Sending ${type} notification to ${userId}: ${message}`);
         return true;
     }
@@ -25,3 +24,4 @@ NotificationService = __decorate([
     (0, common_1.Injectable)()
 ], NotificationService);
 exports.NotificationService = NotificationService;
+//# sourceMappingURL=notification.service.js.map
