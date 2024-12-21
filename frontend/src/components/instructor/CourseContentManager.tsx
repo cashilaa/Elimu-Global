@@ -12,7 +12,8 @@ import {
   Link,
   Download
 } from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DropResult, DraggableProvided, DroppableProvided } from "react-beautiful-dnd";
+import { Section, ContentItem } from "../../types";
 
 const contentTypes = {
   video: { icon: Video, label: "Video" },
@@ -21,8 +22,12 @@ const contentTypes = {
   download: { icon: Download, label: "Downloadable Resource" }
 };
 
-export const CourseContentManager = ({ courseId }) => {
-  const [sections, setSections] = useState([
+interface CourseContentManagerProps {
+  courseId: string;
+}
+
+export const CourseContentManager = ({ courseId }: CourseContentManagerProps) => {
+  const [sections, setSections] = useState<Section[]>([
     {
       id: "1",
       title: "Introduction to the Course",
@@ -43,7 +48,7 @@ export const CourseContentManager = ({ courseId }) => {
 
   const [expandedSections, setExpandedSections] = useState(new Set(["1"]));
 
-  const toggleSection = (sectionId) => {
+  const toggleSection = (sectionId: string) => {
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(sectionId)) {
       newExpanded.delete(sectionId);
@@ -53,7 +58,7 @@ export const CourseContentManager = ({ courseId }) => {
     setExpandedSections(newExpanded);
   };
 
-  const handleDragEnd = (result) => {
+  const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
     const { source, destination } = result;
@@ -79,7 +84,7 @@ export const CourseContentManager = ({ courseId }) => {
     setExpandedSections(new Set([...expandedSections, newSection.id]));
   };
 
-  const addContentItem = (sectionId, type) => {
+  const addContentItem = (sectionId: string, type: keyof typeof contentTypes) => {
     const newItem = {
       id: `item-${Date.now()}`,
       type,
@@ -151,7 +156,7 @@ export const CourseContentManager = ({ courseId }) => {
                   transition={{ duration: 0.2 }}
                 >
                   <Droppable droppableId={section.id}>
-                    {(provided) => (
+                    {(provided: DroppableProvided) => (
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
@@ -165,7 +170,7 @@ export const CourseContentManager = ({ courseId }) => {
                               draggableId={item.id}
                               index={index}
                             >
-                              {(provided) => (
+                              {(provided: DraggableProvided) => (
                                 <div
                                   ref={provided.innerRef}
                                   {...provided.draggableProps}
