@@ -22,7 +22,10 @@ let CourseService = class CourseService {
         this.courseModel = courseModel;
     }
     async create(createCourseDto, instructorId) {
-        const course = new this.courseModel(Object.assign(Object.assign({}, createCourseDto), { instructor: instructorId }));
+        const course = new this.courseModel({
+            ...createCourseDto,
+            instructor: instructorId,
+        });
         return course.save();
     }
     async findAll(instructorId) {

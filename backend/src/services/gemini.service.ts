@@ -202,4 +202,4 @@ export class GeminiService implements OnModuleInit {
     if (!messages.some(msg => msg.includes('duration'))) return 'duration';
     return 'final';
   }
-} 
+}

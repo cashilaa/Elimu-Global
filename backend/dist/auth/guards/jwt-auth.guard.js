@@ -29,13 +29,12 @@ let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
             request.user = payload;
             return true;
         }
-        catch (_a) {
+        catch {
             throw new common_1.UnauthorizedException('Invalid or expired token');
         }
     }
     extractTokenFromHeader(request) {
-        var _a, _b;
-        const [type, token] = (_b = (_a = request.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')) !== null && _b !== void 0 ? _b : [];
+        const [type, token] = request.headers.authorization?.split(' ') ?? [];
         return type === 'Bearer' ? token : undefined;
     }
 };

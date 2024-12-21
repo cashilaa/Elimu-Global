@@ -8,14 +8,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ZoomService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const axios_1 = __importDefault(require("axios"));
+const axios_1 = require("axios");
 let ZoomService = class ZoomService {
     constructor(configService) {
         this.configService = configService;
@@ -59,7 +56,6 @@ let ZoomService = class ZoomService {
         }
     }
     async createMeeting(instructorId, courseData) {
-        var _a;
         const token = await this.getAccessToken();
         try {
             const response = await axios_1.default.post(`${this.baseUrl}/users/me/meetings`, {
@@ -92,7 +88,7 @@ let ZoomService = class ZoomService {
         }
         catch (error) {
             const axiosError = error;
-            console.error('Error details:', (_a = axiosError.response) === null || _a === void 0 ? void 0 : _a.data);
+            console.error('Error details:', axiosError.response?.data);
             throw new Error(`Failed to create Zoom meeting: ${axiosError.message}`);
         }
     }

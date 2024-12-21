@@ -49,7 +49,7 @@ let CourseService = class CourseService {
     }
     async updateStatus(id, status) {
         const course = await this.courseModel
-            .findByIdAndUpdate(id, Object.assign({ status }, (status === 'published' ? { publishedAt: new Date() } : {})), { new: true })
+            .findByIdAndUpdate(id, { status, ...(status === 'published' ? { publishedAt: new Date() } : {}) }, { new: true })
             .exec();
         if (!course) {
             throw new common_1.NotFoundException(`Course with ID ${id} not found`);
@@ -84,7 +84,6 @@ let CourseService = class CourseService {
         return course;
     }
     async updateAnalytics(courseId) {
-        var _a;
         const course = await this.findOne(courseId);
         if (!course) {
             throw new common_1.NotFoundException(`Course with ID ${courseId} not found`);
@@ -94,7 +93,7 @@ let CourseService = class CourseService {
             averageRating: course.reviews.reduce((acc, review) => acc + review.rating, 0) /
                 (course.reviews.length || 1),
             activeStudents: course.students.length,
-            revenue: course.students.length * (((_a = course.pricing) === null || _a === void 0 ? void 0 : _a.amount) || 0),
+            revenue: course.students.length * (course.pricing?.amount || 0),
         };
         return this.courseModel
             .findByIdAndUpdate(courseId, { 'analytics': analytics }, { new: true })

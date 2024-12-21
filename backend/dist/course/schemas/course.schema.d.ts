@@ -25,13 +25,13 @@
 /// <reference types="mongoose/types/inferrawdoctype" />
 import { Document, Schema as MongooseSchema } from 'mongoose';
 export type CourseDocument = Course & Document;
-interface Review {
+export interface Review {
     student: string;
     rating: number;
     comment: string;
     createdAt: Date;
 }
-interface Analytics {
+export interface Analytics {
     enrollments: number;
     averageRating: number;
     activeStudents: number;
@@ -71,4 +71,3 @@ export declare const CourseSchema: MongooseSchema<Course, import("mongoose").Mod
 } & {
     __v: number;
 }>;
-export {};

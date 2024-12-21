@@ -22,7 +22,7 @@ let CourseContentService = class CourseContentService {
         this.contentModel = contentModel;
     }
     async createContent(courseId, moduleId, createContentDto) {
-        const newContent = new this.contentModel(Object.assign(Object.assign({}, createContentDto), { courseId, moduleId }));
+        const newContent = new this.contentModel({ ...createContentDto, courseId, moduleId });
         return newContent.save();
     }
     async updateContent(courseId, moduleId, contentId, updateContentDto) {

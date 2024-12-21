@@ -18,7 +18,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { CourseDocument } from './schemas/course.schema';
+import { CourseDocument, Analytics } from './schemas/course.schema';
 
 @Controller('courses')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -134,7 +134,7 @@ export class CourseController {
 
   @Get(':id/analytics')
   @Roles('instructor', 'admin')
-  async getAnalytics(@Param('id') id: string) {
+  async getAnalytics(@Param('id') id: string): Promise<Analytics | null> {
     const course = await this.courseService.findOne(id);
     if (course) {
       return course.analytics;

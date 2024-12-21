@@ -37,7 +37,7 @@ let ZoomController = class ZoomController {
             throw new common_1.HttpException({
                 status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
                 error: 'Failed to create Zoom meeting',
-                details: (error === null || error === void 0 ? void 0 : error.message) || 'Unknown error occurred',
+                details: error?.message || 'Unknown error occurred',
             }, common_1.HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

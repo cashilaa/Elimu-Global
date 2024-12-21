@@ -14,7 +14,7 @@ export class CourseGenerationController {
   constructor(private readonly geminiService: GeminiService) {}
 
   @Post('generate')
-  async generateCourse(@Body() body: GenerateRequestDto) {
+  async generateCourse(@Body() body: GenerateRequestDto): Promise<any> {
     try {
       const { message, context } = body;
 
@@ -39,4 +39,4 @@ export class CourseGenerationController {
       throw error;
     }
   }
-} 
+}
