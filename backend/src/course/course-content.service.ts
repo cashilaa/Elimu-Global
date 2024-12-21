@@ -28,7 +28,7 @@ export class CourseContentService {
     if (createContentDto.video) {
       const videoData = createContentDto.video; 
       const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: process.env.S3_BUCKET_NAME || 'default-bucket-name',
         Key: `videos/${Date.now()}_${videoData.originalname}`,
         Body: videoData.buffer,
         ContentType: videoData.mimetype,
@@ -42,7 +42,7 @@ export class CourseContentService {
     if (createContentDto.pdf) {
       const pdfData = createContentDto.pdf; 
       const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
+        Bucket: process.env.S3_BUCKET_NAME || 'default-bucket-name',
         Key: `pdfs/${Date.now()}_${pdfData.originalname}`,
         Body: pdfData.buffer,
         ContentType: pdfData.mimetype,

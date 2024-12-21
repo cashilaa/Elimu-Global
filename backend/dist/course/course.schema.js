@@ -12,6 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CourseSchema = exports.Course = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 let Course = class Course {
+    constructor() {
+        this.title = '';
+        this.description = '';
+        this.category = '';
+        this.instructor = '';
+        this.students = [];
+        this.learningObjectives = [];
+        this.modules = [];
+        this.pricing = { amount: 0, currency: 'USD' };
+    }
 };
 exports.Course = Course;
 __decorate([

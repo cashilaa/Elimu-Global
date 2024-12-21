@@ -7,6 +7,7 @@ export declare class Group extends Document {
     description?: string;
     createdAt: Date;
     updatedAt: Date;
+    constructor(name: string, instructorId: string, studentIds?: string[], meetingIds?: string[], createdAt?: Date, updatedAt?: Date, description?: string);
 }
 export declare const GroupSchema: import("mongoose").Schema<Group, import("mongoose").Model<Group, any, any, any, Document<unknown, any, Group> & Group & Required<{
     _id: unknown;

@@ -41,9 +41,7 @@ export class Instructor extends Document {
 
   @Prop({ type: Object })
   socialLinks: {
-    linkedin: string;
-    twitter: string;
-    website: string;
+    [key: string]: string;
   };
 
   @Prop()
@@ -57,6 +55,45 @@ export class Instructor extends Document {
 
   @Prop({ default: Date.now })
   updatedAt: Date;
+
+  constructor(
+    id: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    expertise: string,
+    experience: string,
+    education: string,
+    teachingAreas: string[] = [],
+    bio: string = '',
+    socialLinks: { [key: string]: string } = {},
+    isVerified: boolean = false,
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
+    phoneNumber?: string,
+    certification?: string,
+    avatarUrl?: string,
+  ) {
+    super();
+    this.id = id;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.password = password;
+    this.expertise = expertise;
+    this.experience = experience;
+    this.education = education;
+    this.teachingAreas = teachingAreas;
+    this.bio = bio;
+    this.socialLinks = socialLinks;
+    this.isVerified = isVerified;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.phoneNumber = phoneNumber;
+    this.certification = certification;
+    this.avatarUrl = avatarUrl;
+  }
 }
 
 export const InstructorSchema = SchemaFactory.createForClass(Instructor);

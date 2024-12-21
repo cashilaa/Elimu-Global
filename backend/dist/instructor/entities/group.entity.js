@@ -13,6 +13,16 @@ exports.GroupSchema = exports.Group = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Group = class Group extends mongoose_2.Document {
+    constructor(name, instructorId, studentIds = [], meetingIds = [], createdAt = new Date(), updatedAt = new Date(), description) {
+        super();
+        this.name = name;
+        this.instructorId = instructorId;
+        this.studentIds = studentIds;
+        this.meetingIds = meetingIds;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.description = description;
+    }
 };
 exports.Group = Group;
 __decorate([
@@ -44,7 +54,9 @@ __decorate([
     __metadata("design:type", Date)
 ], Group.prototype, "updatedAt", void 0);
 exports.Group = Group = __decorate([
-    (0, mongoose_1.Schema)()
+    (0, mongoose_1.Schema)(),
+    __metadata("design:paramtypes", [String, String, Array, Array, Date,
+        Date, String])
 ], Group);
 exports.GroupSchema = mongoose_1.SchemaFactory.createForClass(Group);
 //# sourceMappingURL=group.entity.js.map

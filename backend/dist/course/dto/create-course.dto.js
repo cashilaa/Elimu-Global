@@ -63,6 +63,13 @@ __decorate([
     __metadata("design:type", String)
 ], PricingDto.prototype, "currency", void 0);
 class CreateCourseDto {
+    constructor() {
+        this.title = '';
+        this.description = '';
+        this.modules = [];
+        this.pricing = { amount: 0, currency: 'USD' };
+        this.status = 'draft';
+    }
 }
 exports.CreateCourseDto = CreateCourseDto;
 __decorate([

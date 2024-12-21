@@ -43,21 +43,21 @@ class PricingDto {
 
 export class CreateCourseDto {
   @IsString()
-  title: string;
+  title: string = ''; // Default value
 
   @IsString()
-  description: string;
+  description: string = ''; // Default value
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ModuleDto)
-  modules: ModuleDto[];
+  modules: ModuleDto[] = []; // Default value
 
   @ValidateNested()
   @Type(() => PricingDto)
-  pricing: PricingDto;
+  pricing: PricingDto = { amount: 0, currency: 'USD' }; // Default value
 
   @IsEnum(['draft', 'published', 'archived'])
   @IsOptional()
-  status?: string;
-} 
+  status?: string = 'draft'; // Default value
+}

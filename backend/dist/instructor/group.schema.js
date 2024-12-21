@@ -11,7 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GroupSchema = exports.Group = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
-let Group = class Group {
+const mongoose_2 = require("mongoose");
+let Group = class Group extends mongoose_2.Document {
+    constructor() {
+        super(...arguments);
+        this.name = '';
+        this.instructorId = '';
+        this.studentIds = [];
+        this.meetingIds = [];
+        this.createdAt = new Date();
+        this.updatedAt = new Date();
+    }
 };
 exports.Group = Group;
 __decorate([
@@ -19,9 +29,25 @@ __decorate([
     __metadata("design:type", String)
 ], Group.prototype, "name", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ default: [] }),
+    (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", String)
+], Group.prototype, "instructorId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [String], default: [] }),
     __metadata("design:type", Array)
-], Group.prototype, "members", void 0);
+], Group.prototype, "studentIds", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ type: [String], default: [] }),
+    __metadata("design:type", Array)
+], Group.prototype, "meetingIds", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: Date.now }),
+    __metadata("design:type", Date)
+], Group.prototype, "createdAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: Date.now }),
+    __metadata("design:type", Date)
+], Group.prototype, "updatedAt", void 0);
 exports.Group = Group = __decorate([
     (0, mongoose_1.Schema)()
 ], Group);

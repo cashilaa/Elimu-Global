@@ -13,6 +13,26 @@ exports.InstructorSchema = exports.Instructor = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Instructor = class Instructor extends mongoose_2.Document {
+    constructor(id, firstName, lastName, email, password, expertise, experience, education, teachingAreas = [], bio = '', socialLinks = {}, isVerified = false, createdAt = new Date(), updatedAt = new Date(), phoneNumber, certification, avatarUrl) {
+        super();
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.expertise = expertise;
+        this.experience = experience;
+        this.education = education;
+        this.teachingAreas = teachingAreas;
+        this.bio = bio;
+        this.socialLinks = socialLinks;
+        this.isVerified = isVerified;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.phoneNumber = phoneNumber;
+        this.certification = certification;
+        this.avatarUrl = avatarUrl;
+    }
 };
 exports.Instructor = Instructor;
 __decorate([
@@ -84,7 +104,9 @@ __decorate([
     __metadata("design:type", Date)
 ], Instructor.prototype, "updatedAt", void 0);
 exports.Instructor = Instructor = __decorate([
-    (0, mongoose_1.Schema)()
+    (0, mongoose_1.Schema)(),
+    __metadata("design:paramtypes", [String, String, String, String, String, String, String, String, Array, String, Object, Boolean, Date,
+        Date, String, String, String])
 ], Instructor);
 exports.InstructorSchema = mongoose_1.SchemaFactory.createForClass(Instructor);
 //# sourceMappingURL=instructor.entity.js.map

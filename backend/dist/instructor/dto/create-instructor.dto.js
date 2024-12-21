@@ -30,6 +30,33 @@ __decorate([
     __metadata("design:type", String)
 ], SocialLinksDto.prototype, "website", void 0);
 class CreateInstructorDto {
+    constructor(firstName = '', lastName = '', email = '', password = '', phoneNumber = '', expertise = '', experience = '', education = '', certification = '', teachingAreas = [], bio = '', socialLinks = new SocialLinksDto(), profilePicture = '') {
+        this.firstName = '';
+        this.lastName = '';
+        this.email = '';
+        this.password = '';
+        this.phoneNumber = '';
+        this.expertise = '';
+        this.experience = '';
+        this.education = '';
+        this.certification = '';
+        this.teachingAreas = [];
+        this.bio = '';
+        this.profilePicture = '';
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.expertise = expertise;
+        this.experience = experience;
+        this.education = education;
+        this.certification = certification;
+        this.teachingAreas = teachingAreas;
+        this.bio = bio;
+        this.socialLinks = socialLinks;
+        this.profilePicture = profilePicture;
+    }
 }
 exports.CreateInstructorDto = CreateInstructorDto;
 __decorate([
@@ -80,6 +107,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateInstructorDto.prototype, "bio", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.ValidateNested)(),
     (0, class_transformer_1.Type)(() => SocialLinksDto),
     __metadata("design:type", SocialLinksDto)

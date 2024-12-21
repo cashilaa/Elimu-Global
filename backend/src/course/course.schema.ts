@@ -6,41 +6,40 @@ export type CourseDocument = Course & Document & { _id: Types.ObjectId };
 @Schema()
 export class Course {
   @Prop({ required: true })
-  title: string;
+  title: string = ''; // Default value
 
   @Prop({ required: true })
-  description: string;
+  description: string = ''; // Default value
 
   @Prop({ required: true })
-  category: string;
+  category: string = ''; // Default value
 
   @Prop({ type: String, ref: 'Instructor', required: true })
-  instructor: string;
+  instructor: string = ''; // Default value
 
   @Prop({ type: [String], default: [] })
-  students: string[];
+  students: string[] = []; // Default value
 
   @Prop({ type: [String], required: true })
-  learningObjectives: string[];
+  learningObjectives: string[] = []; // Default value
 
   @Prop({ type: [Object], required: true })
   modules: {
     title: string;
     description: string;
     content: {
-      type: string; // 'video', 'document', 'quiz', etc.
+      type: string;
       url: string;
       duration?: number;
     }[];
-  }[];
+  }[] = []; // Default value
 
   @Prop({ type: Object, required: true })
   pricing: {
     amount: number;
     currency: string;
     discountPrice?: number;
-    discountValidUntil?: Date;
-  };
+  } = { amount: 0, currency: 'USD' }; // Default value
 
   @Prop({ type: Object, default: {} })
   analytics: {

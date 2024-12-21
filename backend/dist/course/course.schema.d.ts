@@ -22,7 +22,6 @@ export declare class Course {
         amount: number;
         currency: string;
         discountPrice?: number;
-        discountValidUntil?: Date;
     };
     analytics: {
         enrollments: number;

@@ -23,6 +23,25 @@ export class Group extends Document {
 
   @Prop({ default: Date.now })
   updatedAt: Date;
+
+  constructor(
+    name: string,
+    instructorId: string,
+    studentIds: string[] = [],
+    meetingIds: string[] = [],
+    createdAt: Date = new Date(),
+    updatedAt: Date = new Date(),
+    description?: string,
+  ) {
+    super();
+    this.name = name;
+    this.instructorId = instructorId;
+    this.studentIds = studentIds;
+    this.meetingIds = meetingIds;
+    this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.description = description;
+  }
 }
 
 export const GroupSchema = SchemaFactory.createForClass(Group);
