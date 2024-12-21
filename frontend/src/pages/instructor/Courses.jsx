@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Clock, Star, Video, BarChart, Edit, Trash, Plus, Search, Filter, Download, Upload, Book, Calendar, X } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Badge } from '../../components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui';
+import { Badge } from '../../components/ui';
 import { Alert, AlertDescription } from '../../components/ui/alert';
-import { Button } from '../../components/ui/button';
+import { Button } from '../../components/ui';
 import { Avatar } from '../../components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import CourseForm from '../../components/instructor/CourseForm';
