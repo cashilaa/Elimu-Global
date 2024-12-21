@@ -1,8 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { Upload, X, FileText, Video, AlertCircle, Check } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent } from '@/components/ui/card';
 
 const API_BASE_URL = 'https://elimu-instructor-bc.onrender.com'; // e.g., 'http://localhost:3000/api'
 
@@ -126,8 +124,8 @@ const CourseForm = ({ onClose, onSubmit }) => {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardContent className="p-6">
+    <div className="w-full max-w-4xl mx-auto">
+      <section className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information Section */}
           <div className="space-y-4">
@@ -141,7 +139,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                   name="title"
                   value={formData.title}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   required
                 />
               </div>
@@ -152,7 +150,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                   name="category"
                   value={formData.category}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   required
                 >
                   <option value="">Select a category</option>
@@ -170,7 +168,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                   name="level"
                   value={formData.level}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   required
                 >
                   <option value="beginner">Beginner</option>
@@ -186,7 +184,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                   name="duration"
                   value={formData.duration}
                   onChange={handleChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                   required
                   min="1"
                 />
@@ -200,7 +198,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                 required
               />
             </div>
@@ -212,7 +210,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                 value={formData.prerequisites}
                 onChange={handleChange}
                 rows={2}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                 placeholder="List any prerequisites for this course"
               />
             </div>
@@ -297,7 +295,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -316,7 +314,7 @@ const CourseForm = ({ onClose, onSubmit }) => {
                   name="price"
                   value={formData.price}
                   onChange={handleChange}
-                  className="block w-full rounded-md border border-gray-300 pl-7 pr-12 focus:border-blue-500 focus:outline-none"
+                  className="block w-full border border-gray-300 rounded-md shadow-sm pl-7 pr-12 p-2"
                   placeholder="0.00"
                   min="0"
                   step="0.01"
@@ -327,17 +325,17 @@ const CourseForm = ({ onClose, onSubmit }) => {
 
           {/* Error and Success Messages */}
           {error && (
-            <Alert variant="destructive">
+            <div className="bg-red-50 text-red-800 border-red-200 p-4 rounded-md">
               <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
+              <span className="ml-2">{error}</span>
+            </div>
           )}
 
           {success && (
-            <Alert className="bg-green-50 text-green-800 border-green-200">
+            <div className="bg-green-50 text-green-800 border-green-200 p-4 rounded-md">
               <Check className="h-4 w-4" />
-              <AlertDescription>{success}</AlertDescription>
-            </Alert>
+              <span className="ml-2">{success}</span>
+            </div>
           )}
 
           {/* Form Actions */}
@@ -358,8 +356,8 @@ const CourseForm = ({ onClose, onSubmit }) => {
             </button>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </section>
+    </div>
   );
 };
 
