@@ -1,12 +1,12 @@
+import React from "@vitejs/plugin-react";
 import { defineConfig } from 'vite';
 import dotenv from 'dotenv';
 
 // Load environment variables
 dotenv.config();
-import React from "@vitejs/plugin-react";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [React()],
   server: {
     host: true, // Expose to all networks
     port: 5173, // Explicitly set the port for deployment
