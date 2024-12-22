@@ -89,13 +89,13 @@ const Header = () => {
                 className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
               >
                 <Link
-                  to="https://student.com"
+                  to="https://elimu-student-frontend.onrender.com/"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
                 >
                   Student Login
                 </Link>
                 <Link
-                  to="https://instructor.com"
+                  to="https://elimu-instructor-fr.onrender.com/"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white"
                 >
                   Instructor Login
