@@ -5,7 +5,7 @@
   "description": "e-learning platform",
   "main": "src/server/server.js",
   "scripts": {
-    "start": "NODE_ENV=production vite --host",
+    "start": "cross-env HOST=0.0.0.0 PORT=5173 vite",
     "build": "vite build",
     "dev": "concurrently \"NODE_ENV=development nodemon src/server/server.js\" \"vite\"",
     "preview": "vite preview"
@@ -32,6 +32,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
+    "cross-env": "^7.0.3",
     "nodemon": "^2.0.22",
     "postcss": "^8.4.33",
     "prefix": "^1.0.0",
