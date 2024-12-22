@@ -11,9 +11,9 @@ export default defineConfig({
     host: '0.0.0.0', // Correctly bind to all network interfaces
     port: 5173, // Explicitly set the port for deployment
     proxy: {
-      "/api": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
+      '/api': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
       },
       "/socket.io": {
         target: "http://localhost:3000",

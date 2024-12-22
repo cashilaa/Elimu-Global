@@ -4,12 +4,16 @@
   "version": "1.0.0",
   "description": "e-learning platform",
   "main": "src/server/server.js",
-  "scripts": {
-    "start": "cross-env HOST=0.0.0.0 PORT=5173 vite",
-    "build": "vite build",
-    "dev": "concurrently \"NODE_ENV=development nodemon src/server/server.js\" \"vite\"",
-    "preview": "vite preview"
-  },
+  
+    "scripts": {
+      "start": "node src/server/server.js",
+      "server": "node src/server/server.js",
+      "dev": "concurrently \"npm run client\" \"npm run server\"",
+      "client": "vite",
+      "build": "vite build"
+    },
+  
+  
   "dependencies": {
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
