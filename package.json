@@ -10,7 +10,8 @@
       "server": "node src/server/server.js",
       "dev": "concurrently \"npm run client\" \"npm run server\"",
       "client": "vite",
-      "build": "vite build"
+      "build": "vite build",
+      "production": "npm run build && npm run server"
     },
   
   
