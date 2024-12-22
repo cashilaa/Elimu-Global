@@ -70,7 +70,6 @@ app.get("/api/health", (req, res) => {
 });
 
 // AI Assistant route
-// AI Assistant route with project context
 app.post("/api/ai-assistant", async (req, res) => {
   try {
     const systemContext = `You are an AI assistant for Elimu Global, an interactive learning platform.
@@ -174,19 +173,9 @@ io.on("connection", (socket) => {
   });
 });
 
-if (process.env.NODE_ENV === "production") {
-  const distPath = path.resolve(__dirname, "../../dist");
-  app.use(express.static(distPath));
-
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
-  });
-}
-
 const PORT = process.env.PORT || 3000;
-const HOST = "0.0.0.0";
-httpServer.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
+httpServer.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
 // Error handling for server
