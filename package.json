@@ -8,7 +8,7 @@
     "start": "npm run client",
     "server": "nodemon src/server/server.js",
     "client": "vite",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run client\" \"npm run server\"",
     "dev:frontend": "npm run client",
     "dev:backend": "npm run server",
     "build": "vite build",
