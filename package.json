@@ -4,17 +4,16 @@
   "version": "1.0.0",
   "description": "e-learning platform",
   "main": "src/server/server.js",
-  
-    "scripts": {
-      "start": "node src/server/server.js",
-      "server": "node src/server/server.js",
-      "dev": "concurrently \"npm run client\" \"npm run server\"",
-      "client": "vite",
-      "build": "vite build",
-      "production": "npm run build && npm run server"
-    },
-  
-  
+  "scripts": {
+    "start": "npm run client",
+    "server": "nodemon src/server/server.js",
+    "client": "vite",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev:frontend": "npm run client",
+    "dev:backend": "npm run server",
+    "build": "vite build",
+    "production": "npm run build && npm run server"
+  },
   "dependencies": {
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",

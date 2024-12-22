@@ -1,3 +1,5 @@
+// `Source: src/server/server.js`
+
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -8,12 +10,17 @@ import { Groq } from "groq-sdk";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// Initialize environment variables
+dotenv.config();
+
+// Setup __dirname and __filename for ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config();
-
+// Initialize Express app
 const app = express();
+
+// Create HTTP server and integrate with Socket.IO
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -23,6 +30,7 @@ const io = new Server(httpServer, {
   },
 });
 
+// Middleware setup
 app.use(cors());
 app.use(express.json());
 
@@ -37,7 +45,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-// Define Course Schema
+// Define Mongoose Schemas and Models
 const courseSchema = new mongoose.Schema({
   title: String,
   description: String,
@@ -47,7 +55,6 @@ const courseSchema = new mongoose.Schema({
 
 const Course = mongoose.model("Course", courseSchema);
 
-// Define Student Progress Schema
 const progressSchema = new mongoose.Schema({
   userId: String,
   coursesInProgress: Number,
@@ -64,12 +71,14 @@ const progressSchema = new mongoose.Schema({
 
 const Progress = mongoose.model("Progress", progressSchema);
 
-// API routes
+// API Routes
+
+// Health Check Route
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-// AI Assistant route
+// AI Assistant Route
 app.post("/api/ai-assistant", async (req, res) => {
   try {
     const systemContext = `You are an AI assistant for Elimu Global, an interactive learning platform.
@@ -114,7 +123,7 @@ app.post("/api/ai-assistant", async (req, res) => {
   }
 });
 
-// Course Preview route
+// Course Preview Route
 app.get("/api/courses/preview", async (req, res) => {
   try {
     const courses = await Course.find().limit(6);
@@ -127,10 +136,10 @@ app.get("/api/courses/preview", async (req, res) => {
   }
 });
 
-// Student Progress route
+// Student Progress Route
 app.get("/api/student/progress", async (req, res) => {
   try {
-    const userId = "example-user-id";
+    const userId = "example-user-id"; // Replace with actual user identification logic
     let progress = await Progress.findOne({ userId });
 
     if (!progress) {
@@ -153,15 +162,15 @@ app.get("/api/student/progress", async (req, res) => {
   }
 });
 
-// Serve static files from the Vite build directory
+// Serve Static Files from the Frontend Build
 app.use(express.static(path.join(__dirname, '../../dist')));
 
-// Handle React routing by sending all requests to index.html
+// Handle React Routing by Serving the Frontend's index.html for All Unmatched Routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../../dist/index.html'));
 });
 
-// Socket.IO connection
+// Socket.IO Connection Handling
 io.on("connection", (socket) => {
   console.log("A user connected");
 
@@ -170,12 +179,15 @@ io.on("connection", (socket) => {
   });
 });
 
+// Define Server Port
 const PORT = process.env.PORT || 3000;
+
+// Start the HTTP Server
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-// Error handling for server
+// Error Handling for Server
 httpServer.on("error", (error) => {
   if (error.syscall !== "listen") {
     throw error;
