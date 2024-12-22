@@ -8,7 +8,7 @@ dotenv.config();
 export default defineConfig({
   plugins: [React()],
   server: {
-    host: true, // Expose to all networks
+    host: true || 5173, // Expose to all networks
     port: 5173, // Explicitly set the port for deployment
     proxy: {
       "/api": {
