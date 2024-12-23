@@ -6,37 +6,25 @@ const ADMIN_CREDENTIALS = {
 };
 
 export const authService = {
-  async login(credentials: { email: string; password: string }) {
-    // Check against hardcoded credentials
-    if (credentials.email === ADMIN_CREDENTIALS.email && 
-        credentials.password === ADMIN_CREDENTIALS.password) {
-      const user = {
-        id: '1',
-        email: ADMIN_CREDENTIALS.email,
-        fullName: 'Admin User',
-        role: 'admin'
-      };
-      
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', 'admin-token');
-      return { user, token: 'admin-token' };
+  login: async (credentials: { email: string; password: string }) => {
+    // For testing, you can use these hardcoded credentials
+    if (credentials.email === 'admin@elimu.com' && credentials.password === 'admin123') {
+      const token = 'dummy-token';
+      localStorage.setItem('token', token);
+      return { token };
     }
-    
     throw new Error('Invalid credentials');
   },
 
-  logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-  },
-
-  getCurrentUser() {
-    const userStr = localStorage.getItem('user');
-    if (userStr) return JSON.parse(userStr);
+  getCurrentUser: () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      return { role: 'admin' }; // For testing purposes
+    }
     return null;
   },
 
-  getToken() {
-    return localStorage.getItem('token');
-  },
+  logout: () => {
+    localStorage.removeItem('token');
+  }
 };

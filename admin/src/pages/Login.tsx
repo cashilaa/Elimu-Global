@@ -48,7 +48,7 @@ const Login = () => {
     try {
       await authService.login(values);
       message.success('Login successful!');
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       message.error('Invalid credentials');
     }

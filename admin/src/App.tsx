@@ -1,73 +1,52 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
-import './styles/global.scss';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import { CourseProvider } from './contexts/CourseContext';
-import { StudentProvider } from './contexts/StudentContext';
-import { ErrorBoundary } from './components/ErrorBoundary';
-
-// Import pages
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import Students from './pages/Students';
 import Revenue from './pages/Revenue';
 import Settings from './pages/Settings';
-import Login from './pages/Login';
-import Instructors from './pages/Instructors';
-import { CourseForm } from './components/CourseForm';
-import { StudentForm } from './components/StudentForm';
-
-const router = createBrowserRouter([
-  {
-    path: '/login',
-    element: <Login />
-  },
-  {
-    path: '/',
-    element: <ProtectedRoute><Dashboard /></ProtectedRoute>
-  },
-  {
-    path: '/courses',
-    element: <ProtectedRoute><Courses /></ProtectedRoute>
-  },
-  {
-    path: '/students',
-    element: <ProtectedRoute><Students /></ProtectedRoute>
-  },
-  {
-    path: '/revenue',
-    element: <ProtectedRoute><Revenue /></ProtectedRoute>
-  },
-  {
-    path: '/settings',
-    element: <ProtectedRoute><Settings /></ProtectedRoute>
-  },
-  {
-    path: '/instructors',
-    element: <ProtectedRoute><Instructors /></ProtectedRoute>
-  },
-  {
-    path: '/courses/new',
-    element: <CourseForm />
-  },
-  {
-    path: '/students/new',
-    element: <StudentForm />
-  }
-]);
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <ErrorBoundary>
-        <CourseProvider>
-          <StudentProvider>
-            <RouterProvider router={router} />
-          </StudentProvider>
-        </CourseProvider>
-      </ErrorBoundary>
+      <Router>
+        <Routes>
+          {/* Make login the default route */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/login" element={<Login />} />
+          
+          {/* Protected routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/courses" element={
+            <ProtectedRoute>
+              <Courses />
+            </ProtectedRoute>
+          } />
+          <Route path="/students" element={
+            <ProtectedRoute>
+              <Students />
+            </ProtectedRoute>
+          } />
+          <Route path="/revenue" element={
+            <ProtectedRoute>
+              <Revenue />
+            </ProtectedRoute>
+          } />
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          } />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 };
