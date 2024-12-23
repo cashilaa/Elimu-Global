@@ -10,6 +10,8 @@ import { InteractiveChart } from '../components/InteractiveChart';
 import { QuickActions } from '../components/QuickActions';
 import moment from 'moment';
 import styled from 'styled-components';
+import { fadeIn } from '../utils/animations';
+import { StatsCard } from '../components/StatsCard';
 
 const PageWrapper = styled.div`
   padding: 24px;

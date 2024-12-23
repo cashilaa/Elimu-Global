@@ -3,7 +3,8 @@ import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Space,
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { coursesService } from '../services/courses.service';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
+import { fadeIn } from '../utils/animations';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -18,6 +19,18 @@ interface Course {
   status: string;
   students?: number;
 }
+
+// Add the slideIn animation
+const slideIn = keyframes`
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`;
 
 const PageWrapper = styled.div`
   padding: 24px;

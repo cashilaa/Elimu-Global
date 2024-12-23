@@ -11,6 +11,17 @@ export const fadeIn = keyframes`
   }
 `;
 
+export const slideIn = keyframes`
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`;
+
 export const bounce = keyframes`
   0%, 100% {
     transform: translateY(0);
