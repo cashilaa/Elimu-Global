@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Menu } from 'antd';
 import { 
   DashboardOutlined, 
@@ -86,9 +86,21 @@ interface DashboardLayoutProps {
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  const [isMobile, setIsMobile] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const menuItems = [
     {
@@ -132,7 +144,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       <Sider 
         trigger={null} 
         collapsible 
-        collapsed={collapsed}
+        collapsed={isMobile ? true : collapsed}
+        breakpoint="lg"
+        collapsedWidth={isMobile ? 0 : 80}
+        onCollapse={(collapsed) => setCollapsed(collapsed)}
         width={260}
       >
         <div className="logo">

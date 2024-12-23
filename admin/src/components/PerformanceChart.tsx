@@ -25,23 +25,25 @@ export const PerformanceChart = () => {
   ];
 
   return (
-    <ChartWrapper>
-      <h3 className="chart-title">Student Growth</h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Line 
-            type="monotone" 
-            dataKey="students" 
-            stroke="#4A90E2" 
-            strokeWidth={2}
-            dot={{ fill: '#4A90E2', strokeWidth: 2 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </ChartWrapper>
+    <div className="chart-container">
+      <ChartWrapper>
+        <h3 className="chart-title">Student Growth</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Line 
+              type="monotone" 
+              dataKey="students" 
+              stroke="#4A90E2" 
+              strokeWidth={2}
+              dot={{ fill: '#4A90E2', strokeWidth: 2 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartWrapper>
+    </div>
   );
 }; 

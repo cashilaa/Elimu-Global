@@ -10,16 +10,16 @@ export class Student extends Document {
   email: string;
 
   @Prop()
-  phone: string;
+  dateOfBirth?: string;
 
   @Prop({ default: 0 })
   enrolledCourses: number;
 
-  @Prop({ default: true })
-  isActive: boolean;
+  @Prop({ default: 'Active' })
+  status: string;
 
   @Prop()
-  lastLogin: Date;
+  lastLogin?: Date;
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student); 

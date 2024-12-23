@@ -4,6 +4,9 @@ import { ThemeProvider } from 'styled-components';
 import { theme } from './theme';
 import './styles/global.scss';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { CourseProvider } from './contexts/CourseContext';
+import { StudentProvider } from './contexts/StudentContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Import pages
 import Dashboard from './pages/Dashboard';
@@ -13,6 +16,8 @@ import Revenue from './pages/Revenue';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Instructors from './pages/Instructors';
+import { CourseForm } from './components/CourseForm';
+import { StudentForm } from './components/StudentForm';
 
 const router = createBrowserRouter([
   {
@@ -42,13 +47,27 @@ const router = createBrowserRouter([
   {
     path: '/instructors',
     element: <ProtectedRoute><Instructors /></ProtectedRoute>
+  },
+  {
+    path: '/courses/new',
+    element: <CourseForm />
+  },
+  {
+    path: '/students/new',
+    element: <StudentForm />
   }
 ]);
 
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <RouterProvider router={router} />
+      <ErrorBoundary>
+        <CourseProvider>
+          <StudentProvider>
+            <RouterProvider router={router} />
+          </StudentProvider>
+        </CourseProvider>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 };

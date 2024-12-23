@@ -3,19 +3,94 @@ import { Table, Button, Tag, Space, Modal, Input, message } from 'antd';
 import { CheckOutlined, CloseOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { instructorsService } from '../services/instructors.service';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 const { TextArea } = Input;
 const { confirm } = Modal;
 
+// Animations
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const slideIn = keyframes`
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`;
+
+// Styled Components
 const PageWrapper = styled.div`
   padding: 24px;
+  animation: ${fadeIn} 0.5s ease-out;
 
   .header {
     margin-bottom: 24px;
+    animation: ${slideIn} 0.5s ease-out;
     h1 {
       margin: 0;
+      font-size: 24px;
+      color: #1890ff;
     }
+  }
+`;
+
+const StyledCard = styled.div`
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const StyledTable = styled(Table)`
+  .ant-table {
+    background: transparent;
+  }
+
+  .ant-table-thead > tr > th {
+    background: #f8faff;
+    padding: 16px;
+    font-weight: 600;
+    border-bottom: 2px solid #e6f0ff;
+    transition: background 0.3s ease;
+
+    &:hover {
+      background: #f0f5ff !important;
+    }
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 16px;
+    border-bottom: 1px solid #f0f7ff;
+    transition: all 0.3s ease;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background: #f8faff;
+  }
+
+  .status-tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    text-transform: capitalize;
   }
 
   .status-pending {
@@ -34,6 +109,49 @@ const PageWrapper = styled.div`
     background: #fff1f0;
     color: #cf1322;
     border-color: #ffa39e;
+  }
+`;
+
+const ActionButton = styled(Button)`
+  border-radius: 8px;
+  padding: 4px 12px;
+  height: 32px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .anticon {
+    font-size: 14px;
+  }
+`;
+
+const StyledModal = styled(Modal)`
+  .ant-modal-content {
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .ant-modal-header {
+    background: #f8faff;
+    padding: 16px 24px;
+    border-bottom: 1px solid #f0f7ff;
+  }
+
+  .ant-modal-body {
+    padding: 24px;
+  }
+
+  textarea.ant-input {
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 120px;
+    resize: vertical;
   }
 `;
 
@@ -184,20 +302,31 @@ const Instructors = () => {
           <h1>Instructor Applications</h1>
         </div>
 
-        <Table
-          columns={columns}
-          dataSource={instructors}
-          loading={loading}
-          rowKey="id"
-        />
+        <StyledCard>
+          <StyledTable
+            columns={columns}
+            dataSource={instructors}
+            loading={loading}
+            rowKey="id"
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total) => `Total ${total} applications`,
+            }}
+          />
+        </StyledCard>
 
-        <Modal
+        <StyledModal
           title="Reject Instructor"
           open={rejectModalVisible}
           onOk={handleReject}
           onCancel={() => {
             setRejectModalVisible(false);
             setRejectionReason('');
+          }}
+          okButtonProps={{ 
+            danger: true,
+            icon: <CloseOutlined /> 
           }}
         >
           <p>Please provide a reason for rejection:</p>
@@ -207,7 +336,7 @@ const Instructors = () => {
             onChange={(e) => setRejectionReason(e.target.value)}
             placeholder="Enter rejection reason"
           />
-        </Modal>
+        </StyledModal>
       </PageWrapper>
     </DashboardLayout>
   );

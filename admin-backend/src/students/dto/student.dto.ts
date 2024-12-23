@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsBoolean, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsEmail, IsBoolean, IsOptional, IsNumber, IsDateString } from 'class-validator';
 
 export class CreateStudentDto {
   @IsString()
@@ -7,23 +7,37 @@ export class CreateStudentDto {
   @IsEmail()
   email: string;
 
-  @IsString()
+  @IsDateString()
   @IsOptional()
-  phone?: string;
+  dateOfBirth?: string;
 
   @IsNumber()
   @IsOptional()
   enrolledCourses?: number;
 
-  @IsBoolean()
+  @IsString()
   @IsOptional()
-  isActive?: boolean;
+  status?: string;
 }
 
-export class UpdateStudentDto extends CreateStudentDto {
+export class UpdateStudentDto {
+  @IsString()
   @IsOptional()
-  fullName: string;
+  fullName?: string;
 
+  @IsEmail()
   @IsOptional()
-  email: string;
+  email?: string;
+
+  @IsDateString()
+  @IsOptional()
+  dateOfBirth?: string;
+
+  @IsNumber()
+  @IsOptional()
+  enrolledCourses?: number;
+
+  @IsString()
+  @IsOptional()
+  status?: string;
 } 

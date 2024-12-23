@@ -1,41 +1,93 @@
-import axios from 'axios';
+import { api } from '../utils/api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
-const STUDENT_DASHBOARD_URL = import.meta.env.VITE_STUDENT_DASHBOARD_URL || 'http://localhost:3003/api';
+interface StudentData {
+  fullName: string;
+  email: string;
+  dateOfBirth?: string;
+  enrolledCourses: number;
+  status?: 'Active' | 'Inactive';
+}
 
-export const studentsService = {
+interface UpdateStudentData extends Partial<StudentData> {
+  // Any additional fields specific to updates
+}
+
+class StudentsService {
   async getAllStudents() {
     try {
-      const response = await axios.get(`${STUDENT_DASHBOARD_URL}/students`);
+      const response = await api.get('/students');
       return response.data;
     } catch (error) {
       console.error('Error fetching students:', error);
-      return []; // Return empty array as fallback
+      throw error;
     }
-  },
+  }
+
+  async createStudent(studentData: StudentData) {
+    try {
+      console.log('Creating student with data:', studentData);
+      
+      const formattedData = {
+        ...studentData,
+        status: studentData.status || 'Active'
+      };
+      
+      const response = await api.post('/students', formattedData);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error creating student:', error);
+      console.error('Error response:', error.response?.data);
+      throw error;
+    }
+  }
 
   async getStudentStats() {
     try {
-      const response = await axios.get(`${STUDENT_DASHBOARD_URL}/students/stats`);
+      const response = await api.get('/students/stats');
       return response.data;
     } catch (error) {
-      console.error('Error fetching stats:', error);
-      return { totalStudents: 0, activeStudents: 0, averageProgress: 0 }; // Return default values
+      console.error('Error fetching student stats:', error);
+      throw error;
     }
-  },
-
-  async getStudentById(id: string) {
-    const response = await axios.get(`${STUDENT_DASHBOARD_URL}/students/${id}`);
-    return response.data;
-  },
-
-  async getStudentProgress(id: string) {
-    const response = await axios.get(`${STUDENT_DASHBOARD_URL}/students/${id}/progress`);
-    return response.data;
-  },
-
-  async getStudentEnrollments(id: string) {
-    const response = await axios.get(`${STUDENT_DASHBOARD_URL}/students/${id}/enrollments`);
-    return response.data;
   }
-}; 
+
+  async updateStudent(id: string, studentData: Partial<StudentData>) {
+    try {
+      if (!id) {
+        throw new Error('Student ID is required for update');
+      }
+
+      const formattedData = {
+        ...studentData,
+        dateOfBirth: studentData.dateOfBirth || undefined,
+        status: studentData.status || 'Active',
+        enrolledCourses: typeof studentData.enrolledCourses === 'string' 
+          ? parseInt(studentData.enrolledCourses) 
+          : studentData.enrolledCourses
+      };
+
+      console.log('Updating student with ID:', id);
+      console.log('Update data:', formattedData);
+      
+      // Changed back to /students
+      const response = await api.put(`/students/${id}`, formattedData);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error updating student:', error);
+      console.error('Error response:', error.response?.data);
+      throw error;
+    }
+  }
+
+  async deleteStudent(id: string) {
+    try {
+      const response = await api.delete(`/students/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting student:', error);
+      throw error;
+    }
+  }
+}
+
+export const studentsService = new StudentsService(); 

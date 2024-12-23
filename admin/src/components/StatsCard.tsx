@@ -1,22 +1,51 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import { Card } from 'antd';
 import { fadeIn, pulse } from '../utils/animations';
+
+// New animations
+const float = keyframes`
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+`;
+
+const shine = keyframes`
+  0% { background-position: -100px; }
+  40%, 100% { background-position: 140px; }
+`;
 
 const StyledCard = styled(Card)`
   border-radius: 16px;
   box-shadow: 0 8px 16px rgba(74, 144, 226, 0.12);
   border: none;
-  transition: all 0.3s ease;
-  animation: ${fadeIn} 0.5s ease-out;
-  
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(74, 144, 226, 0.2);
-    
-    .stats-icon {
-      animation: ${pulse} 1s infinite;
-    }
+  transition: all 0.5s ease;
+  animation: ${fadeIn} 0.5s ease-out, ${float} 6s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    border-radius: 12px;
+  }
+
+  @media (max-width: 576px) {
+    border-radius: 8px;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100px;
+    width: 100px;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+    animation: ${shine} 3s infinite linear;
   }
 
   .stats-icon {
@@ -29,16 +58,19 @@ const StyledCard = styled(Card)`
     justify-content: center;
     margin-bottom: 16px;
     padding: 12px;
-    
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
+    transition: all 0.3s ease;
+
+    @media (max-width: 768px) {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
     }
 
-    svg {
-      width: 100%;
-      height: 100%;
+    @media (max-width: 576px) {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      padding: 10px;
     }
   }
 
@@ -47,12 +79,30 @@ const StyledCard = styled(Card)`
     font-weight: bold;
     color: ${props => props.theme.colors.primaryBlue};
     margin-bottom: 8px;
+    transition: all 0.3s ease;
+
+    @media (max-width: 768px) {
+      font-size: 24px;
+    }
+
+    @media (max-width: 576px) {
+      font-size: 20px;
+    }
   }
 
   .stats-label {
     font-size: 16px;
     color: ${props => props.theme.colors.textGray};
     font-family: 'Comic Sans MS', cursive;
+    transition: all 0.3s ease;
+
+    @media (max-width: 768px) {
+      font-size: 14px;
+    }
+
+    @media (max-width: 576px) {
+      font-size: 13px;
+    }
   }
 `;
 

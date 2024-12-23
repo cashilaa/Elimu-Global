@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Space, Popconfirm, Tag, Tooltip } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, message, Space, Popconfirm, Tag, Tooltip, Card, Row, Col, Progress } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { coursesService } from '../services/courses.service';
+import styled from 'styled-components';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -17,6 +18,126 @@ interface Course {
   status: string;
   students?: number;
 }
+
+const PageWrapper = styled.div`
+  padding: 24px;
+  animation: ${fadeIn} 0.5s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+`;
+
+const HeaderSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  animation: ${slideIn} 0.5s ease-out;
+  gap: 16px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #1890ff;
+    white-space: nowrap;
+
+    @media (max-width: 768px) {
+      font-size: 20px;
+    }
+
+    @media (max-width: 576px) {
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+`;
+
+const StyledCard = styled.div`
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  width: 100%;
+  overflow-x: auto;
+
+  @media (max-width: 768px) {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+`;
+
+const CourseGrid = styled(Row)`
+  margin-top: 24px;
+
+  @media (max-width: 576px) {
+    margin-top: 16px;
+  }
+`;
+
+const CourseCard = styled(Card)`
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    border-radius: 8px;
+  }
+
+  .ant-card-cover {
+    height: 200px;
+    overflow: hidden;
+
+    @media (max-width: 576px) {
+      height: 160px;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .ant-card-body {
+    padding: 20px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+
+    @media (max-width: 576px) {
+      padding: 12px;
+    }
+  }
+
+  .course-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+    }
+  }
+
+  .course-instructor {
+    color: #666;
+    margin-bottom: 16px;
+    font-size: 14px;
+
+    @media (max-width: 576px) {
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+  }
+`;
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -154,28 +275,32 @@ const Courses = () => {
 
   return (
     <DashboardLayout>
-      <div style={{ padding: '24px' }}>
-        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ margin: 0 }}>Courses</h1>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />}
-            onClick={() => {
-              setModalMode('add');
-              form.resetFields();
-              setIsModalVisible(true);
-            }}
-          >
+      <PageWrapper>
+        <HeaderSection>
+          <h1>Courses</h1>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalVisible(true)}>
             Add Course
           </Button>
-        </div>
+        </HeaderSection>
 
-        <Table 
-          columns={columns} 
-          dataSource={courses}
-          loading={loading}
-          rowKey="_id"
-        />
+        <CourseGrid gutter={[24, 24]}>
+          {courses.map(course => (
+            <Col xs={24} sm={12} md={8} lg={6} key={course.id}>
+              <CourseCard
+                hoverable
+                cover={<img alt={course.title} src={course.coverImage} />}
+                actions={[
+                  <EditOutlined key="edit" onClick={() => handleEdit(course)} />,
+                  <DeleteOutlined key="delete" onClick={() => handleDelete(course)} />
+                ]}
+              >
+                <h3 className="course-title">{course.title}</h3>
+                <p className="course-instructor">{course.instructor}</p>
+                <Progress percent={course.progress} status="active" />
+              </CourseCard>
+            </Col>
+          ))}
+        </CourseGrid>
 
         {/* Add/Edit Modal */}
         <Modal
@@ -276,7 +401,7 @@ const Courses = () => {
             </div>
           )}
         </Modal>
-      </div>
+      </PageWrapper>
     </DashboardLayout>
   );
 };

@@ -20,4 +20,14 @@ export class StudentsController {
   create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentsService.create(createStudentDto);
   }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
+    return this.studentsService.update(id, updateStudentDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.studentsService.remove(id);
+  }
 } 

@@ -24,4 +24,24 @@ export class StudentsService {
     const newStudent = new this.studentModel(createStudentDto);
     return newStudent.save();
   }
+
+  async update(id: string, updateStudentDto: UpdateStudentDto) {
+    const updatedStudent = await this.studentModel
+      .findByIdAndUpdate(id, updateStudentDto, { new: true })
+      .exec();
+    
+    if (!updatedStudent) {
+      throw new NotFoundException('Student not found');
+    }
+    
+    return updatedStudent;
+  }
+
+  async remove(id: string) {
+    const deletedStudent = await this.studentModel.findByIdAndDelete(id).exec();
+    if (!deletedStudent) {
+      throw new NotFoundException('Student not found');
+    }
+    return deletedStudent;
+  }
 } 

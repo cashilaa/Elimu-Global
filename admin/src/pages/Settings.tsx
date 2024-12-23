@@ -14,23 +14,84 @@ import {
 import { settingsService } from '../services/settings.service';
 
 const PageWrapper = styled.div`
+  padding: 24px;
   animation: ${fadeIn} 0.5s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
 
     h1 {
-      font-family: 'Comic Sans MS', cursive;
+      font-size: 24px;
       color: ${props => props.theme.colors.primaryBlue};
       margin: 0;
+
+      @media (max-width: 768px) {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+`;
+
+const StyledCard = styled(Card)`
+  border-radius: 16px;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    border-radius: 8px;
+  }
+
+  .ant-card-body {
+    padding: 24px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
     }
   }
 
-  .settings-form {
-    max-width: 600px;
+  .ant-form-item {
+    margin-bottom: 24px;
+
+    @media (max-width: 576px) {
+      margin-bottom: 16px;
+    }
+  }
+`;
+
+const StyledTabs = styled(Tabs)`
+  .ant-tabs-nav {
+    margin-bottom: 24px;
+
+    @media (max-width: 576px) {
+      margin-bottom: 16px;
+    }
+  }
+
+  .ant-tabs-tab {
+    padding: 12px 16px;
+
+    @media (max-width: 768px) {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 576px) {
+      padding: 6px 10px;
+      font-size: 13px;
+    }
   }
 `;
 
@@ -68,7 +129,7 @@ const Settings = () => {
         </span>
       ),
       children: (
-        <Card>
+        <StyledCard>
           <Form
             form={form}
             layout="vertical"
@@ -80,8 +141,8 @@ const Settings = () => {
               language: 'en',
             }}
           >
-            <Row gutter={24}>
-              <Col span={12}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={24} md={12}>
                 <Form.Item
                   label="Site Name"
                   name="siteName"
@@ -90,7 +151,7 @@ const Settings = () => {
                   <Input prefix={<GlobalOutlined />} />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col xs={24} sm={24} md={12}>
                 <Form.Item
                   label="Admin Email"
                   name="adminEmail"
@@ -101,8 +162,8 @@ const Settings = () => {
               </Col>
             </Row>
 
-            <Row gutter={24}>
-              <Col span={12}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={24} md={12}>
                 <Form.Item label="Timezone" name="timezone">
                   <Select>
                     <Select.Option value="UTC+3">East Africa Time (UTC+3)</Select.Option>
@@ -111,7 +172,7 @@ const Settings = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col xs={24} sm={24} md={12}>
                 <Form.Item label="Language" name="language">
                   <Select>
                     <Select.Option value="en">English</Select.Option>
@@ -136,7 +197,7 @@ const Settings = () => {
               </Upload>
             </Form.Item>
           </Form>
-        </Card>
+        </StyledCard>
       )
     },
     {
@@ -147,7 +208,7 @@ const Settings = () => {
         </span>
       ),
       children: (
-        <Card>
+        <StyledCard>
           <Form
             layout="vertical"
             initialValues={{
@@ -190,7 +251,7 @@ const Settings = () => {
               <TimePicker.RangePicker format="HH:mm" />
             </Form.Item>
           </Form>
-        </Card>
+        </StyledCard>
       )
     },
     {
@@ -201,7 +262,7 @@ const Settings = () => {
         </span>
       ),
       children: (
-        <Card>
+        <StyledCard>
           <Alert
             message="Security Settings"
             description="Configure security settings for your platform"
@@ -239,7 +300,7 @@ const Settings = () => {
               <InputNumber min={3} max={10} />
             </Form.Item>
           </Form>
-        </Card>
+        </StyledCard>
       )
     }
   ];
@@ -254,7 +315,7 @@ const Settings = () => {
           </Button>
         </div>
 
-        <Tabs items={items} />
+        <StyledTabs items={items} />
       </PageWrapper>
     </DashboardLayout>
   );

@@ -9,50 +9,98 @@ import { fadeIn } from '../utils/animations';
 const { RangePicker } = DatePicker;
 
 const PageWrapper = styled.div`
+  padding: 24px;
   animation: ${fadeIn} 0.5s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
 
     h1 {
-      font-family: 'Comic Sans MS', cursive;
+      font-size: 24px;
       color: ${props => props.theme.colors.primaryBlue};
       margin: 0;
+
+      @media (max-width: 768px) {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+`;
+
+const StatsGrid = styled(Row)`
+  margin-bottom: 24px;
+
+  @media (max-width: 576px) {
+    margin-bottom: 16px;
+  }
+`;
+
+const StatCard = styled(Card)`
+  .ant-card-body {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+
+    @media (max-width: 576px) {
+      padding: 12px;
     }
   }
 
-  .stat-card {
-    .ant-card-body {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+  .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    background: ${props => props.theme.colors.lightBlue};
+    color: ${props => props.theme.colors.primaryBlue};
 
-    .icon-wrapper {
-      width: 48px;
-      height: 48px;
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      background: ${props => props.theme.colors.lightBlue};
-      color: ${props => props.theme.colors.primaryBlue};
+    @media (max-width: 576px) {
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
     }
+  }
 
-    .stat-content {
-      h3 {
-        margin: 0;
-        color: ${props => props.theme.colors.textGray};
+  .stat-content {
+    h3 {
+      margin: 0;
+      font-size: 14px;
+      color: ${props => props.theme.colors.textGray};
+
+      @media (max-width: 576px) {
+        font-size: 12px;
       }
-      
-      .value {
-        font-size: 24px;
-        font-weight: bold;
-        color: ${props => props.theme.colors.primaryBlue};
+    }
+
+    .value {
+      font-size: 24px;
+      font-weight: bold;
+      color: ${props => props.theme.colors.primaryBlue};
+
+      @media (max-width: 576px) {
+        font-size: 20px;
       }
     }
   }
@@ -76,9 +124,9 @@ const Revenue = () => {
           <RangePicker />
         </div>
 
-        <Row gutter={[24, 24]}>
-          <Col span={8}>
-            <Card className="stat-card">
+        <StatsGrid gutter={[16, 16]}>
+          <Col xs={24} sm={24} md={8}>
+            <StatCard>
               <div className="icon-wrapper">
                 <DollarOutlined />
               </div>
@@ -86,10 +134,10 @@ const Revenue = () => {
                 <h3>Total Revenue</h3>
                 <div className="value">$121,000</div>
               </div>
-            </Card>
+            </StatCard>
           </Col>
-          <Col span={8}>
-            <Card className="stat-card">
+          <Col xs={24} sm={24} md={8}>
+            <StatCard>
               <div className="icon-wrapper">
                 <RiseOutlined />
               </div>
@@ -97,10 +145,10 @@ const Revenue = () => {
                 <h3>Growth</h3>
                 <div className="value">+15.3%</div>
               </div>
-            </Card>
+            </StatCard>
           </Col>
-          <Col span={8}>
-            <Card className="stat-card">
+          <Col xs={24} sm={24} md={8}>
+            <StatCard>
               <div className="icon-wrapper">
                 <TeamOutlined />
               </div>
@@ -108,25 +156,24 @@ const Revenue = () => {
                 <h3>New Subscriptions</h3>
                 <div className="value">234</div>
               </div>
-            </Card>
+            </StatCard>
           </Col>
-        </Row>
+        </StatsGrid>
 
-        <Card style={{ marginTop: 24 }}>
+        <Card>
           <h3>Revenue Trend</h3>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={window.innerWidth <= 576 ? 300 : 400}>
             <LineChart data={revenueData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line 
-                type="monotone" 
-                dataKey="revenue" 
-                stroke="#4A90E2" 
-                strokeWidth={2}
-                dot={{ fill: '#4A90E2' }}
+              <XAxis 
+                dataKey="month" 
+                tick={{ fontSize: window.innerWidth <= 576 ? 12 : 14 }}
               />
+              <YAxis 
+                tick={{ fontSize: window.innerWidth <= 576 ? 12 : 14 }}
+              />
+              <Tooltip />
+              <Line type="monotone" dataKey="revenue" stroke="#4A90E2" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </Card>
