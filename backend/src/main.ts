@@ -19,7 +19,7 @@ async function bootstrap() {
   
   // Enable CORS
   app.enableCors({
-    origin: ['http://localhost:3001', 'https://elimu-instructor-fr.onrender.com'], 
+    origin: ['http://localhost:3001', 'https://elimu-instructor-fr.onrender.com', 'https://elimu-admin-dashboard.onrender.com'], 
     credentials: true,
   });
 
