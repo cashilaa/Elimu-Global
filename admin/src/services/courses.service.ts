@@ -126,6 +126,19 @@ class CoursesService {
       throw error;
     }
   }
+
+  async getFreeCourses() {
+    try {
+      const response = await fetch('https://elimu-instructor-bc.onrender.com/api/courses/free');
+      if (!response.ok) {
+        throw new Error('Failed to fetch free courses');
+      }
+      return response.json();
+    } catch (error) {
+      console.error('Error fetching free courses:', error);
+      throw error;
+    }
+  }
 }
 
 export const coursesService = new CoursesService(); 

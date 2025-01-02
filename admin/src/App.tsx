@@ -8,6 +8,7 @@ import Courses from './pages/Courses';
 import Students from './pages/Students';
 import Revenue from './pages/Revenue';
 import Settings from './pages/Settings';
+import Instructors from './pages/Instructors';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 const App = () => {
@@ -28,6 +29,11 @@ const App = () => {
           <Route path="/courses" element={
             <ProtectedRoute>
               <Courses />
+            </ProtectedRoute>
+          } />
+          <Route path="/instructors" element={
+            <ProtectedRoute>
+              <Instructors />
             </ProtectedRoute>
           } />
           <Route path="/students" element={

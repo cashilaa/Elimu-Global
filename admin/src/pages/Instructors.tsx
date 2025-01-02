@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Button, Tag, Space, Modal, Input, message } from 'antd';
-import { CheckOutlined, CloseOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Card, Row, Col, Button, Avatar, Tag, Modal, Form, Input, Upload, message, Spin } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, StarFilled } from '@ant-design/icons';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { instructorsService } from '../services/instructors.service';
 import styled, { keyframes } from 'styled-components';
+import { fadeIn } from '../utils/animations';
 
-const { TextArea } = Input;
-const { confirm } = Modal;
+interface Instructor {
+  id: number;
+  avatar: string;
+  name: string;
+  specialization: string;
+  rating: number;
+  coursesCount: number;
+  studentsCount: number;
+  status: string;
+  bio: string;
+}
 
-// Animations
-const fadeIn = keyframes`
+const slideUp = keyframes`
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -20,326 +28,306 @@ const fadeIn = keyframes`
   }
 `;
 
-const slideIn = keyframes`
-  from {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-`;
-
-// Styled Components
 const PageWrapper = styled.div`
   padding: 24px;
   animation: ${fadeIn} 0.5s ease-out;
 
-  .header {
-    margin-bottom: 24px;
-    animation: ${slideIn} 0.5s ease-out;
-    h1 {
-      margin: 0;
-      font-size: 24px;
-      color: #1890ff;
-    }
-  }
-`;
-
-const StyledCard = styled.div`
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-`;
-
-const StyledTable = styled(Table)`
-  .ant-table {
-    background: transparent;
-  }
-
-  .ant-table-thead > tr > th {
-    background: #f8faff;
+  @media (max-width: 768px) {
     padding: 16px;
-    font-weight: 600;
-    border-bottom: 2px solid #e6f0ff;
-    transition: background 0.3s ease;
-
-    &:hover {
-      background: #f0f5ff !important;
-    }
-  }
-
-  .ant-table-tbody > tr > td {
-    padding: 16px;
-    border-bottom: 1px solid #f0f7ff;
-    transition: all 0.3s ease;
-  }
-
-  .ant-table-tbody > tr:hover > td {
-    background: #f8faff;
-  }
-
-  .status-tag {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-weight: 500;
-    text-transform: capitalize;
-  }
-
-  .status-pending {
-    background: #fff7e6;
-    color: #d46b08;
-    border-color: #ffd591;
-  }
-
-  .status-approved {
-    background: #f6ffed;
-    color: #389e0d;
-    border-color: #b7eb8f;
-  }
-
-  .status-rejected {
-    background: #fff1f0;
-    color: #cf1322;
-    border-color: #ffa39e;
   }
 `;
 
-const ActionButton = styled(Button)`
-  border-radius: 8px;
-  padding: 4px 12px;
-  height: 32px;
-  transition: all 0.3s ease;
+const HeaderSection = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 4px;
+  margin-bottom: 24px;
+  gap: 16px;
+
+  h1 {
+    font-size: 24px;
+    margin: 0;
+    color: ${props => props.theme.colors.primaryBlue};
+
+    @media (max-width: 768px) {
+      font-size: 20px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+`;
+
+const InstructorCard = styled(Card)`
+  height: 100%;
+  transition: all 0.3s ease;
+  animation: ${slideUp} 0.5s ease-out;
+  animation-fill-mode: both;
+  border-radius: 12px;
+  overflow: hidden;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
   }
 
-  .anticon {
-    font-size: 14px;
-  }
-`;
-
-const StyledModal = styled(Modal)`
-  .ant-modal-content {
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .ant-modal-header {
-    background: #f8faff;
-    padding: 16px 24px;
-    border-bottom: 1px solid #f0f7ff;
-  }
-
-  .ant-modal-body {
+  .ant-card-body {
     padding: 24px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
   }
 
-  textarea.ant-input {
-    border-radius: 8px;
-    padding: 12px;
-    min-height: 120px;
-    resize: vertical;
+  .instructor-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .instructor-info {
+      flex: 1;
+
+      h3 {
+        margin: 0 0 4px;
+        font-size: 18px;
+        color: ${props => props.theme.colors.primaryBlue};
+      }
+
+      p {
+        margin: 0;
+        color: ${props => props.theme.colors.textGray};
+      }
+    }
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .stat-item {
+      text-align: center;
+      flex: 1;
+      min-width: 80px;
+
+      .value {
+        font-size: 20px;
+        font-weight: bold;
+        color: ${props => props.theme.colors.primaryBlue};
+      }
+
+      .label {
+        font-size: 12px;
+        color: ${props => props.theme.colors.textGray};
+      }
+    }
+  }
+
+  .rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #faad14;
   }
 `;
 
-interface Instructor {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  expertise: string[];
-  status: 'pending' | 'approved' | 'rejected';
-  appliedDate: string;
-  documents?: string[];
-}
+const StyledTag = styled(Tag)`
+  border-radius: 4px;
+  padding: 2px 8px;
+`;
 
 const Instructors = () => {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [loading, setLoading] = useState(true);
-  const [rejectionReason, setRejectionReason] = useState('');
-  const [rejectModalVisible, setRejectModalVisible] = useState(false);
-  const [selectedInstructor, setSelectedInstructor] = useState<Instructor | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [form] = Form.useForm();
 
   useEffect(() => {
+    const fetchInstructors = async () => {
+      const abortController = new AbortController();
+      setLoading(true);
+      
+      try {
+        const JWT_TOKEN = 'jdfisdsododksnscuisdjmdoadkoajdwdiudhaiodmokqodqdjdwudh';
+        const response = await fetch('https://1b8c-102-212-236-207.ngrok-free.app/api/instructors/logged-in-count', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JWT_TOKEN}`
+          },
+          signal: abortController.signal
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        setInstructors(data);
+      } catch (error: any) {
+        console.error('Error fetching instructors:', error);
+        message.error('Failed to load instructors. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchInstructors();
   }, []);
 
-  const fetchInstructors = async () => {
+  const handleAddInstructor = async (values: any) => {
     try {
-      const data = await instructorsService.getAllInstructors();
-      setInstructors(data);
+      const JWT_TOKEN = 'jdfisdsododksnscuisdjmdoadkoajdwdiudhaiodmokqodqdjdwudh';
+      const response = await fetch('https://1b8c-102-212-236-207.ngrok-free.app/api/instructors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${JWT_TOKEN}`
+        },
+        body: JSON.stringify(values)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add instructor');
+      }
+
+      message.success('Instructor added successfully');
+      setModalVisible(false);
+      form.resetFields();
+      // Refresh the instructors list
+      window.location.reload();
     } catch (error) {
-      message.error('Failed to fetch instructors');
-    } finally {
-      setLoading(false);
+      console.error('Error adding instructor:', error);
+      message.error('Failed to add instructor');
     }
   };
-
-  const handleApprove = (instructor: Instructor) => {
-    confirm({
-      title: 'Are you sure you want to approve this instructor?',
-      icon: <ExclamationCircleOutlined />,
-      content: 'This will send an approval email to the instructor.',
-      async onOk() {
-        try {
-          await instructorsService.approveInstructor(instructor.id);
-          message.success('Instructor approved successfully');
-          fetchInstructors();
-        } catch (error) {
-          message.error('Failed to approve instructor');
-        }
-      },
-    });
-  };
-
-  const showRejectModal = (instructor: Instructor) => {
-    setSelectedInstructor(instructor);
-    setRejectModalVisible(true);
-  };
-
-  const handleReject = async () => {
-    if (!selectedInstructor) return;
-
-    try {
-      await instructorsService.rejectInstructor(selectedInstructor.id, rejectionReason);
-      message.success('Instructor rejected');
-      setRejectModalVisible(false);
-      setRejectionReason('');
-      fetchInstructors();
-    } catch (error) {
-      message.error('Failed to reject instructor');
-    }
-  };
-
-  const columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Phone',
-      dataIndex: 'phone',
-      key: 'phone',
-    },
-    {
-      title: 'Expertise',
-      dataIndex: 'expertise',
-      key: 'expertise',
-      render: (expertise: string[]) => (
-        <Space size={[0, 8]} wrap>
-          {expertise.map((item) => (
-            <Tag key={item}>{item}</Tag>
-          ))}
-        </Space>
-      ),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) => (
-        <Tag className={`status-${status.toLowerCase()}`}>
-          {status.toUpperCase()}
-        </Tag>
-      ),
-    },
-    {
-      title: 'Applied Date',
-      dataIndex: 'appliedDate',
-      key: 'appliedDate',
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_: any, record: Instructor) => (
-        <Space>
-          {record.status === 'pending' && (
-            <>
-              <Button
-                type="primary"
-                icon={<CheckOutlined />}
-                onClick={() => handleApprove(record)}
-              >
-                Approve
-              </Button>
-              <Button
-                danger
-                icon={<CloseOutlined />}
-                onClick={() => showRejectModal(record)}
-              >
-                Reject
-              </Button>
-            </>
-          )}
-        </Space>
-      ),
-    },
-  ];
 
   return (
     <DashboardLayout>
       <PageWrapper>
-        <div className="header">
-          <h1>Instructor Applications</h1>
-        </div>
+        <HeaderSection>
+          <h1>Instructors</h1>
+          <Button 
+            type="primary" 
+            icon={<PlusOutlined />}
+            onClick={() => setModalVisible(true)}
+          >
+            Add Instructor
+          </Button>
+        </HeaderSection>
 
-        <StyledCard>
-          <StyledTable
-            columns={columns}
-            dataSource={instructors}
-            loading={loading}
-            rowKey="id"
-            pagination={{
-              pageSize: 10,
-              showSizeChanger: true,
-              showTotal: (total) => `Total ${total} applications`,
-            }}
-          />
-        </StyledCard>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <Spin size="large" />
+          </div>
+        ) : (
+          <Row gutter={[24, 24]}>
+            {instructors.map((instructor, index) => (
+              <Col xs={24} sm={12} lg={8} xl={6} key={instructor.id}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <InstructorCard
+                  actions={[
+                    <EditOutlined key="edit" />,
+                    <DeleteOutlined key="delete" />
+                  ]}
+                >
+                  <div className="instructor-header">
+                    <Avatar size={64} src={instructor.avatar} />
+                    <div className="instructor-info">
+                      <h3>{instructor.name}</h3>
+                      <p>{instructor.specialization}</p>
+                    </div>
+                  </div>
+                  <div className="rating">
+                    <StarFilled /> {instructor.rating}
+                  </div>
+                  <div className="stats-row">
+                    <div className="stat-item">
+                      <div className="value">{instructor.coursesCount}</div>
+                      <div className="label">Courses</div>
+                    </div>
+                    <div className="stat-item">
+                      <div className="value">{instructor.studentsCount}</div>
+                      <div className="label">Students</div>
+                    </div>
+                  </div>
+                  <StyledTag color={instructor.status === 'Active' ? 'success' : 'warning'}>
+                    {instructor.status}
+                  </StyledTag>
+                  <p style={{ marginTop: 16, fontSize: 14 }}>{instructor.bio}</p>
+                </InstructorCard>
+              </Col>
+            ))}
+          </Row>
+        )}
 
-        <StyledModal
-          title="Reject Instructor"
-          open={rejectModalVisible}
-          onOk={handleReject}
-          onCancel={() => {
-            setRejectModalVisible(false);
-            setRejectionReason('');
-          }}
-          okButtonProps={{ 
-            danger: true,
-            icon: <CloseOutlined /> 
-          }}
+        <Modal
+          title="Add New Instructor"
+          open={modalVisible}
+          onCancel={() => setModalVisible(false)}
+          footer={null}
         >
-          <p>Please provide a reason for rejection:</p>
-          <TextArea
-            rows={4}
-            value={rejectionReason}
-            onChange={(e) => setRejectionReason(e.target.value)}
-            placeholder="Enter rejection reason"
-          />
-        </StyledModal>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleAddInstructor}
+          >
+            <Form.Item
+              name="name"
+              label="Full Name"
+              rules={[{ required: true, message: 'Please enter instructor name' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="specialization"
+              label="Specialization"
+              rules={[{ required: true, message: 'Please enter specialization' }]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="bio"
+              label="Bio"
+              rules={[{ required: true, message: 'Please enter bio' }]}
+            >
+              <Input.TextArea rows={4} />
+            </Form.Item>
+
+            <Form.Item
+              name="avatar"
+              label="Profile Picture"
+            >
+              <Upload
+                listType="picture-card"
+                maxCount={1}
+                beforeUpload={() => false}
+              >
+                <div>
+                  <UploadOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              </Upload>
+            </Form.Item>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" block>
+                Add Instructor
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
       </PageWrapper>
     </DashboardLayout>
   );
 };
 
-export default Instructors; 
+export default Instructors;

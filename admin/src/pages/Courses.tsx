@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Row, Col, Button, Tag, Progress, Modal, Form, Input, InputNumber, Select, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, BookOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, BookOutlined, EyeOutlined } from '@ant-design/icons';
 import { DashboardLayout } from '../components/DashboardLayout';
 import styled, { keyframes } from 'styled-components';
 import { fadeIn } from '../utils/animations';
@@ -53,6 +53,58 @@ const sampleCourses = [
     status: 'Draft',
     progress: 45,
     description: 'Start your journey with Python programming...'
+  }
+];
+
+// Sample MIT OpenCourseWare data
+const freeCourses = [
+  {
+    id: 1,
+    name: 'Introduction to Computer Science and Programming in Python',
+    courseCode: '6.0001',
+    instructor: 'Dr. Ana Bell, Prof. Eric Grimson, Prof. John Guttag',
+    description: 'Introduction to computer science and programming for students with little or no programming experience.',
+    price: 0, // Free course
+    thumbnail: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/3d0ba8a1c8684cd42c8917c06c35b47c_6-0001f16.jpg',
+    status: 'Active',
+    students: 10234,
+    resources: {
+      lectures: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/video_galleries/lecture-videos/',
+      assignments: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/pages/assignments/',
+      readings: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/pages/readings/'
+    }
+  },
+  {
+    id: 2,
+    name: 'Linear Algebra',
+    courseCode: '18.06',
+    instructor: 'Prof. Gilbert Strang',
+    description: 'A basic subject on matrix theory and linear algebra, emphasizing topics useful in other disciplines.',
+    price: 0,
+    thumbnail: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/dbe45e837b8494d1fe684594aa9991d7_18-06s10.jpg',
+    status: 'Active',
+    students: 8756,
+    resources: {
+      lectures: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/video_galleries/video-lectures/',
+      assignments: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/assignments/',
+      readings: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/readings/'
+    }
+  },
+  {
+    id: 3,
+    name: 'Introduction to Algorithms',
+    courseCode: '6.006',
+    instructor: 'Prof. Erik Demaine, Prof. Srini Devadas',
+    description: 'Introduction to mathematical modeling of computational problems and the design and analysis of algorithms.',
+    price: 0,
+    thumbnail: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/7837f6161c8e71de7baf91a2fb80194b_6-006s20.jpg',
+    status: 'Active',
+    students: 7453,
+    resources: {
+      lectures: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/video_galleries/lecture-videos/',
+      assignments: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/assignments/',
+      readings: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/calendar/'
+    }
   }
 ];
 
@@ -177,9 +229,15 @@ const StyledTag = styled(Tag)`
   margin: 4px;
 `;
 
+// Add this function to expose the courses data
+export const getFreeCourses = () => {
+  return freeCourses;
+};
+
 const Courses = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const [showFreeCourses, setShowFreeCourses] = useState(false);
 
   const handleAddCourse = (values: any) => {
     console.log('New course:', values);
@@ -193,17 +251,25 @@ const Courses = () => {
       <PageWrapper>
         <HeaderSection>
           <h1>Courses</h1>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />}
-            onClick={() => setModalVisible(true)}
-          >
-            Add Course
-          </Button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Button 
+              onClick={() => setShowFreeCourses(!showFreeCourses)}
+              type={showFreeCourses ? "primary" : "default"}
+            >
+              {showFreeCourses ? 'Show Regular Courses' : 'Show Free Courses'}
+            </Button>
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />}
+              onClick={() => setModalVisible(true)}
+            >
+              Add Course
+            </Button>
+          </div>
         </HeaderSection>
 
         <Row gutter={[24, 24]}>
-          {sampleCourses.map((course, index) => (
+          {(showFreeCourses ? freeCourses : sampleCourses).map((course, index) => (
             <Col xs={24} sm={12} md={8} lg={6} key={course.id}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
@@ -211,8 +277,8 @@ const Courses = () => {
                 hoverable
                 cover={
                   <img 
-                    alt={course.title} 
-                    src={course.coverImage}
+                    alt={course.name} 
+                    src={course.thumbnail}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = '/assets/illustrations/course-placeholder.svg';
@@ -220,24 +286,29 @@ const Courses = () => {
                   />
                 }
                 actions={[
-                  <EditOutlined key="edit" />,
-                  <DeleteOutlined key="delete" />
+                  <a href={course.resources?.lectures} target="_blank" rel="noopener noreferrer" key="view">
+                    <EyeOutlined />
+                  </a>,
+                  ...(!showFreeCourses ? [
+                    <EditOutlined key="edit" />,
+                    <DeleteOutlined key="delete" />
+                  ] : [])
                 ]}
               >
-                <h3 className="course-title">{course.title}</h3>
+                <h3 className="course-title">{course.name}</h3>
                 <div className="course-stats">
                   <span className="stat-item">
-                    <UserOutlined /> {course.enrolled}
+                    <UserOutlined /> {course.students}
                   </span>
                   <span className="stat-item">
                     <BookOutlined /> {course.status}
                   </span>
                 </div>
-                <p>${course.price}</p>
+                <p>{course.price === 0 ? 'Free' : `$${course.price}`}</p>
                 <StyledTag color={course.status === 'Active' ? 'success' : 'warning'}>
                   {course.status}
                 </StyledTag>
-                <Progress percent={course.progress} status="active" />
+                <Progress percent={75} status="active" />
               </CourseCard>
             </Col>
           ))}
