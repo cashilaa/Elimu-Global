@@ -10,6 +10,7 @@ import Revenue from './pages/Revenue';
 import Settings from './pages/Settings';
 import Instructors from './pages/Instructors';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import Payments from './pages/Payments';
 
 const App = () => {
   return (
@@ -49,6 +50,11 @@ const App = () => {
           <Route path="/settings" element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          } />
+          <Route path="/payments" element={
+            <ProtectedRoute>
+              <Payments />
             </ProtectedRoute>
           } />
         </Routes>

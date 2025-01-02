@@ -8,7 +8,8 @@ import {
   SettingOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  TeamOutlined
+  TeamOutlined,
+  WalletOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -168,6 +169,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       key: '/revenue',
       icon: <DollarOutlined />,
       label: 'Revenue',
+    },
+    {
+      key: '/payments',
+      icon: <WalletOutlined />,
+      label: 'Payments',
     },
     {
       key: '/settings',

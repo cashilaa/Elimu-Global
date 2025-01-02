@@ -1,10 +1,19 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Public } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto/course.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('courses')
+@UseGuards(JwtAuthGuard)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
+
+  // Public endpoint for free courses - no auth required
+  @Public()
+  @Get('free')
+  async getFreeCourses() {
+    return this.coursesService.getFreeCourses();
+  }
 
   @Get()
   findAll(@Query() query: any) {

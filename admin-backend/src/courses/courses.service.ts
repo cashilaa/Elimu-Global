@@ -60,4 +60,11 @@ export class CoursesService {
       totalStudents: totalStudents[0]?.total || 0
     };
   }
+
+  async getFreeCourses() {
+    return this.courseModel.find({ 
+      price: 0,
+      status: 'Active'
+    }).select('-__v').exec();
+  }
 } 

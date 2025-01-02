@@ -129,7 +129,13 @@ class CoursesService {
 
   async getFreeCourses() {
     try {
-      const response = await fetch('https://elimu-instructor-bc.onrender.com/api/courses/free');
+      const response = await fetch('https://elimu-instructor-bc.onrender.com/api/courses/free', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
       if (!response.ok) {
         throw new Error('Failed to fetch free courses');
       }
