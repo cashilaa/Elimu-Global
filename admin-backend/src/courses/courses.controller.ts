@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Public } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto, UpdateCourseDto } from './dto/course.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Public } from '../decorators/public.decorator';
 
 @Controller('courses')
 @UseGuards(JwtAuthGuard)
