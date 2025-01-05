@@ -5,6 +5,7 @@ import { studentsService } from '../services/students.service';
 import { ExclamationCircleOutlined, EditOutlined, DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
 import { EditStudentForm } from '../components/EditStudentForm';
 import styled, { keyframes } from 'styled-components';
+import { Breakpoint } from 'antd/lib/_util/responsiveObserve';
 
 const fadeIn = keyframes`
   from {
@@ -311,19 +312,19 @@ const Students = () => {
         title: 'Email',
         dataIndex: 'email',
         key: 'email',
-        responsive: ['md'],
+        responsive: ['md' as Breakpoint],
       },
       {
         title: 'Date of Birth',
         dataIndex: 'dateOfBirth',
         key: 'dateOfBirth',
-        responsive: ['lg'],
+        responsive: ['lg' as Breakpoint],
       },
       {
         title: 'Enrolled Courses',
         dataIndex: 'enrolledCourses',
         key: 'enrolledCourses',
-        responsive: ['md'],
+        responsive: ['md' as Breakpoint],
       },
       {
         title: 'Status',

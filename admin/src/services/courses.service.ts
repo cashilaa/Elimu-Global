@@ -44,6 +44,8 @@ interface CourseData {
   status: string;
 }
 
+const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
+
 class CoursesService {
   async getAllCourses() {
     try {
@@ -129,10 +131,11 @@ class CoursesService {
 
   async getFreeCourses() {
     try {
-      const response = await fetch('https://elimu-instructor-bc.onrender.com/api/courses/free', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/courses/free`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${JWT_TOKEN}`
         }
       });
 

@@ -1,30 +1,40 @@
 import axios from 'axios';
 
-const ADMIN_CREDENTIALS = {
-  email: 'admin@elimu.com',
-  password: 'admin123'
-};
+const authApi = axios.create({
+  baseURL: import.meta.env.VITE_AUTH_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export const authService = {
-  login: async (credentials: { email: string; password: string }) => {
-    // For testing, you can use these hardcoded credentials
-    if (credentials.email === 'admin@elimu.com' && credentials.password === 'admin123') {
-      const token = 'dummy-token';
+  login: async (values: { email: string; password: string }) => {
+    try {
+      const response = await authApi.post('/login/admin', values);
+      const { token, user } = response.data;
+      
+      // Store the token and user data
       localStorage.setItem('token', token);
-      return { token };
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return response.data;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
-    throw new Error('Invalid credentials');
-  },
-
-  getCurrentUser: () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      return { role: 'admin' }; // For testing purposes
-    }
-    return null;
   },
 
   logout: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  },
+
+  getCurrentUser: () => {
+    const userStr = localStorage.getItem('user');
+    return userStr ? JSON.parse(userStr) : null;
+  },
+
+  isAuthenticated: () => {
+    return !!localStorage.getItem('token');
   }
 };

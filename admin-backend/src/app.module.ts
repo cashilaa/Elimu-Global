@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 import { CoursesModule } from './courses/courses.module';
 import { StudentsModule } from './students/students.module';
 import { RevenueModule } from './revenue/revenue.module';
@@ -12,6 +13,7 @@ import { SettingsModule } from './settings/settings.module';
       isGlobal: true,
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI),
+    AuthModule,
     CoursesModule,
     StudentsModule,
     RevenueModule,

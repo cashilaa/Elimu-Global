@@ -4,22 +4,14 @@ import { authService } from '../services/auth.service';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRoles?: string[];
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requiredRoles 
-}) => {
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const location = useLocation();
-  const currentUser = authService.getCurrentUser();
+  const isAuthenticated = authService.isAuthenticated();
 
-  if (!currentUser) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  if (requiredRoles && !requiredRoles.includes(currentUser.role)) {
-    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

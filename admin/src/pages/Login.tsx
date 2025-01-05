@@ -4,7 +4,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { fadeIn } from '../utils/animations';
-import { authService } from '../services/auth.service';
+import axios from 'axios';
 
 const LoginWrapper = styled.div`
   min-height: 100vh;
@@ -44,12 +44,25 @@ const LoginWrapper = styled.div`
 const Login = () => {
   const navigate = useNavigate();
 
-  const handleLogin = async (values: any) => {
+  const handleLogin = async (values: { email: string; password: string }) => {
     try {
-      await authService.login(values);
+      const response = await axios.post(
+        'https://centralize-auth-elimu.onrender.com/auth/login/admin',
+        values,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const { token } = response.data;
+      localStorage.setItem('token', token);
+      
       message.success('Login successful!');
       navigate('/dashboard');
     } catch (error) {
+      console.error('Login error:', error);
       message.error('Invalid credentials');
     }
   };
