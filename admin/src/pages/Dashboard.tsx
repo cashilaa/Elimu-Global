@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Statistic } from 'antd';
-import { DashboardLayout } from '../components/DashboardLayout';
 import { coursesService } from '../services/courses.service';
 import { revenueService } from '../services/revenue.service';
 import { StatsCarousel } from '../components/StatsCarousel';
@@ -159,40 +158,38 @@ const Dashboard = () => {
   };
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
-        <DashboardHeader 
-          onDateRangeChange={setDateRange}
-          onViewChange={setViewType}
-          onRefresh={handleRefresh}
-        />
-        
-        <StatsSection gutter={[24, 24]}>
-          <Col xs={24} sm={12} md={6}>
-            <StatsCard {...statsData[0]} />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <StatsCard {...statsData[1]} />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <StatsCard {...statsData[2]} />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <StatsCard {...statsData[3]} />
-          </Col>
-        </StatsSection>
+    <PageWrapper>
+      <DashboardHeader 
+        onDateRangeChange={setDateRange}
+        onViewChange={setViewType}
+        onRefresh={handleRefresh}
+      />
+      
+      <StatsSection gutter={[24, 24]}>
+        <Col xs={24} sm={12} md={6}>
+          <StatsCard {...statsData[0]} />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <StatsCard {...statsData[1]} />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <StatsCard {...statsData[2]} />
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <StatsCard {...statsData[3]} />
+        </Col>
+      </StatsSection>
 
-        <DashboardGrid gutter={[24, 24]}>
-          <Col xs={24} lg={16}>
-            <InteractiveChart data={chartData} />
-          </Col>
-          <Col xs={24} lg={8}>
-            <QuickActions />
-          </Col>
-        </DashboardGrid>
-      </PageWrapper>
-    </DashboardLayout>
+      <DashboardGrid gutter={[24, 24]}>
+        <Col xs={24} lg={16}>
+          <InteractiveChart data={chartData} />
+        </Col>
+        <Col xs={24} lg={8}>
+          <QuickActions />
+        </Col>
+      </DashboardGrid>
+    </PageWrapper>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

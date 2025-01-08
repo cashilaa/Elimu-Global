@@ -141,7 +141,7 @@ const StyledTag = styled(Tag)`
   padding: 2px 8px;
 `;
 
-const Instructors = () => {
+const Instructors: React.FC = () => {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -208,126 +208,130 @@ const Instructors = () => {
   };
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
-        <HeaderSection>
-          <h1>Instructors</h1>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />}
-            onClick={() => setModalVisible(true)}
-          >
-            Add Instructor
-          </Button>
-        </HeaderSection>
-
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '50px' }}>
-            <Spin size="large" />
-          </div>
-        ) : (
-          <Row gutter={[24, 24]}>
-            {instructors.map((instructor, index) => (
-              <Col xs={24} sm={12} lg={8} xl={6} key={instructor.id}
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <InstructorCard
-                  actions={[
-                    <EditOutlined key="edit" />,
-                    <DeleteOutlined key="delete" />
-                  ]}
-                >
-                  <div className="instructor-header">
-                    <Avatar size={64} src={instructor.avatar} />
-                    <div className="instructor-info">
-                      <h3>{instructor.name}</h3>
-                      <p>{instructor.specialization}</p>
-                    </div>
-                  </div>
-                  <div className="rating">
-                    <StarFilled /> {instructor.rating}
-                  </div>
-                  <div className="stats-row">
-                    <div className="stat-item">
-                      <div className="value">{instructor.coursesCount}</div>
-                      <div className="label">Courses</div>
-                    </div>
-                    <div className="stat-item">
-                      <div className="value">{instructor.studentsCount}</div>
-                      <div className="label">Students</div>
-                    </div>
-                  </div>
-                  <StyledTag color={instructor.status === 'Active' ? 'success' : 'warning'}>
-                    {instructor.status}
-                  </StyledTag>
-                  <p style={{ marginTop: 16, fontSize: 14 }}>{instructor.bio}</p>
-                </InstructorCard>
-              </Col>
-            ))}
-          </Row>
-        )}
-
-        <Modal
-          title="Add New Instructor"
-          open={modalVisible}
-          onCancel={() => setModalVisible(false)}
-          footer={null}
+    <PageWrapper>
+      <HeaderSection>
+        <h1>Instructors</h1>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />}
+          onClick={() => setModalVisible(true)}
         >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleAddInstructor}
-          >
-            <Form.Item
-              name="name"
-              label="Full Name"
-              rules={[{ required: true, message: 'Please enter instructor name' }]}
-            >
-              <Input />
-            </Form.Item>
+          Add Instructor
+        </Button>
+      </HeaderSection>
 
-            <Form.Item
-              name="specialization"
-              label="Specialization"
-              rules={[{ required: true, message: 'Please enter specialization' }]}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <Spin size="large" />
+        </div>
+      ) : (
+        <Row gutter={[24, 24]}>
+          {instructors.map((instructor, index) => (
+            <Col xs={24} sm={12} lg={8} xl={6} key={instructor.id}
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="bio"
-              label="Bio"
-              rules={[{ required: true, message: 'Please enter bio' }]}
-            >
-              <Input.TextArea rows={4} />
-            </Form.Item>
-
-            <Form.Item
-              name="avatar"
-              label="Profile Picture"
-            >
-              <Upload
-                listType="picture-card"
-                maxCount={1}
-                beforeUpload={() => false}
+              <InstructorCard
+                actions={[
+                  <EditOutlined key="edit" />,
+                  <DeleteOutlined key="delete" />
+                ]}
               >
-                <div>
-                  <UploadOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
+                <div className="instructor-header">
+                  <Avatar size={64} src={instructor.avatar} />
+                  <div className="instructor-info">
+                    <h3>{instructor.name}</h3>
+                    <p>{instructor.specialization}</p>
+                  </div>
                 </div>
-              </Upload>
-            </Form.Item>
+                <div className="rating">
+                  <StarFilled /> {instructor.rating}
+                </div>
+                <div className="stats-row">
+                  <div className="stat-item">
+                    <div className="value">{instructor.coursesCount}</div>
+                    <div className="label">Courses</div>
+                  </div>
+                  <div className="stat-item">
+                    <div className="value">{instructor.studentsCount}</div>
+                    <div className="label">Students</div>
+                  </div>
+                </div>
+                <StyledTag color={instructor.status === 'Active' ? 'success' : 'warning'}>
+                  {instructor.status}
+                </StyledTag>
+                <p style={{ marginTop: 16, fontSize: 14 }}>{instructor.bio}</p>
+              </InstructorCard>
+            </Col>
+          ))}
+        </Row>
+      )}
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block>
-                Add Instructor
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      </PageWrapper>
-    </DashboardLayout>
+      <Modal
+        title="Add New Instructor"
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleAddInstructor}
+        >
+          <Form.Item
+            name="name"
+            label="Full Name"
+            rules={[{ required: true, message: 'Please enter instructor name' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="specialization"
+            label="Specialization"
+            rules={[{ required: true, message: 'Please enter specialization' }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="bio"
+            label="Bio"
+            rules={[{ required: true, message: 'Please enter bio' }]}
+          >
+            <Input.TextArea rows={4} />
+          </Form.Item>
+
+          <Form.Item
+            name="avatar"
+            label="Profile Picture"
+          >
+            <Upload
+              listType="picture-card"
+              maxCount={1}
+              beforeUpload={() => false}
+            >
+              <div>
+                <UploadOutlined />
+                <div style={{ marginTop: 8 }}>Upload</div>
+              </div>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Add Instructor
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </PageWrapper>
   );
 };
 
-export default Instructors;
+const WrappedInstructors: React.FC = () => (
+  <DashboardLayout>
+    <Instructors />
+  </DashboardLayout>
+);
+
+export default WrappedInstructors;

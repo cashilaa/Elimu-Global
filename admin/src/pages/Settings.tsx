@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Card, Form, Input, Button, Switch, Divider, Select, Tabs, Upload, Row, Col, Alert, TimePicker, InputNumber, message } from 'antd';
-import { DashboardLayout } from '../components/DashboardLayout';
 import styled from 'styled-components';
 import { fadeIn } from '../utils/animations';
 import { 
@@ -306,19 +305,17 @@ const Settings = () => {
   ];
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
-        <div className="header">
-          <h1>Settings</h1>
-          <Button type="primary" onClick={() => form.submit()}>
-            Save Changes
-          </Button>
-        </div>
+    <PageWrapper>
+      <div className="header">
+        <h1>Settings</h1>
+        <Button type="primary" onClick={() => form.submit()}>
+          Save Changes
+        </Button>
+      </div>
 
-        <StyledTabs items={items} />
-      </PageWrapper>
-    </DashboardLayout>
+      <StyledTabs items={items} />
+    </PageWrapper>
   );
 };
 
-export default Settings; 
+export default Settings;

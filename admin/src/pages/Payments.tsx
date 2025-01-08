@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Table, Button, Modal, Form, Input, Select, InputNumber, Tag, message, Tooltip } from 'antd';
-import { DashboardLayout } from '../components/DashboardLayout';
-import { PlusOutlined, DollarOutlined, FileTextOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react';
+import { Table, Button, Space, Tag, DatePicker, Input, Card, Select, Form, Modal, Tooltip, InputNumber, message } from 'antd';
 import styled from 'styled-components';
+import { SearchOutlined, DownloadOutlined, PlusOutlined, FileTextOutlined, DollarOutlined } from '@ant-design/icons';
 import { fadeIn } from '../utils/animations';
+import { paymentsService } from '../services/payments.service';
+import { DashboardLayout } from '../components/DashboardLayout';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -81,7 +82,7 @@ const StatCard = styled.div`
   }
 `;
 
-const Payments = () => {
+const Payments: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [form] = Form.useForm();
 
@@ -211,103 +212,107 @@ const Payments = () => {
   };
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
-        <HeaderSection>
-          <h1>Payments & Contracts</h1>
-          <Button 
-            type="primary" 
-            icon={<PlusOutlined />}
-            onClick={() => setModalVisible(true)}
-          >
-            New Contract
-          </Button>
-        </HeaderSection>
-
-        <StatsRow>
-          <StatCard>
-            <div className="stat-title">Active Contracts</div>
-            <div className="stat-value">12</div>
-          </StatCard>
-          <StatCard>
-            <div className="stat-title">Total Paid (This Month)</div>
-            <div className="stat-value">$24,500</div>
-          </StatCard>
-          <StatCard>
-            <div className="stat-title">Pending Payments</div>
-            <div className="stat-value">$3,200</div>
-          </StatCard>
-        </StatsRow>
-
-        <Table 
-          dataSource={sampleContracts}
-          columns={columns}
-          rowKey="id"
-        />
-
-        <Modal
-          title="Create New Contract"
-          open={modalVisible}
-          onCancel={() => setModalVisible(false)}
-          footer={null}
+    <PageWrapper>
+      <HeaderSection>
+        <h1>Payments & Contracts</h1>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />}
+          onClick={() => setModalVisible(true)}
         >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleCreateContract}
+          New Contract
+        </Button>
+      </HeaderSection>
+
+      <StatsRow>
+        <StatCard>
+          <div className="stat-title">Active Contracts</div>
+          <div className="stat-value">12</div>
+        </StatCard>
+        <StatCard>
+          <div className="stat-title">Total Paid (This Month)</div>
+          <div className="stat-value">$24,500</div>
+        </StatCard>
+        <StatCard>
+          <div className="stat-title">Pending Payments</div>
+          <div className="stat-value">$3,200</div>
+        </StatCard>
+      </StatsRow>
+
+      <Table 
+        dataSource={sampleContracts}
+        columns={columns}
+        rowKey="id"
+      />
+
+      <Modal
+        title="Create New Contract"
+        open={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}
+      >
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleCreateContract}
+        >
+          <Form.Item
+            name="instructorId"
+            label="Select Instructor"
+            rules={[{ required: true }]}
           >
-            <Form.Item
-              name="instructorId"
-              label="Select Instructor"
-              rules={[{ required: true }]}
-            >
-              <Select>
-                <Option value="INS001">Dr. Sarah Wilson</Option>
-                <Option value="INS002">Prof. Michael Chen</Option>
-              </Select>
-            </Form.Item>
+            <Select>
+              <Option value="INS001">Dr. Sarah Wilson</Option>
+              <Option value="INS002">Prof. Michael Chen</Option>
+            </Select>
+          </Form.Item>
 
-            <Form.Item
-              name="contractType"
-              label="Contract Type"
-              rules={[{ required: true }]}
-            >
-              <Select>
-                <Option value="Revenue Share">Revenue Share</Option>
-                <Option value="Fixed Rate">Fixed Rate</Option>
-              </Select>
-            </Form.Item>
+          <Form.Item
+            name="contractType"
+            label="Contract Type"
+            rules={[{ required: true }]}
+          >
+            <Select>
+              <Option value="Revenue Share">Revenue Share</Option>
+              <Option value="Fixed Rate">Fixed Rate</Option>
+            </Select>
+          </Form.Item>
 
-            <Form.Item
-              name="amount"
-              label="Amount"
-              rules={[{ required: true }]}
-            >
-              <InputNumber
-                style={{ width: '100%' }}
-                formatter={value => `${value}${form.getFieldValue('contractType') === 'Revenue Share' ? '%' : '$'}`}
-                parser={value => value!.replace(/[%$]/g, '')}
-              />
-            </Form.Item>
+          <Form.Item
+            name="amount"
+            label="Amount"
+            rules={[{ required: true }]}
+          >
+            <InputNumber
+              style={{ width: '100%' }}
+              formatter={value => `${value}${form.getFieldValue('contractType') === 'Revenue Share' ? '%' : '$'}`}
+              parser={value => value!.replace(/[%$]/g, '')}
+            />
+          </Form.Item>
 
-            <Form.Item
-              name="terms"
-              label="Contract Terms"
-              rules={[{ required: true }]}
-            >
-              <TextArea rows={4} />
-            </Form.Item>
+          <Form.Item
+            name="terms"
+            label="Contract Terms"
+            rules={[{ required: true }]}
+          >
+            <TextArea rows={4} />
+          </Form.Item>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block>
-                Create Contract
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      </PageWrapper>
-    </DashboardLayout>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Create Contract
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </PageWrapper>
   );
 };
 
-export default Payments; 
+const WrappedPayments: React.FC = () => (
+  <DashboardLayout>
+    <Payments />
+  </DashboardLayout>
+);
+
+export default WrappedPayments;

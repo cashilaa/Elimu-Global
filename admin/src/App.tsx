@@ -9,8 +9,9 @@ import Students from './pages/Students';
 import Revenue from './pages/Revenue';
 import Settings from './pages/Settings';
 import Instructors from './pages/Instructors';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import Payments from './pages/Payments';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import DashboardLayout from './components/DashboardLayout';
 
 const App = () => {
   return (
@@ -21,46 +22,26 @@ const App = () => {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           
-          {/* Protected routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/courses" element={
-            <ProtectedRoute>
-              <Courses />
-            </ProtectedRoute>
-          } />
-          <Route path="/instructors" element={
-            <ProtectedRoute>
-              <Instructors />
-            </ProtectedRoute>
-          } />
-          <Route path="/students" element={
-            <ProtectedRoute>
-              <Students />
-            </ProtectedRoute>
-          } />
-          <Route path="/revenue" element={
-            <ProtectedRoute>
-              <Revenue />
-            </ProtectedRoute>
-          } />
-          <Route path="/settings" element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          } />
-          <Route path="/payments" element={
-            <ProtectedRoute>
-              <Payments />
-            </ProtectedRoute>
-          } />
+          {/* Protected dashboard routes */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/instructors" element={<Instructors />} />
+            <Route path="/students" element={<Students />} />
+            <Route path="/revenue" element={<Revenue />} />
+            <Route path="/payments" element={<Payments />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
         </Routes>
       </Router>
     </ThemeProvider>
   );
 };
 
-export default App; 
+export default App;

@@ -1,388 +1,265 @@
-import React, { useState } from 'react';
-import { Card, Row, Col, Button, Tag, Progress, Modal, Form, Input, InputNumber, Select, message } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, BookOutlined, EyeOutlined } from '@ant-design/icons';
-import { DashboardLayout } from '../components/DashboardLayout';
-import styled, { keyframes } from 'styled-components';
-import { fadeIn } from '../utils/animations';
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  TextField,
+  Typography,
+  CircularProgress,
+  Alert,
+  Snackbar
+} from '@mui/material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
+import { coursesService, Course } from '../services/courses.service';
 
-const { TextArea } = Input;
-const { Option } = Select;
+const Courses: React.FC = () => {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-// Sample course data
-const sampleCourses = [
-  {
-    id: 1,
-    title: 'Introduction to React',
-    instructor: 'John Doe',
-    coverImage: 'https://res.cloudinary.com/dj7nomqfd/image/upload/v1647958227/react_js_lgq1ww.png',
-    price: 49.99,
-    enrolled: 234,
-    progress: 78,
-    status: 'Active',
-    description: 'Learn the fundamentals of React development...'
-  },
-  {
-    id: 2,
-    title: 'Advanced JavaScript',
-    instructor: 'Jane Smith',
-    coverImage: 'https://res.cloudinary.com/dj7nomqfd/image/upload/v1647958227/javascript_fes7aa.png',
-    price: 59.99,
-    enrolled: 189,
-    progress: 65,
-    status: 'Active',
-    description: 'Master advanced JavaScript concepts...'
-  },
-  {
-    id: 3,
-    title: 'UI/UX Design Basics',
-    instructor: 'Mike Johnson',
-    coverImage: 'https://res.cloudinary.com/dj7nomqfd/image/upload/v1647958227/ux_design_d2duj1.png',
-    price: 39.99,
-    enrolled: 156,
-    progress: 92,
-    status: 'Active',
-    description: 'Learn the fundamentals of UI/UX design...'
-  },
-  {
-    id: 4,
-    title: 'Python for Beginners',
-    instructor: 'Sarah Wilson',
-    coverImage: 'https://res.cloudinary.com/dj7nomqfd/image/upload/v1647958227/python_zfqx2v.png',
-    price: 44.99,
-    enrolled: 312,
-    status: 'Draft',
-    progress: 45,
-    description: 'Start your journey with Python programming...'
-  }
-];
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
-// Sample MIT OpenCourseWare data
-const freeCourses = [
-  {
-    id: 1,
-    name: 'Introduction to Computer Science and Programming in Python',
-    courseCode: '6.0001',
-    instructor: 'Dr. Ana Bell, Prof. Eric Grimson, Prof. John Guttag',
-    description: 'Introduction to computer science and programming for students with little or no programming experience.',
-    price: 0, // Free course
-    thumbnail: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/3d0ba8a1c8684cd42c8917c06c35b47c_6-0001f16.jpg',
-    status: 'Active',
-    students: 10234,
-    resources: {
-      lectures: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/video_galleries/lecture-videos/',
-      assignments: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/pages/assignments/',
-      readings: 'https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/pages/readings/'
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const data = await coursesService.getAllCourses();
+      setCourses(data);
+    } catch (err) {
+      setError('Failed to fetch courses');
+    } finally {
+      setLoading(false);
     }
-  },
-  {
-    id: 2,
-    name: 'Linear Algebra',
-    courseCode: '18.06',
-    instructor: 'Prof. Gilbert Strang',
-    description: 'A basic subject on matrix theory and linear algebra, emphasizing topics useful in other disciplines.',
-    price: 0,
-    thumbnail: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/dbe45e837b8494d1fe684594aa9991d7_18-06s10.jpg',
-    status: 'Active',
-    students: 8756,
-    resources: {
-      lectures: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/video_galleries/video-lectures/',
-      assignments: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/assignments/',
-      readings: 'https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/pages/readings/'
+  };
+
+  const handleOpenDialog = (course?: Course) => {
+    if (course) {
+      setSelectedCourse(course);
+      setFormData({
+        title: course.title,
+        description: course.description,
+      });
+    } else {
+      setSelectedCourse(null);
+      setFormData({
+        title: '',
+        description: '',
+      });
     }
-  },
-  {
-    id: 3,
-    name: 'Introduction to Algorithms',
-    courseCode: '6.006',
-    instructor: 'Prof. Erik Demaine, Prof. Srini Devadas',
-    description: 'Introduction to mathematical modeling of computational problems and the design and analysis of algorithms.',
-    price: 0,
-    thumbnail: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/7837f6161c8e71de7baf91a2fb80194b_6-006s20.jpg',
-    status: 'Active',
-    students: 7453,
-    resources: {
-      lectures: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/video_galleries/lecture-videos/',
-      assignments: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/assignments/',
-      readings: 'https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/pages/calendar/'
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedCourse(null);
+    setSelectedFile(null);
+    setFormData({ title: '', description: '' });
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      if (file.type === 'application/pdf') {
+        setSelectedFile(file);
+        setError(null);
+      } else {
+        setError('Please select a PDF file');
+        setSelectedFile(null);
+      }
     }
-  }
-];
+  };
 
-const slideUp = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
-const PageWrapper = styled.div`
-  padding: 24px;
-  animation: ${fadeIn} 0.5s ease-out;
+    try {
+      const formDataObj = new FormData();
+      formDataObj.append('title', formData.title);
+      formDataObj.append('description', formData.description);
+      if (selectedFile) {
+        formDataObj.append('pdf', selectedFile);
+      }
 
-  @media (max-width: 768px) {
-    padding: 16px;
-  }
-`;
+      if (selectedCourse) {
+        await coursesService.updateCourse(selectedCourse.id, formDataObj);
+        setSuccess('Course updated successfully');
+      } else {
+        await coursesService.createCourse(formDataObj);
+        setSuccess('Course created successfully');
+      }
 
-const HeaderSection = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  gap: 16px;
-
-  h1 {
-    font-size: 24px;
-    margin: 0;
-    color: ${props => props.theme.colors.primaryBlue};
-
-    @media (max-width: 768px) {
-      font-size: 20px;
+      handleCloseDialog();
+      fetchCourses();
+    } catch (err) {
+      setError(selectedCourse ? 'Failed to update course' : 'Failed to create course');
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
-  @media (max-width: 576px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
-const CourseCard = styled(Card)`
-  height: 100%;
-  transition: all 0.3s ease;
-  animation: ${slideUp} 0.5s ease-out;
-  animation-fill-mode: both;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  }
-
-  .ant-card-cover {
-    height: 200px;
-    overflow: hidden;
-    background: #f5f5f5;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this course?')) {
+      setLoading(true);
+      try {
+        await coursesService.deleteCourse(id);
+        setSuccess('Course deleted successfully');
+        fetchCourses();
+      } catch (err) {
+        setError('Failed to delete course');
+      } finally {
+        setLoading(false);
+      }
     }
-
-    &:hover img {
-      transform: scale(1.05);
-    }
-
-    @media (max-width: 768px) {
-      height: 180px;
-    }
-
-    @media (max-width: 576px) {
-      height: 160px;
-    }
-  }
-
-  .ant-card-body {
-    padding: 20px;
-
-    @media (max-width: 768px) {
-      padding: 16px;
-    }
-  }
-
-  .course-title {
-    font-size: 18px;
-    margin-bottom: 8px;
-    color: ${props => props.theme.colors.primaryBlue};
-
-    @media (max-width: 768px) {
-      font-size: 16px;
-    }
-  }
-
-  .course-stats {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 12px;
-    color: ${props => props.theme.colors.textGray};
-
-    .stat-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-  }
-`;
-
-const StyledTag = styled(Tag)`
-  border-radius: 4px;
-  padding: 2px 8px;
-  margin: 4px;
-`;
-
-// Add this function to expose the courses data
-export const getFreeCourses = () => {
-  return freeCourses;
-};
-
-const Courses = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [form] = Form.useForm();
-  const [showFreeCourses, setShowFreeCourses] = useState(false);
-
-  const handleAddCourse = (values: any) => {
-    console.log('New course:', values);
-    message.success('Course added successfully');
-    setModalVisible(false);
-    form.resetFields();
   };
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
-        <HeaderSection>
-          <h1>Courses</h1>
-          <div style={{ display: 'flex', gap: '12px' }}>
-            <Button 
-              onClick={() => setShowFreeCourses(!showFreeCourses)}
-              type={showFreeCourses ? "primary" : "default"}
-            >
-              {showFreeCourses ? 'Show Regular Courses' : 'Show Free Courses'}
-            </Button>
-            <Button 
-              type="primary" 
-              icon={<PlusOutlined />}
-              onClick={() => setModalVisible(true)}
-            >
-              Add Course
-            </Button>
-          </div>
-        </HeaderSection>
-
-        <Row gutter={[24, 24]}>
-          {(showFreeCourses ? freeCourses : sampleCourses).map((course, index) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={course.id}
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <CourseCard
-                hoverable
-                cover={
-                  <img 
-                    alt={course.name} 
-                    src={course.thumbnail}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = '/assets/illustrations/course-placeholder.svg';
-                    }}
-                  />
-                }
-                actions={[
-                  <a href={course.resources?.lectures} target="_blank" rel="noopener noreferrer" key="view">
-                    <EyeOutlined />
-                  </a>,
-                  ...(!showFreeCourses ? [
-                    <EditOutlined key="edit" />,
-                    <DeleteOutlined key="delete" />
-                  ] : [])
-                ]}
-              >
-                <h3 className="course-title">{course.name}</h3>
-                <div className="course-stats">
-                  <span className="stat-item">
-                    <UserOutlined /> {course.students}
-                  </span>
-                  <span className="stat-item">
-                    <BookOutlined /> {course.status}
-                  </span>
-                </div>
-                <p>{course.price === 0 ? 'Free' : `$${course.price}`}</p>
-                <StyledTag color={course.status === 'Active' ? 'success' : 'warning'}>
-                  {course.status}
-                </StyledTag>
-                <Progress percent={75} status="active" />
-              </CourseCard>
-            </Col>
-          ))}
-        </Row>
-
-        <Modal
-          title="Add New Course"
-          open={modalVisible}
-          onCancel={() => setModalVisible(false)}
-          footer={null}
+    <Box sx={{ p: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+        <Typography variant="h4">Courses</Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog()}
         >
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={handleAddCourse}
-          >
-            <Form.Item
-              name="title"
-              label="Course Title"
-              rules={[{ required: true, message: 'Please enter course title' }]}
-            >
-              <Input />
-            </Form.Item>
+          Add Course
+        </Button>
+      </Box>
 
-            <Form.Item
-              name="instructor"
-              label="Instructor"
-              rules={[{ required: true, message: 'Please enter instructor name' }]}
-            >
-              <Input />
-            </Form.Item>
+      {loading && <CircularProgress />}
 
-            <Form.Item
-              name="description"
+      <Grid container spacing={3}>
+        {courses.map((course) => (
+          <Grid item xs={12} sm={6} md={4} key={course.id}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  {course.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" paragraph>
+                  {course.description}
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                  {course.pdfUrl && (
+                    <IconButton
+                      color="primary"
+                      onClick={() => window.open(course.pdfUrl, '_blank')}
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                  )}
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleOpenDialog(course)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDelete(course.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {selectedCourse ? 'Edit Course' : 'Add New Course'}
+        </DialogTitle>
+        <form onSubmit={handleSubmit}>
+          <DialogContent>
+            <TextField
+              fullWidth
+              label="Title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
               label="Description"
-              rules={[{ required: true, message: 'Please enter course description' }]}
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              margin="normal"
+              multiline
+              rows={4}
+              required
+            />
+            <Button
+              variant="contained"
+              component="label"
+              sx={{ mt: 2 }}
             >
-              <TextArea rows={4} />
-            </Form.Item>
-
-            <Form.Item
-              name="price"
-              label="Price"
-              rules={[{ required: true, message: 'Please enter course price' }]}
-            >
-              <InputNumber
-                prefix="$"
-                min={0}
-                style={{ width: '100%' }}
+              Upload PDF
+              <input
+                type="file"
+                hidden
+                accept="application/pdf"
+                onChange={handleFileChange}
               />
-            </Form.Item>
-
-            <Form.Item
-              name="status"
-              label="Status"
-              initialValue="Draft"
+            </Button>
+            {selectedFile && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                Selected file: {selectedFile.name}
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={loading || (!selectedCourse && !selectedFile)}
             >
-              <Select>
-                <Option value="Active">Active</Option>
-                <Option value="Draft">Draft</Option>
-                <Option value="Inactive">Inactive</Option>
-              </Select>
-            </Form.Item>
+              {loading ? <CircularProgress size={24} /> : 'Save'}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" block>
-                Create Course
-              </Button>
-            </Form.Item>
-          </Form>
-        </Modal>
-      </PageWrapper>
-    </DashboardLayout>
+      <Snackbar
+        open={!!error || !!success}
+        autoHideDuration={6000}
+        onClose={() => {
+          setError(null);
+          setSuccess(null);
+        }}
+      >
+        <Alert
+          severity={error ? 'error' : 'success'}
+          onClose={() => {
+            setError(null);
+            setSuccess(null);
+          }}
+        >
+          {error || success}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 
-export default Courses; 
+export default Courses;

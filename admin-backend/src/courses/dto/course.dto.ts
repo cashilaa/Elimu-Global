@@ -3,34 +3,54 @@ import { CourseStatus } from '../schemas/course.schema';
 
 export class CreateCourseDto {
   @IsString()
-  name: string;
+  title: string;
+
+  @IsString()
+  description: string;
 
   @IsString()
   instructor: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
 
   @IsNumber()
   price: number;
 
   @IsString()
-  @IsOptional()
-  thumbnail?: string;
+  duration: string;
 
-  @IsEnum(CourseStatus)
+  @IsString()
+  level: string;
+
+  @IsString()
   @IsOptional()
-  status?: CourseStatus;
+  pdfUrl?: string;
 }
 
-export class UpdateCourseDto extends CreateCourseDto {
+export class UpdateCourseDto {
   @IsOptional()
-  name: string;
+  @IsString()
+  title?: string;
 
   @IsOptional()
-  instructor: string;
+  @IsString()
+  description?: string;
 
   @IsOptional()
-  price: number;
-} 
+  @IsString()
+  instructor?: string;
+
+  @IsOptional()
+  @IsNumber()
+  price?: number;
+
+  @IsOptional()
+  @IsString()
+  duration?: string;
+
+  @IsOptional()
+  @IsString()
+  level?: string;
+
+  @IsOptional()
+  @IsString()
+  pdfUrl?: string;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
 import { 
   DashboardOutlined, 
@@ -12,7 +12,7 @@ import {
   WalletOutlined
 } from '@ant-design/icons';
 import styled from 'styled-components';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;
 
@@ -37,6 +37,9 @@ const StyledLayout = styled(Layout)`
     box-shadow: 2px 0 8px rgba(0,0,0,0.05);
 
     @media (max-width: 768px) {
+      position: absolute;
+      min-height: 100%;
+      z-index: 999;
       display: none;
     }
 
@@ -97,6 +100,12 @@ const StyledLayout = styled(Layout)`
 `;
 
 const MobileDrawer = styled(Drawer)`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+  }
+  
   .ant-drawer-body {
     padding: 0;
   }
@@ -134,11 +143,7 @@ const MobileDrawer = styled(Drawer)`
   }
 `;
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
-
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+export const DashboardLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileDrawerVisible, setMobileDrawerVisible] = useState(false);
   const navigate = useNavigate();
@@ -146,7 +151,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
 
   const menuItems = [
     {
-      key: '/',
+      key: '/dashboard',
       icon: <DashboardOutlined />,
       label: 'Dashboard',
     },
@@ -235,9 +240,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
           />
         </Header>
         <Content className="site-content">
-          {children}
+          <Outlet />
         </Content>
       </Layout>
     </StyledLayout>
   );
-}; 
+};
+
+export default DashboardLayout;

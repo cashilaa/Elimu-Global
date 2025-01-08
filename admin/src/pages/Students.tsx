@@ -1,33 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Space, Button, Tag, Modal, message, Row, Col } from 'antd';
-import { DashboardLayout } from '../components/DashboardLayout';
+import React, { useState, useEffect } from 'react';
+import { Table, Button, Space, Modal, message, Input, Card, Tag } from 'antd';
+import type { Breakpoint } from 'antd/lib/grid/hooks/useBreakpoint';
+import styled from 'styled-components';
+import { PlusOutlined, SearchOutlined, ExclamationCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { fadeIn } from '../utils/animations';
 import { studentsService } from '../services/students.service';
-import { ExclamationCircleOutlined, EditOutlined, DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
-import { EditStudentForm } from '../components/EditStudentForm';
-import styled, { keyframes } from 'styled-components';
-import { Breakpoint } from 'antd/lib/_util/responsiveObserve';
-
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
-const slideIn = keyframes`
-  from {
-    transform: translateX(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-`;
+import { AddStudentModal } from '../components/AddStudentModal';
+import { DashboardLayout } from '../components/DashboardLayout';
 
 const PageWrapper = styled.div`
   padding: 24px;
@@ -38,7 +17,7 @@ const PageWrapper = styled.div`
   }
 `;
 
-const StyledCard = styled.div`
+const StyledCard = styled(Card)`
   background: white;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -185,7 +164,7 @@ const HeaderSection = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  animation: ${slideIn} 0.5s ease-out;
+  animation: ${fadeIn} 0.5s ease-out;
   gap: 16px;
 
   h1 {
@@ -221,7 +200,7 @@ interface Student {
 
 const { confirm } = Modal;
 
-const Students = () => {
+const Students: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -366,56 +345,60 @@ const Students = () => {
   };
 
   return (
-    <DashboardLayout>
-      <PageWrapper>
-        <HeaderSection>
-          <h1>Student Management</h1>
-          <ActionButton
-            type="primary"
-            icon={<UserAddOutlined />}
-            onClick={() => setEditModalVisible(true)}
-          >
-            Add Student
-          </ActionButton>
-        </HeaderSection>
-
-        <StyledCard>
-          <StyledTable
-            columns={getColumns()}
-            dataSource={students}
-            rowKey="_id"
-            loading={loading}
-            scroll={{ x: 'max-content' }}
-            pagination={{
-              total: students.length,
-              pageSize: 10,
-              showTotal: (total) => `Total ${total} students`,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              responsive: true,
-              size: window.innerWidth <= 576 ? 'small' : 'default',
-            }}
-          />
-        </StyledCard>
-
-        <StyledModal
-          title={selectedStudent ? 'Edit Student' : 'Add Student'}
-          open={editModalVisible}
-          onCancel={() => setEditModalVisible(false)}
-          footer={null}
-          width={window.innerWidth <= 576 ? '90%' : 520}
+    <PageWrapper>
+      <HeaderSection>
+        <h1>Student Management</h1>
+        <ActionButton
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => setEditModalVisible(true)}
         >
-          {selectedStudent && (
-            <EditStudentForm
-              initialValues={selectedStudent}
-              onSubmit={handleEditSubmit}
-              onCancel={() => setEditModalVisible(false)}
-            />
-          )}
-        </StyledModal>
-      </PageWrapper>
-    </DashboardLayout>
+          Add Student
+        </ActionButton>
+      </HeaderSection>
+
+      <StyledCard>
+        <StyledTable
+          columns={getColumns()}
+          dataSource={students}
+          rowKey="_id"
+          loading={loading}
+          scroll={{ x: 'max-content' }}
+          pagination={{
+            total: students.length,
+            pageSize: 10,
+            showTotal: (total) => `Total ${total} students`,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            responsive: true,
+            size: window.innerWidth <= 576 ? 'small' : 'default',
+          }}
+        />
+      </StyledCard>
+
+      <StyledModal
+        title={selectedStudent ? 'Edit Student' : 'Add Student'}
+        open={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        footer={null}
+        width={window.innerWidth <= 576 ? '90%' : 520}
+      >
+        {selectedStudent && (
+          <AddStudentModal
+            initialValues={selectedStudent}
+            onSubmit={handleEditSubmit}
+            onCancel={() => setEditModalVisible(false)}
+          />
+        )}
+      </StyledModal>
+    </PageWrapper>
   );
 };
 
-export default Students; 
+const WrappedStudents: React.FC = () => (
+  <DashboardLayout>
+    <Students />
+  </DashboardLayout>
+);
+
+export default WrappedStudents;

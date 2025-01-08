@@ -1,153 +1,96 @@
-import axios from 'axios';
+import { api } from './api';
 
-// Create a separate axios instance for the instructor backend
-export const instructorApi = axios.create({
-  baseURL: 'https://elimu-instructor-bc.onrender.com/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+const API_URL = 'http://localhost:5000/api';
 
-// Add auth interceptor for instructor API
-instructorApi.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor for better error handling
-instructorApi.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', {
-      status: error.response?.status,
-      data: error.response?.data,
-      url: error.config?.url,
-      method: error.config?.method
-    });
-    return Promise.reject(error);
-  }
-);
-
-interface CourseData {
-  name: string;
-  instructor: string;
+export interface Course {
+  id: string;
+  title: string;
   description: string;
-  price: string;
-  status: string;
+  instructor: string;
+  price: number;
+  duration: string;
+  level: string;
+  category: string;
+  thumbnail: string;
+  pdfUrl?: string;
+  enrolledStudents?: number;
+  rating?: number;
+  status: 'active' | 'draft' | 'archived';
+  createdAt: string;
+  updatedAt: string;
 }
 
-const JWT_TOKEN = import.meta.env.VITE_JWT_TOKEN;
-
-class CoursesService {
-  async getAllCourses() {
+export const coursesService = {
+  // Get all courses
+  getAllCourses: async () => {
     try {
-      console.log('Fetching courses from:', `${instructorApi.defaults.baseURL}/courses`);
-      const response = await instructorApi.get('/courses');
+      const response = await api.get<Course[]>(`${API_URL}/courses`);
       return response.data;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching courses:', error);
-      console.error('Error details:', {
-        status: error.response?.status,
-        data: error.response?.data,
-        url: error.config?.url
-      });
       throw error;
     }
-  }
+  },
 
-  async getCourseStats() {
+  // Get course by id
+  getCourseById: async (id: string) => {
     try {
-      const response = await instructorApi.get('/courses/stats');
+      const response = await api.get<Course>(`${API_URL}/courses/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching course:', error);
+      throw error;
+    }
+  },
+
+  // Create new course
+  createCourse: async (formData: FormData) => {
+    try {
+      const response = await api.post<Course>(`${API_URL}/courses`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating course:', error);
+      throw error;
+    }
+  },
+
+  // Update course
+  updateCourse: async (id: string, formData: FormData) => {
+    try {
+      const response = await api.put<Course>(`${API_URL}/courses/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error updating course:', error);
+      throw error;
+    }
+  },
+
+  // Delete course
+  deleteCourse: async (id: string) => {
+    try {
+      await api.delete(`${API_URL}/courses/${id}`);
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      throw error;
+    }
+  },
+
+  // Get course stats
+  getCourseStats: async () => {
+    try {
+      const response = await api.get(`${API_URL}/courses/stats`);
       return response.data;
     } catch (error) {
       console.error('Error fetching course stats:', error);
       throw error;
     }
   }
-
-  async createCourse(courseData: CourseData) {
-    try {
-      const formattedData = {
-        ...courseData,
-        price: parseFloat(courseData.price),
-      };
-      
-      const response = await instructorApi.post('/courses', formattedData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating course:', error);
-      throw error;
-    }
-  }
-
-  async updateCourse(id: string, courseData: Partial<CourseData>) {
-    try {
-      const response = await instructorApi.put(`/courses/${id}`, courseData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating course:', error);
-      throw error;
-    }
-  }
-
-  async deleteCourse(id: string) {
-    try {
-      const response = await instructorApi.delete(`/courses/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error deleting course:', error);
-      throw error;
-    }
-  }
-
-  async getCourseById(id: string) {
-    try {
-      const response = await instructorApi.get(`/courses/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching course:', error);
-      throw error;
-    }
-  }
-
-  async checkHealth() {
-    try {
-      const response = await instructorApi.get('/health');
-      console.log('Instructor API health check:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Health check failed:', error);
-      throw error;
-    }
-  }
-
-  async getFreeCourses() {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/courses/free`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${JWT_TOKEN}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch free courses');
-      }
-      return response.json();
-    } catch (error) {
-      console.error('Error fetching free courses:', error);
-      throw error;
-    }
-  }
-}
-
-export const coursesService = new CoursesService(); 
+};
