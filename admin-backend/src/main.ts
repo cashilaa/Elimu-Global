@@ -8,8 +8,16 @@ import * as express from 'express';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
-  // Enable CORS
-  app.enableCors();
+  // Enable CORS with specific options
+  app.enableCors({
+    origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  });
+  
+  // Global prefix for all routes
+  app.setGlobalPrefix('api');
   
   // Serve static files from uploads directory
   app.use('/uploads', express.static(join(__dirname, '..', 'uploads')));
@@ -23,9 +31,6 @@ async function bootstrap() {
   
   // Enable validation
   app.useGlobalPipes(new ValidationPipe());
-  
-  // Set global API prefix
-  app.setGlobalPrefix('api');
   
   await app.listen(3002);
 }

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Modal, message, Input, Card, Tag } from 'antd';
-import type { Breakpoint } from 'antd/lib/grid/hooks/useBreakpoint';
+import type { ColumnType } from 'antd/lib/table';
+import type { Breakpoint } from 'antd';
 import styled from 'styled-components';
 import { PlusOutlined, SearchOutlined, ExclamationCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { fadeIn } from '../utils/animations';
 import { studentsService } from '../services/students.service';
-import { AddStudentModal } from '../components/AddStudentModal';
+import { EditStudentForm } from '../components/EditStudentForm';
 import { DashboardLayout } from '../components/DashboardLayout';
 
 const PageWrapper = styled.div`
@@ -279,8 +280,8 @@ const Students: React.FC = () => {
     }
   };
 
-  const getColumns = () => {
-    const baseColumns = [
+  const getColumns = (): ColumnType<Student>[] => {
+    const baseColumns: ColumnType<Student>[] = [
       {
         title: 'Name',
         dataIndex: 'fullName',
@@ -358,7 +359,7 @@ const Students: React.FC = () => {
       </HeaderSection>
 
       <StyledCard>
-        <StyledTable
+        <StyledTable<Student>
           columns={getColumns()}
           dataSource={students}
           rowKey="_id"
@@ -384,7 +385,7 @@ const Students: React.FC = () => {
         width={window.innerWidth <= 576 ? '90%' : 520}
       >
         {selectedStudent && (
-          <AddStudentModal
+          <EditStudentForm
             initialValues={selectedStudent}
             onSubmit={handleEditSubmit}
             onCancel={() => setEditModalVisible(false)}

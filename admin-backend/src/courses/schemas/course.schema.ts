@@ -7,28 +7,29 @@ export enum CourseStatus {
   INACTIVE = 'Inactive'
 }
 
-@Schema({ timestamps: true })
+@Schema({ 
+  timestamps: true,
+  toJSON: {
+    transform: function(doc, ret) {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    }
+  }
+})
 export class Course extends Document {
   @Prop({ required: true })
-  name: string;
-
-  @Prop({ required: true })
-  instructor: string;
+  title: string;
 
   @Prop()
   description: string;
 
-  @Prop({ default: 0 })
-  students: number;
-
-  @Prop({ type: Number, required: true })
-  price: number;
-
   @Prop()
-  thumbnail: string;
+  pdfUrl: string;
 
-  @Prop({ enum: CourseStatus, default: CourseStatus.DRAFT })
+  @Prop({ enum: CourseStatus, default: CourseStatus.ACTIVE })
   status: CourseStatus;
 }
 
-export const CourseSchema = SchemaFactory.createForClass(Course); 
+export const CourseSchema = SchemaFactory.createForClass(Course);

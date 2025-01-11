@@ -27,6 +27,10 @@ const Courses: React.FC = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    instructor: '',
+    price: '',
+    duration: '',
+    level: '',
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,12 +58,20 @@ const Courses: React.FC = () => {
       setFormData({
         title: course.title,
         description: course.description,
+        instructor: course.instructor,
+        price: course.price,
+        duration: course.duration,
+        level: course.level,
       });
     } else {
       setSelectedCourse(null);
       setFormData({
         title: '',
         description: '',
+        instructor: '',
+        price: '',
+        duration: '',
+        level: '',
       });
     }
     setOpenDialog(true);
@@ -69,7 +81,7 @@ const Courses: React.FC = () => {
     setOpenDialog(false);
     setSelectedCourse(null);
     setSelectedFile(null);
-    setFormData({ title: '', description: '' });
+    setFormData({ title: '', description: '', instructor: '', price: '', duration: '', level: '' });
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,8 +104,19 @@ const Courses: React.FC = () => {
 
     try {
       const formDataObj = new FormData();
+      // Convert price to number
+      const priceValue = parseFloat(formData.price);
+      if (isNaN(priceValue)) {
+        throw new Error('Price must be a valid number');
+      }
+
       formDataObj.append('title', formData.title);
       formDataObj.append('description', formData.description);
+      formDataObj.append('instructor', formData.instructor);
+      formDataObj.append('price', priceValue.toString());
+      formDataObj.append('duration', formData.duration);
+      formDataObj.append('level', formData.level);
+      
       if (selectedFile) {
         formDataObj.append('pdf', selectedFile);
       }
@@ -108,8 +131,8 @@ const Courses: React.FC = () => {
 
       handleCloseDialog();
       fetchCourses();
-    } catch (err) {
-      setError(selectedCourse ? 'Failed to update course' : 'Failed to create course');
+    } catch (err: any) {
+      setError(err.message || (selectedCourse ? 'Failed to update course' : 'Failed to create course'));
     } finally {
       setLoading(false);
     }
@@ -206,6 +229,38 @@ const Courses: React.FC = () => {
               margin="normal"
               multiline
               rows={4}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Instructor"
+              value={formData.instructor}
+              onChange={(e) => setFormData({ ...formData, instructor: e.target.value })}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Price"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Duration"
+              value={formData.duration}
+              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Level"
+              value={formData.level}
+              onChange={(e) => setFormData({ ...formData, level: e.target.value })}
+              margin="normal"
               required
             />
             <Button

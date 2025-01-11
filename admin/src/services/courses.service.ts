@@ -1,6 +1,6 @@
 import { api } from './api';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'http://localhost:3002/api';
 
 export interface Course {
   id: string;

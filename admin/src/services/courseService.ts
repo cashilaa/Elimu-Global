@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/courses';
+const API_URL = 'http://localhost:3002/api/courses';
 
 export interface Course {
   id: string;
@@ -25,6 +25,20 @@ export const courseService = {
     }
   },
 
+  // Create a new course
+  createCourse: async (formData: FormData): Promise<Course> => {
+    try {
+      const response = await axios.post(API_URL, formData);
+      if (response.data && typeof response.data === 'object') {
+        return response.data;
+      }
+      throw new Error('Invalid response format');
+    } catch (error: any) {
+      console.error('Error creating course:', error);
+      throw new Error(error.response?.data?.message || 'Failed to create course');
+    }
+  },
+
   // Get all courses
   getAllCourses: async (): Promise<Course[]> => {
     try {
@@ -42,6 +56,19 @@ export const courseService = {
       return response.data;
     } catch (error) {
       throw new Error('Failed to fetch course');
+    }
+  },
+
+  // Delete a course
+  deleteCourse: async (id: string): Promise<void> => {
+    if (!id) {
+      throw new Error('Course ID is required');
+    }
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      throw new Error('Failed to delete course');
     }
   },
 };
