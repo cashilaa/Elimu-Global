@@ -105,7 +105,7 @@ const Courses: React.FC = () => {
     try {
       const formDataObj = new FormData();
       // Convert price to number
-      const priceValue = parseFloat(formData.price);
+const priceValue = parseFloat(formData.price);
       if (isNaN(priceValue)) {
         throw new Error('Price must be a valid number');
       }

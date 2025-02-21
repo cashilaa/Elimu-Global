@@ -19,8 +19,8 @@
     "typescript": "^4.5.4"
   },
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
+    "start": "node init && vite",
+    "build": "node init && vite build",
     "serve": "vite preview"
   },
   "devDependencies": {
