@@ -8,6 +8,10 @@ export interface Course {
   description: string;
   pdfUrl: string;
   createdAt: Date;
+  instructor: string;
+  price: number;
+  duration: string;
+  level: string;
 }
 
 const getAuthToken = () => {
