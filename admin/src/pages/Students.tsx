@@ -396,10 +396,4 @@ const Students: React.FC = () => {
   );
 };
 
-const WrappedStudents: React.FC = () => (
-  <DashboardLayout>
-    <Students />
-  </DashboardLayout>
-);
-
-export default WrappedStudents;
+export default Students;

@@ -9,12 +9,19 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   TeamOutlined,
-  WalletOutlined
+  MessageOutlined
 } from '@ant-design/icons';
-import styled from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
 const { Header, Sider, Content } = Layout;
+
+const theme = {
+  colors: {
+    primaryBlue: '#1890ff',
+    lightBlue: '#e6f7ff',
+  },
+};
 
 const StyledLayout = styled(Layout)`
   min-height: 100vh;
@@ -176,9 +183,9 @@ export const DashboardLayout: React.FC = () => {
       label: 'Revenue',
     },
     {
-      key: '/payments',
-      icon: <WalletOutlined />,
-      label: 'Payments',
+      key: '/feedback',
+      icon: <MessageOutlined />,
+      label: 'Feedback',
     },
     {
       key: '/settings',
@@ -193,57 +200,59 @@ export const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <StyledLayout>
-      {/* Desktop Sidebar */}
-      <Sider 
-        trigger={null} 
-        collapsible 
-        collapsed={collapsed}
-        width={260}
-      >
-        <div className="logo">
-          <img src="/assets/illustrations/logo.svg" alt="Elimu Logo" />
-        </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={handleMenuClick}
-        />
-      </Sider>
-
-      {/* Mobile Drawer */}
-      <MobileDrawer
-        placement="left"
-        open={mobileDrawerVisible}
-        onClose={() => setMobileDrawerVisible(false)}
-        width={280}
-      >
-        <div className="logo">
-          <img src="/assets/illustrations/logo.svg" alt="Elimu Logo" />
-        </div>
-        <Menu
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          onClick={handleMenuClick}
-        />
-      </MobileDrawer>
-
-      <Layout>
-        <Header className="site-header">
-          <Button
-            type="text"
-            icon={mobileDrawerVisible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setMobileDrawerVisible(!mobileDrawerVisible)}
-            className="trigger"
+    <ThemeProvider theme={theme}>
+      <StyledLayout>
+        {/* Desktop Sidebar */}
+        <Sider 
+          trigger={null} 
+          collapsible 
+          collapsed={collapsed}
+          width={260}
+        >
+          <div className="logo">
+            <img src="/assets/illustrations/logo.svg" alt="Elimu Logo" />
+          </div>
+          <Menu
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            onClick={handleMenuClick}
           />
-        </Header>
-        <Content className="site-content">
-          <Outlet />
-        </Content>
-      </Layout>
-    </StyledLayout>
+        </Sider>
+
+        {/* Mobile Drawer */}
+        <MobileDrawer
+          placement="left"
+          open={mobileDrawerVisible}
+          onClose={() => setMobileDrawerVisible(false)}
+          width={280}
+        >
+          <div className="logo">
+            <img src="/assets/illustrations/logo.svg" alt="Elimu Logo" />
+          </div>
+          <Menu
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            onClick={handleMenuClick}
+          />
+        </MobileDrawer>
+
+        <Layout>
+          <Header className="site-header">
+            <Button
+              type="text"
+              icon={mobileDrawerVisible ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setMobileDrawerVisible(!mobileDrawerVisible)}
+              className="trigger"
+            />
+          </Header>
+          <Content className="site-content">
+            <Outlet />
+          </Content>
+        </Layout>
+      </StyledLayout>
+    </ThemeProvider>
   );
 };
 

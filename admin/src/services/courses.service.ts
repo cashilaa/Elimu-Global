@@ -1,6 +1,6 @@
 import { api } from './api';
 
-const API_URL = 'http://localhost:3002/api';
+const API_URL = 'https://centralize-auth-elimu.onrender.com/admin/courses';
 
 export interface Course {
   id: string;

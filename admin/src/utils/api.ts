@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Admin backend API
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://elimu-admin-backend.onrender.com/api',
+baseURL: 'https://centralize-auth-elimu.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -10,7 +10,7 @@ export const api = axios.create({
 
 // Instructor backend API
 export const instructorApi = axios.create({
-  baseURL: import.meta.env.VITE_INSTRUCTOR_API_URL || 'https://elimu-instructor-bc.onrender.com/api',
+baseURL: 'https://centralize-auth-elimu.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -99,4 +99,4 @@ export const apiHelpers = {
       throw error;
     }
   }
-}; 
+};

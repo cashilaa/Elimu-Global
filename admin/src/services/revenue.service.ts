@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002/api';
+const API_URL = 'https://centralize-auth-elimu.onrender.com/admin/revenue';
 
 export const revenueService = {
   async getRevenueStats() {
@@ -17,4 +17,4 @@ export const revenueService = {
     const response = await axios.get(`${API_URL}/revenue/monthly`);
     return response.data;
   }
-}; 
+};

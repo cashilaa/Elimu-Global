@@ -17,7 +17,7 @@ import {
   Snackbar
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as VisibilityIcon } from '@mui/icons-material';
-import { coursesService, Course } from '../services/courses.service';
+import { courseService, Course } from '../services/courseService';
 
 const Courses: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -43,7 +43,7 @@ const Courses: React.FC = () => {
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const data = await coursesService.getAllCourses();
+      const data = await courseService.getAllCourses();
       setCourses(data);
     } catch (err) {
       setError('Failed to fetch courses');
@@ -122,10 +122,10 @@ const Courses: React.FC = () => {
       }
 
       if (selectedCourse) {
-        await coursesService.updateCourse(selectedCourse.id, formDataObj);
+        await courseService.updateCourse(selectedCourse.id, formDataObj);
         setSuccess('Course updated successfully');
       } else {
-        await coursesService.createCourse(formDataObj);
+        await courseService.createCourse(formDataObj);
         setSuccess('Course created successfully');
       }
 
@@ -142,7 +142,7 @@ const Courses: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this course?')) {
       setLoading(true);
       try {
-        await coursesService.deleteCourse(id);
+        await courseService.deleteCourse(id);
         setSuccess('Course deleted successfully');
         fetchCourses();
       } catch (err) {

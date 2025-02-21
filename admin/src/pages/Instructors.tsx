@@ -154,7 +154,7 @@ const Instructors: React.FC = () => {
       
       try {
         const JWT_TOKEN = 'jdfisdsododksnscuisdjmdoadkoajdwdiudhaiodmokqodqdjdwudh';
-        const response = await fetch('https://1b8c-102-212-236-207.ngrok-free.app/api/instructors/logged-in-count', {
+const response = await fetch('https://centralize-auth-elimu.onrender.com/admin/instructors/logged-in-count', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ const Instructors: React.FC = () => {
   const handleAddInstructor = async (values: any) => {
     try {
       const JWT_TOKEN = 'jdfisdsododksnscuisdjmdoadkoajdwdiudhaiodmokqodqdjdwudh';
-      const response = await fetch('https://1b8c-102-212-236-207.ngrok-free.app/api/instructors', {
+const response = await fetch('https://centralize-auth-elimu.onrender.com/admin/instructors', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -328,10 +328,4 @@ const Instructors: React.FC = () => {
   );
 };
 
-const WrappedInstructors: React.FC = () => (
-  <DashboardLayout>
-    <Instructors />
-  </DashboardLayout>
-);
-
-export default WrappedInstructors;
+export default Instructors;
